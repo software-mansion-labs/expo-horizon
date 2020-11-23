@@ -2,4 +2,4 @@ export default {
     addListener: () => { },
     removeListeners: () => { },
 };
-//# sourceMappingURL=InstallationIdProvider.js.map
+//# sourceMappingURL=ServerRegistrationModule.js.map
