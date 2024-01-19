@@ -6,4 +6,4 @@ export default {
         return null;
     },
 };
-//# sourceMappingURL=BackgroundNotificationTasksModule.web.js.map
+//# sourceMappingURL=BackgroundNotificationTasksModule.js.map
