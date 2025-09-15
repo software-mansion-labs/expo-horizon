@@ -45,3 +45,31 @@ This ensures compatibility across Quest, standard Android devices, and iOS.
 | `geocodeAsync` <br> `reverseGeocodeAsync`                                                         | ✅ Supported     | ❌ Not supported | The [`Geocoder`](https://developer.android.com/reference/android/location/Geocoder) is not present on Quest. |
 | `startGeofencingAsync` <br> `stopGeofencingAsync` <br> `hasStartedGeofencingAsync`                | ✅ Supported     | ❓ In testing    | Meta Horizon Store doesn't support `ACCESS_BACKGROUND_LOCATION` Android permission.                          |
 | `startLocationUpdatesAsync` <br> `stopLocationUpdatesAsync` <br> `hasStartedLocationUpdatesAsync` | ✅ Supported     | ❓ In testing    | Meta Horizon Store doesn't support `ACCESS_BACKGROUND_LOCATION` Android permission.                          |
+
+## Contributing
+
+1. Build the package:
+
+```bash
+cd expo-quest-location
+yarn build
+```
+
+2. Install, run and test the library using the example app:
+
+```bash
+cd ../example
+yarn
+yarn quest # to run the app on Quest
+yarn android # to run the app on Android
+yarn ios # to run the app on iOS
+```
+
+> [!NOTE]
+>  You need to prebuild the app to see changes reflected in the example app.
+
+3. Publish the package:
+
+```bash
+npm publish --access public
+```
