@@ -1,0 +1,163 @@
+name: Upstream sync → PR (no conflicts)
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    # Weekly on Monday 06:05 UTC. Adjust as needed.
+    - cron: "5 6 * * 1"
+
+permissions:
+  contents: write        # push branch
+  pull-requests: write   # open PR
+
+concurrency:
+  group: upstream-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    env:
+      BRANCH_NAME: chore/upstream-sync-${{ github.run_id }}
+      UPSTREAM_REPO: https://github.com/expo/expo.git
+    steps:
+      - name: Checkout (full history)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup git identity
+        run: |
+          git config user.name  "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+
+      - name: Install git-filter-repo
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install git-filter-repo
+
+      - name: Add upstream remote
+        run: |
+          if ! git remote | grep -q '^upstream$'; then
+            git remote add upstream "${UPSTREAM_REPO}"
+          fi
+          git fetch upstream --tags --force
+
+      # 1) Build filtered upstream branch in separate clone
+      - name: Create filtered upstream branch
+        run: |
+          # Create a temporary directory for the filtered repository
+          TEMP_DIR=$(mktemp -d)
+          echo "TEMP_DIR=${TEMP_DIR}" >> $GITHUB_ENV
+          
+          # Clone upstream repo to temp directory
+          git clone "${UPSTREAM_REPO}" "${TEMP_DIR}/upstream-repo"
+          cd "${TEMP_DIR}/upstream-repo"
+          
+          # Filter to only keep the two packages and rename them
+          git filter-repo \
+            --force \
+            --path packages/expo-location \
+            --path packages/expo-notifications \
+            --path-rename packages/expo-location:expo-quest-location \
+            --path-rename packages/expo-notifications:expo-quest-notifications
+          
+          # Go back to original repo and add the filtered repo as a remote
+          cd "${GITHUB_WORKSPACE}"
+          git remote add filtered-upstream "${TEMP_DIR}/upstream-repo"
+          git fetch filtered-upstream
+
+      # 2) Create working branch off main
+      - name: Create working branch off main
+        run: |
+          # Create working branch from main
+          git checkout -B "${BRANCH_NAME}" origin/main || git checkout -B "${BRANCH_NAME}" main
+
+      # 3) Try the merge WITHOUT committing — detect conflicts safely
+      - name: Attempt no-commit merge to detect conflicts
+        id: trymerge
+        shell: bash
+        run: |
+          set -e
+          
+          # Try the merge and capture the result
+          MERGE_OUTPUT=$(git merge --no-commit --no-ff filtered-upstream/main 2>&1) || MERGE_RESULT=$?
+          echo "Merge output: $MERGE_OUTPUT"
+          
+          # Check if merge was already up to date
+          if echo "$MERGE_OUTPUT" | grep -q "Already up to date"; then
+            echo "conflicts=false" >> "$GITHUB_OUTPUT"
+            echo "already_up_to_date=true" >> "$GITHUB_OUTPUT"
+            echo "ℹ️ Already up to date with upstream. No changes to merge." >> $GITHUB_STEP_SUMMARY
+            exit 0
+          fi
+          
+          # Check for merge conflicts
+          if git diff --name-only --diff-filter=U | grep -q .; then
+            echo "conflicts=true" >> "$GITHUB_OUTPUT"
+            echo "already_up_to_date=false" >> "$GITHUB_OUTPUT"
+            # Abort so the workspace remains clean
+            git merge --abort
+            echo "❌ Merge produced conflicts. No PR will be created." >> $GITHUB_STEP_SUMMARY
+            exit 0
+          else
+            echo "conflicts=false" >> "$GITHUB_OUTPUT"
+            echo "already_up_to_date=false" >> "$GITHUB_OUTPUT"
+            # Make an actual merge commit now
+            git commit -m "Merge latest upstream (filtered) into branch ${BRANCH_NAME}"
+            echo "✅ Successfully merged upstream changes." >> $GITHUB_STEP_SUMMARY
+          fi
+
+      # 4) If no conflicts and there are actual changes, push branch
+      - name: Check if branch has changes vs main
+        id: haschanges
+        if: steps.trymerge.outputs.conflicts == 'false' && steps.trymerge.outputs.already_up_to_date == 'false'
+        run: |
+          # Compare against origin/main; if equal, skip PR
+          git fetch origin main --quiet || true
+          if git rev-parse origin/main >/dev/null 2>&1; then
+            BASE=origin/main
+          else
+            BASE=main
+          fi
+          if [ "$(git rev-parse HEAD)" = "$(git merge-base HEAD $BASE)" ] && \
+             git diff --quiet $BASE..HEAD; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "ℹ️ No changes after merge. Nothing to PR." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Push branch
+        if: steps.trymerge.outputs.conflicts == 'false' && steps.trymerge.outputs.already_up_to_date == 'false' && steps.haschanges.outputs.changed == 'true'
+        run: |
+          git push --force --set-upstream origin "${BRANCH_NAME}"
+
+      # 5) Open the PR (only when there are no conflicts and changes exist)
+      - name: Create PR
+        if: steps.trymerge.outputs.conflicts == 'false' && steps.trymerge.outputs.already_up_to_date == 'false' && steps.haschanges.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Create the PR if it doesn't already exist
+          set -e
+          PR_EXISTS=$(gh pr list --head "${BRANCH_NAME}" --base main --json number --jq 'length')
+          if [ "$PR_EXISTS" -eq 0 ]; then
+            gh pr create \
+              --base main \
+              --head "${BRANCH_NAME}" \
+              --title "chore: sync from upstream (filtered) - $(date -u +'%Y-%m-%d')" \
+              --body "This PR merges the latest **filtered** upstream changes from \`expo/expo\` for:\n- \`packages/expo-location\` → \`expo-quest-location\`\n- \`packages/expo-notifications\` → \`expo-quest-notifications\`\n\nCreated automatically. No merge conflicts were detected." \
+            echo "✅ Opened PR from ${BRANCH_NAME} → main." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "ℹ️ PR from ${BRANCH_NAME} already exists." >> $GITHUB_STEP_SUMMARY
+          fi
+
+      # 6) Cleanup temporary directory
+      - name: Cleanup
+        if: always()
+        run: |
+          if [ -n "${TEMP_DIR}" ] && [ -d "${TEMP_DIR}" ]; then
+            rm -rf "${TEMP_DIR}"
+            echo "Cleaned up temporary directory: ${TEMP_DIR}"
+          fi
