@@ -1,33 +1,58 @@
-<p>
-  <a href="https://docs.expo.dev/versions/latest/sdk/notifications/">
-    <img
-      src="../../.github/resources/expo-notifications.svg"
-      alt="expo-notifications"
-      height="64" />
-  </a>
-</p>
+# expo-quest-notifications
 
-Provides an API to fetch push notification tokens and to present, schedule, receive and respond to notifications.
+A fork of [`expo-notifications`](https://github.com/expo/expo/tree/main/packages/expo-notifications) that provides two implementations:
+- The default `expo-notifications` for Android and iOS platforms.
+- A Meta Quest–compatible implementation that uses the Meta's push notification service.
 
-## Features
+You can choose which implementation to use with the `EXPO_HORIZON` environment variable.
+This makes it compatible with Meta Quest devices, while remaining a drop-in replacement for `expo-notifications` on Android and iOS.
 
-- 📣 schedule a one-off notification for a specific date, or some time from now,
-- 🔁 schedule a notification repeating in some time interval (or a calendar date match on iOS),
-- 1️⃣ get and set application badge icon number,
-- 📲 fetch a native device push token so you can send push notifications with FCM and APNS,
-- 😎 fetch an Expo push token so you can send push notifications with Expo,
-- 📬 listen to incoming notifications in the foreground and background,
-- 👆 listen to interactions with notifications (tapping or dismissing),
-- 🎛 handle notifications when the app is in foreground,
-- 🔕 imperatively dismiss notifications from Notification Center/tray,
-- 🗂 create, update, delete Android notification channels,
-- 🎨 set custom icon and color for notifications on Android.
+## Usage
 
-# Guides
+1. Install the package:
 
-Please refer to our [notification guides](https://docs.expo.dev/push-notifications/overview/).
+```bash
+npx expo install expo-quest-notifications
+```
 
-# API documentation
+2. Update your `app.json` / `app.config.js` to replace `expo-notifications` with `expo-quest-notifications`.
+3. Prebuild your app with the `export EXPO_HORIZON=1` environment variable set (to return to the type just remove the environment variable: `unset EXPO_HORIZON`).
+4. Update your imports:
 
-- [Documentation for the latest stable release](https://docs.expo.dev/versions/latest/sdk/notifications/)
-- [Documentation for the main branch](https://docs.expo.dev/versions/unversioned/sdk/notifications/)
+```js
+// import * as Notifications from 'expo-notifications';
+import * as Notifications from 'expo-quest-notifications';
+```
+
+## Behavior
+- With `EXPO_HORIZON=1` → Uses the Meta Quest–compatible push notification service.
+- Without `EXPO_HORIZON` → Falls back to the default `expo-notifications` behavior.
+- On iOS → The `EXPO_HORIZON` flag has no effect; behavior is always the same as `expo-notifications`.
+
+This ensures compatibility across Quest, standard Android devices, and iOS.
+
+## Features supported on Meta Quest
+
+| Function Name                                                                    | Meta Quest          | Notes                                                                                                         |
+| -------------------------------------------------------------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `addPushTokenListener`                                                           | 🛠️ Under development |                                                                                                               |
+| `getDevicePushTokenAsync`                                                        | 🛠️ Under development |                                                                                                               |
+| `getExpoPushTokenAsync`                                                          | ❌ Not supported     | Currently, support for the Expo Push Service is not planned.                                                  |
+| `addNotificationReceivedListener` <br> `addNotificationResponseReceivedListener` | ✅ Supported         |                                                                                                               |
+| `addNotificationsDroppedListener` <br> `useLastNotificationResponse`             | 🔍 Not tested yet    |                                                                                                               |
+| `setNotificationHandler`                                                         | 🔍 Not tested yet    |                                                                                                               |
+| `registerTaskAsync` <br> `unregisterTaskAsync`                                   | 🔍 Not tested yet    |                                                                                                               |
+| `getPermissionsAsync` <br> `requestPermissionsAsync`                             | 🔍 Not tested yet    |                                                                                                               |
+| `getBadgeCountAsync` <br> `setBadgeCountAsync`                                   | ❌ Not supported     | The [underlying library](https://github.com/leolin310148/ShortcutBadger) does not support this functionality. |
+| `cancelAllScheduledNotificationsAsync` <br> `cancelScheduledNotificationAsync`   | ✅ Supported         |                                                                                                               |
+| `getAllScheduledNotificationsAsync`                                              | ✅ Supported         |                                                                                                               |
+| `getNextTriggerDateAsync`                                                        | ✅ Supported         |                                                                                                               |
+| `scheduleNotificationAsync`                                                      | ✅ Supported         |                                                                                                               |
+| `dismissAllNotificationsAsync` <br> `dismissNotificationAsync`                   | 🔍 Not tested yet    |                                                                                                               |
+| `getPresentedNotificationsAsync`                                                 | 🔍 Not tested yet    |                                                                                                               |
+| Manage notification channels                                                     | 🔍 Not tested yet    |                                                                                                               |
+| Manage notification categories (interactive notifications)                       | 🔍 Not tested yet    |                                                                                                               |
+| `clearLastNotificationResponse` <br> `clearLastNotificationResponseAsync`        | 🔍 Not tested yet    |                                                                                                               |
+| `getLastNotificationResponse` <br> `getLastNotificationResponseAsync`            | 🔍 Not tested yet    |                                                                                                               |
+| `unregisterForNotificationsAsync`                                                | 🔍 Not tested yet    |                                                                                                               |
+

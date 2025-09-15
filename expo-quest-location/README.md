@@ -1,66 +1,47 @@
-<p>
-  <a href="https://docs.expo.dev/versions/latest/sdk/location/">
-    <img
-      src="../../.github/resources/expo-location.svg"
-      alt="expo-location"
-      height="64" />
-  </a>
-</p>
+# expo-quest-location
 
-Allows reading geolocation information from the device. Your app can poll for the current location or subscribe to location update events.
+A fork of [`expo-location`](https://github.com/expo/expo/tree/main/packages/expo-location) that provides two implementations:
+- The default `expo-location` behavior using Google Play Services.
+- A Meta Quest–compatible implementation that does not rely on Google Play Services.
 
-# API documentation
+You can choose which implementation to use with the `EXPO_HORIZON` environment variable.
+This makes it compatible with Meta Quest devices, while remaining a drop-in replacement for `expo-location` on Android and iOS.
 
-- [Documentation for the latest stable release](https://docs.expo.dev/versions/latest/sdk/location/)
-- [Documentation for the main branch](https://docs.expo.dev/versions/unversioned/sdk/location/)
+## Usage
 
-# Installation in managed Expo projects
+1. Install the package:
 
-For [managed](https://docs.expo.dev/archive/managed-vs-bare/) Expo projects, please follow the installation instructions in the [API documentation for the latest stable release](https://docs.expo.dev/versions/latest/sdk/location/).
-
-# Installation in bare React Native projects
-
-For bare React Native projects, you must ensure that you have [installed and configured the `expo` package](https://docs.expo.dev/bare/installing-expo-modules/) before continuing.
-
-### Add the package to your npm dependencies
-
-```
-npx expo install expo-location
+```bash
+npx expo install expo-quest-location
 ```
 
-### Configure for Android
+2. Update your `app.json` / `app.config.js` to replace `expo-location` with `expo-quest-location`.
+3. Prebuild your app with the `export EXPO_HORIZON=1` environment variable set (to return to the type just remove the environment variable: `unset EXPO_HORIZON`).
+4. Update your imports:
 
-This module requires the permissions for approximate and exact device location. It also needs the foreground service permission to subscribe to location updates, while the app is in use. These permissions are automatically added.
-
-```xml
-<!-- Added permissions -->
-<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
-<!-- Optional permissions -->
-<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-<uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
-<uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+```js
+import * as Location from 'expo-quest-location';
 ```
 
-> [!note]
-> On Android, you have to [submit your app for review and request access to use the background location permission](https://support.google.com/googleplay/android-developer/answer/9799150?hl=en) or [foreground location permissions](https://support.google.com/googleplay/android-developer/answer/13392821?hl=en).
+## Behavior
+- With `EXPO_HORIZON=1` → Uses the Meta Quest–compatible location API (no Google Play Services).
+- Without `EXPO_HORIZON` → Falls back to the default `expo-location` behavior (Google Play Services Location API).
+- On iOS → The `EXPO_HORIZON` flag has no effect; behavior is always the same as `expo-location`.
 
-### Configure for iOS
+This ensures compatibility across Quest, standard Android devices, and iOS.
 
-Add `NSLocationAlwaysAndWhenInUseUsageDescription`, `NSLocationAlwaysUsageDescription` and `NSLocationWhenInUseUsageDescription` keys to your `Info.plist`:
+## Features supported on Meta Quest
 
-```xml
-<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-<string>Allow $(PRODUCT_NAME) to use your location</string>
-<key>NSLocationAlwaysUsageDescription</key>
-<string>Allow $(PRODUCT_NAME) to use your location</string>
-<key>NSLocationWhenInUseUsageDescription</key>
-<string>Allow $(PRODUCT_NAME) to use your location</string>
-```
-
-Run `npx pod-install` after installing the npm package.
-
-# Contributing
-
-Contributions are very welcome! Please refer to guidelines described in the [contributing guide](https://github.com/expo/expo#contributing).
+| Function Name                                                                                     | Android Devices | Meta Quest      | Notes                                                                                                        |
+| ------------------------------------------------------------------------------------------------- | --------------- | --------------- | ------------------------------------------------------------------------------------------------------------ |
+| `enableNetworkProviderAsync`                                                                      | ✅ Supported     | ✅ Supported     |                                                                                                              |
+| `getProviderStatusAsync`                                                                          | ✅ Supported     | ✅ Supported     |                                                                                                              |
+| `hasServicesEnabledAsync`                                                                         | ✅ Supported     | ✅ Supported     |                                                                                                              |
+| `requestForegroundPermissionsAsync` <br> `requestBackgroundPermissionsAsync`                      | ✅ Supported     | ✅ Supported     |                                                                                                              |
+| `getForegroundPermissionsAsync` <br> `getBackgroundPermissionsAsync`                              | ✅ Supported     | ✅ Supported     |                                                                                                              |
+| `getCurrentPositionAsync` <br> `watchPositionAsync`                                               | ✅ Supported     | ✅ Supported     |                                                                                                              |
+| `getLastKnownPositionAsync`                                                                       | ✅ Supported     | ✅ Supported     |                                                                                                              |
+| `watchHeadingAsync` <br> `getHeadingAsync`                                                        | ✅ Supported     | ❌ Not supported | Magnetic and accelerometer sensors are not available on Quest.                                               |
+| `geocodeAsync` <br> `reverseGeocodeAsync`                                                         | ✅ Supported     | ❌ Not supported | The [`Geocoder`](https://developer.android.com/reference/android/location/Geocoder) is not present on Quest. |
+| `startGeofencingAsync` <br> `stopGeofencingAsync` <br> `hasStartedGeofencingAsync`                | ✅ Supported     | ❓ In testing    | Meta Horizon Store doesn't support `ACCESS_BACKGROUND_LOCATION` Android permission.                          |
+| `startLocationUpdatesAsync` <br> `stopLocationUpdatesAsync` <br> `hasStartedLocationUpdatesAsync` | ✅ Supported     | ❓ In testing    | Meta Horizon Store doesn't support `ACCESS_BACKGROUND_LOCATION` Android permission.                          |
