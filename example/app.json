@@ -1,0 +1,52 @@
+{
+  "expo": {
+    "name": "app",
+    "slug": "app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "edgeToEdgeEnabled": false,
+      "package": "com.anonymous.app",
+      "permissions": [
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_BACKGROUND_LOCATION",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_LOCATION",
+        "android.permission.WAKE_LOCK"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+        [
+            "../expo-quest-location/app.plugin.js",
+            {
+                "isAndroidBackgroundLocationEnabled": true,
+                "isAndroidForegroundServiceEnabled": true,
+                "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to access your location for background tracking",
+                "locationAlwaysPermission": "Allow $(PRODUCT_NAME) to access your location for background tracking",
+                "locationWhenInUsePermission": "Allow $(PRODUCT_NAME) to access your location"
+            }
+        ],
+        "expo-task-manager"
+    ]
+  }
+}
