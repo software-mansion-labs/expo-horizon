@@ -1,6 +1,6 @@
 {
   "name": "expo-quest-location",
-  "version": "19.0.7",
+  "version": "18.1.16",
   "description": "A fork of expo-location that provides two implementations: The default expo-location behavior using Google Play Services. A Meta Quest-compatible implementation that does not rely on Google Play Services.",
   "main": "build/index.js",
   "types": "build/index.d.ts",

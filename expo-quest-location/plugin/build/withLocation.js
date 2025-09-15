@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const config_plugins_1 = require("expo/config-plugins");
 const withHorizon_1 = __importDefault(require("./withHorizon"));
-const pkg = require('expo-quest-location/package.json');
+const pkg = require('../../package.json');
 const LOCATION_USAGE = 'Allow $(PRODUCT_NAME) to access your location';
 const useHorizon = !!process.env.EXPO_HORIZON;
 const withBackgroundLocation = (config) => {

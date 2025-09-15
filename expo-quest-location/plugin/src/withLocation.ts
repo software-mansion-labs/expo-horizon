@@ -8,7 +8,7 @@ import {
 
 import withHorizon from './withHorizon';
 
-const pkg = require('expo-quest-location/package.json');
+const pkg = require('../../package.json');
 const LOCATION_USAGE = 'Allow $(PRODUCT_NAME) to access your location';
 
 const useHorizon = !!process.env.EXPO_HORIZON;
