@@ -2,13 +2,14 @@ name: Upstream sync → PR (no conflicts)
 
 on:
   workflow_dispatch: {}
-  schedule:
-    # Weekly on Monday 06:05 UTC. Adjust as needed.
-    - cron: "5 6 * * 1"
 
 permissions:
   contents: write        # push branch
   pull-requests: write   # open PR
+  checks: read
+  statuses: read
+  actions: read
+  repository-projects: read
 
 concurrency:
   group: upstream-sync
@@ -147,7 +148,7 @@ jobs:
               --base main \
               --head "${BRANCH_NAME}" \
               --title "chore: sync from upstream (filtered) - $(date -u +'%Y-%m-%d')" \
-              --body "This PR merges the latest **filtered** upstream changes from \`expo/expo\` for:\n- \`packages/expo-location\` → \`expo-quest-location\`\n- \`packages/expo-notifications\` → \`expo-quest-notifications\`\n\nCreated automatically. No merge conflicts were detected." \
+              --body "This PR merges the latest **filtered** upstream changes from \`expo/expo\` for:\n- \`packages/expo-location\` → \`expo-quest-location\`\n- \`packages/expo-notifications\` → \`expo-quest-notifications\`\n\nCreated automatically. No merge conflicts were detected."
             echo "✅ Opened PR from ${BRANCH_NAME} → main." >> $GITHUB_STEP_SUMMARY
           else
             echo "ℹ️ PR from ${BRANCH_NAME} already exists." >> $GITHUB_STEP_SUMMARY
