@@ -61,18 +61,7 @@ cd expo-quest-location
 yarn build
 ```
 
-2. Install, run and test the library using the example app:
-
-```bash
-cd ../example
-yarn
-yarn quest # to run the app on Quest
-yarn android # to run the app on Android
-yarn ios # to run the app on iOS
-```
-
-> [!NOTE]
->  You need to prebuild the app to see changes reflected in the example app.
+2. Install, run and test the library using the example app. See [example/README.md](../example/README.md) for more details.
 
 3. Publish the package:
 
