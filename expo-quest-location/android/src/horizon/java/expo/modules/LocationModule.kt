@@ -54,13 +54,12 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 import kotlin.math.abs
 
-class LocationModule : Module(), LifecycleEventListener, SensorEventListener, ActivityEventListener {
+class LocationModule : Module(), LifecycleEventListener, ActivityEventListener {
   private var mGeofield: GeomagneticField? = null
   private val mLocationCallbacks = HashMap<Int, LocationListener>()
   private val mLocationRequests = HashMap<Int, LocationRequest>()
   private var mPendingLocationRequests = ArrayList<LocationActivityResultListener>()
   private lateinit var mContext: Context
-  private lateinit var mSensorManager: SensorManager
   private lateinit var mUIManager: UIManager
   private lateinit var mLocationManager: LocationManager
   private lateinit var locationHelpers: LocationHelpers
@@ -86,13 +85,11 @@ class LocationModule : Module(), LifecycleEventListener, SensorEventListener, Ac
       mUIManager = appContext.legacyModule<UIManager>() ?: throw MissingUIManagerException()
       mLocationManager = mContext.getSystemService(Context.LOCATION_SERVICE) as? LocationManager
         ?: throw LocationManagerUnavailable()
-      mSensorManager = mContext.getSystemService(Context.SENSOR_SERVICE) as? SensorManager
-        ?: throw SensorManagerUnavailable()
       locationHelpers = LocationHelpers(mContext)
     }
 
     Constant("isQuest") {
-        VRUtilities.isQuest()
+      VRUtilities.isQuest()
     }
 
     Events(HEADING_EVENT_NAME, LOCATION_EVENT_NAME, LOCATION_ERROR_EVENT_NAME)
@@ -161,9 +158,13 @@ class LocationModule : Module(), LifecycleEventListener, SensorEventListener, Ac
       return@AsyncFunction getProviderStatus()
     }
 
-    AsyncFunction("watchDeviceHeading") { watchId: Int ->
-      mHeadingId = watchId
-      return@AsyncFunction startHeadingUpdate()
+    AsyncFunction("watchDeviceHeading") { _: Int, promise: Promise ->
+      if (VRUtilities.isQuest()) {
+        promise.reject(QuestFeatureUnavailableException())
+        return@AsyncFunction
+      }
+      promise.reject(QuestPrebuildEnvironmentException())
+      return@AsyncFunction
     }
 
     AsyncFunction("watchPositionImplAsync") { watchId: Int, options: LocationOptions, promise: Promise ->
@@ -202,7 +203,7 @@ class LocationModule : Module(), LifecycleEventListener, SensorEventListener, Ac
 
       // Check if we want to stop watching location or compass
       if (watchId == mHeadingId) {
-        destroyHeadingWatch()
+        throw QuestFeatureUnavailableException()
       } else {
         removeLocationUpdatesForRequest(watchId)
       }
@@ -521,96 +522,6 @@ class LocationModule : Module(), LifecycleEventListener, SensorEventListener, Ac
     mPendingLocationRequests.clear()
   }
 
-  private fun startHeadingUpdate() {
-    val locationManager = mContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-    if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-      ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
-    ) {
-      return
-    }
-    val lastLocation =
-      locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-        ?: locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
-
-    if (lastLocation != null) {
-      mGeofield = GeomagneticField(
-        lastLocation.latitude.toFloat(),
-        lastLocation.longitude.toFloat(),
-        lastLocation.altitude.toFloat(),
-        System.currentTimeMillis()
-      )
-    } else {
-      val locationRequest = LocationRequest(
-        interval = 0L,
-        minUpdateIntervalMillis = 0L,
-        maxUpdateDelayMillis = 0L,
-        minUpdateDistanceMeters = 0f,
-        priority = LocationModule.ACCURACY_HIGHEST
-      )
-
-      // For LocationManager, we'll get the last known location to initialize the geomagnetic field
-      val provider = LocationManager.GPS_PROVIDER
-      if (mLocationManager.isProviderEnabled(provider)) {
-        val location = mLocationManager.getLastKnownLocation(provider)
-        location?.let {
-          mGeofield = GeomagneticField(
-            it.latitude.toFloat(),
-            it.longitude.toFloat(),
-            it.altitude.toFloat(),
-            System.currentTimeMillis()
-          )
-        }
-      }
-    }
-    val magneticSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
-    val accelerometerSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
-    if (magneticSensor != null && accelerometerSensor != null) {
-      mSensorManager.registerListener(
-        this,
-        magneticSensor,
-        SensorManager.SENSOR_DELAY_NORMAL
-      )
-      mSensorManager.registerListener(
-        this,
-        accelerometerSensor,
-        SensorManager.SENSOR_DELAY_NORMAL
-      )
-    } else {
-      Log.e(TAG, "No magnetic or accelerometer sensor found")
-      sendEvent(LOCATION_ERROR_EVENT_NAME, LocationErrorEventResponse(mHeadingId, "Heading updates not available - magnetic and accelerometer sensors are required").toBundle())
-    }
-  }
-
-  private fun sendUpdate() {
-    val rotationMatrix = FloatArray(9)
-    val inclinationMatrix = FloatArray(9)
-    val success = SensorManager.getRotationMatrix(rotationMatrix, inclinationMatrix, mGravity, mGeomagnetic)
-    if (success) {
-      val orientation = FloatArray(3)
-      SensorManager.getOrientation(rotationMatrix, orientation)
-
-      // Make sure Delta is big enough to warrant an update
-      // Currently: 50ms and ~2 degrees of change (android has a lot of useless updates block up the sending)
-      if (abs(orientation[0] - mLastAzimuth) > DEGREE_DELTA && System.currentTimeMillis() - mLastUpdate > TIME_DELTA) {
-        mLastAzimuth = orientation[0]
-        mLastUpdate = System.currentTimeMillis()
-        val magneticNorth: Float = calcMagNorth(orientation[0])
-        val trueNorth: Float = calcTrueNorth(magneticNorth)
-
-        // Write data to send back to React
-        val response = HeadingEventResponse(
-          watchId = mHeadingId,
-          heading = Heading(
-            trueHeading = trueNorth,
-            magHeading = magneticNorth,
-            accuracy = mAccuracy
-          )
-        )
-        sendEvent(HEADING_EVENT_NAME, response.toBundle())
-      }
-    }
-  }
-
   internal fun sendLocationResponse(watchId: Int, response: LocationResponse) {
     val responseBundle = bundleOf()
     responseBundle.putBundle("location", response.toBundle(Bundle::class.java))
@@ -618,46 +529,12 @@ class LocationModule : Module(), LifecycleEventListener, SensorEventListener, Ac
     sendEvent(LOCATION_EVENT_NAME, responseBundle)
   }
 
-  private fun calcMagNorth(azimuth: Float): Float {
-    val azimuthDeg = Math.toDegrees(azimuth.toDouble()).toFloat()
-    return (azimuthDeg + 360) % 360
-  }
-
-  private fun calcTrueNorth(magNorth: Float): Float {
-    // Need to request geo location info to calculate true north
-    val geofield = mGeofield.takeIf { !isMissingForegroundPermissions() } ?: return -1f
-    return (magNorth + geofield.declination) % 360
-  }
-
-  private fun stopHeadingWatch() {
-    mSensorManager.unregisterListener(this)
-  }
-
-  private fun destroyHeadingWatch() {
-    stopHeadingWatch()
-    mGravity = FloatArray(9)
-    mGeomagnetic = FloatArray(9)
-    mGeofield = null
-    mHeadingId = 0
-    mLastAzimuth = 0f
-    mAccuracy = 0
-  }
-
   private fun startWatching() {
-    // if permissions not granted it won't work anyway, but this can be invoked when permission dialog disappears
-    if (!isMissingForegroundPermissions()) {
-      mGeocoderPaused = false
-    }
-
     // Resume paused location updates
     resumeLocationUpdates()
   }
 
   private fun stopWatching() {
-    // if permissions not granted it won't work anyway, but this can be invoked when permission dialog appears
-    if (Geocoder.isPresent() && !isMissingForegroundPermissions()) {
-      mGeocoderPaused = true
-    }
     for (requestId in mLocationCallbacks.keys) {
       pauseLocationUpdatesForRequest(requestId)
     }
@@ -720,63 +597,17 @@ class LocationModule : Module(), LifecycleEventListener, SensorEventListener, Ac
   }
 
   private suspend fun geocode(address: String): List<GeocodeResponse> {
-    if (mGeocoderPaused) {
-      throw GeocodeException("Geocoder is not running")
+    if (VRUtilities.isQuest()) {
+      throw QuestFeatureUnavailableException()
     }
-
-    if (isMissingForegroundPermissions()) {
-      throw LocationUnauthorizedException()
-    }
-
-    if (!Geocoder.isPresent()) {
-      throw NoGeocodeException()
-    }
-
-    return suspendCoroutine { continuation ->
-      val locations = Geocoder(mContext, Locale.getDefault()).getFromLocationName(address, 1)
-      locations?.let { location ->
-        location.let {
-          val results = it.mapNotNull { address ->
-            val newLocation = Location(LocationManager.GPS_PROVIDER)
-            newLocation.latitude = address.latitude
-            newLocation.longitude = address.longitude
-            GeocodeResponse.from(newLocation)
-          }
-          continuation.resume(results)
-        }
-      } ?: continuation.resume(emptyList())
-    }
+    throw QuestPrebuildEnvironmentException()
   }
 
   private suspend fun reverseGeocode(location: ReverseGeocodeLocation): List<ReverseGeocodeResponse> {
-    if (mGeocoderPaused) {
-      throw GeocodeException("Geocoder is not running")
+    if (VRUtilities.isQuest()) {
+      throw QuestFeatureUnavailableException()
     }
-
-    if (isMissingForegroundPermissions()) {
-      throw LocationUnauthorizedException()
-    }
-
-    if (!Geocoder.isPresent()) {
-      throw NoGeocodeException()
-    }
-
-    val androidLocation = Location("").apply {
-      latitude = location.latitude
-      longitude = location.longitude
-    }
-
-    return suspendCoroutine { continuation ->
-      val locations = Geocoder(mContext, Locale.getDefault()).getFromLocation(androidLocation.latitude, androidLocation.longitude, 1)
-      locations?.let { addresses ->
-        val results = addresses.mapNotNull { address ->
-          address?.let {
-            ReverseGeocodeResponse(it)
-          }
-        }
-        continuation.resume(results)
-      } ?: continuation.resume(emptyList())
-    }
+    throw QuestPrebuildEnvironmentException()
   }
 
   //region private methods
@@ -857,38 +688,18 @@ class LocationModule : Module(), LifecycleEventListener, SensorEventListener, Ac
 
     const val GEOFENCING_EVENT_ENTER = 1
     const val GEOFENCING_EVENT_EXIT = 2
-
-    const val DEGREE_DELTA = 0.0355 // in radians, about 2 degrees
-    const val TIME_DELTA = 50f // in milliseconds
   }
 
   override fun onHostResume() {
     startWatching()
-    startHeadingUpdate()
   }
 
   override fun onHostPause() {
     stopWatching()
-    stopHeadingWatch()
   }
 
   override fun onHostDestroy() {
     stopWatching()
-    stopHeadingWatch()
-  }
-
-  override fun onSensorChanged(event: SensorEvent?) {
-    event ?: return
-    if (event.sensor.type == Sensor.TYPE_ACCELEROMETER) {
-      mGravity = event.values
-    } else if (event.sensor.type == Sensor.TYPE_MAGNETIC_FIELD) {
-      mGeomagnetic = event.values
-    }
-    sendUpdate()
-  }
-
-  override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-    mAccuracy = accuracy
   }
 
   override fun onActivityResult(activity: Activity?, requestCode: Int, resultCode: Int, data: Intent?) {
