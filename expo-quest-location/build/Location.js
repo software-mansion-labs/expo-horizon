@@ -425,4 +425,9 @@ export async function hasStartedGeofencingAsync(taskName) {
     _validate(taskName);
     return ExpoLocation.hasStartedGeofencingAsync(taskName);
 }
+/**
+ * Checks if the device is a Quest.
+ * @return A boolean value indicating whether the device is a Quest.
+ */
+export const isQuest = ExpoLocation ? ExpoLocation.isQuest : null;
 //# sourceMappingURL=Location.js.map

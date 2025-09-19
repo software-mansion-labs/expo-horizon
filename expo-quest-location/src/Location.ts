@@ -516,3 +516,9 @@ export async function hasStartedGeofencingAsync(taskName: string): Promise<boole
   _validate(taskName);
   return ExpoLocation.hasStartedGeofencingAsync(taskName);
 }
+
+/**
+ * Checks if the device is a Quest.
+ * @return A boolean value indicating whether the device is a Quest.
+ */
+export const isQuest: boolean | null = ExpoLocation ? ExpoLocation.isQuest : null;

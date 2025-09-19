@@ -28,7 +28,13 @@ import * as Location from 'expo-quest-location';
 - Without `EXPO_HORIZON` → Falls back to the default `expo-location` behavior (Google Play Services Location API).
 - On iOS → The `EXPO_HORIZON` flag has no effect; behavior is always the same as `expo-location`.
 
+> [!IMPORTANT]
+> The `EXPO_HORIZON` version is intended specifically for Meta Quest devices. Using it on standard Android devices is not recommended, as certain features may be unsupported or behave differently.
+
 This ensures compatibility across Quest, standard Android devices, and iOS.
+
+## Additional features
+- `Location.isQuest()` → Returns `true` if the device is a Meta Quest device.
 
 ## Features supported on Meta Quest
 

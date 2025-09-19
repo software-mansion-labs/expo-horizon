@@ -245,4 +245,9 @@ export declare function stopGeofencingAsync(taskName: string): Promise<void>;
  * started or not.
  */
 export declare function hasStartedGeofencingAsync(taskName: string): Promise<boolean>;
+/**
+ * Checks if the device is a Quest.
+ * @return A boolean value indicating whether the device is a Quest.
+ */
+export declare const isQuest: boolean | null;
 //# sourceMappingURL=Location.d.ts.map
