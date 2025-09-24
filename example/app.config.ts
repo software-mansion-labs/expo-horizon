@@ -1,7 +1,9 @@
-{
+import 'tsx/cjs';
+
+module.exports = () => ({
   "expo": {
-    "name": "app",
-    "slug": "app",
+    "name": "expo-quest-demo",
+    "slug": "expo-quest-demo",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -17,20 +19,13 @@
       "bundleIdentifier": "com.anonymous.app"
     },
     "android": {
+      "versionCode": 3,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": false,
-      "package": "com.anonymous.app",
-      "permissions": [
-        "android.permission.ACCESS_FINE_LOCATION",
-        "android.permission.ACCESS_COARSE_LOCATION",
-        "android.permission.ACCESS_BACKGROUND_LOCATION",
-        "android.permission.FOREGROUND_SERVICE",
-        "android.permission.FOREGROUND_SERVICE_LOCATION",
-        "android.permission.WAKE_LOCK"
-      ]
+      "edgeToEdgeEnabled": true,
+      "package": "com.jakubswm.questlocation"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -46,7 +41,17 @@
                 "locationWhenInUsePermission": "Allow $(PRODUCT_NAME) to access your location"
             }
         ],
-        "expo-task-manager"
+        "expo-task-manager",
+        [
+        "expo-build-properties",
+            {
+                "android": {
+                    "compileSdkVersion": 34,
+                    "targetSdkVersion": 34,
+                }
+            }
+        ],
+        ["./plugins/withPlugin.ts"],
     ]
   }
-}
+})
