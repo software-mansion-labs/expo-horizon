@@ -42,11 +42,11 @@ android {
 }
 
 dependencies {
-  implementation 'androidx.core:core:1.6.0'
-  implementation 'androidx.lifecycle:lifecycle-runtime:2.2.0'
-  implementation 'androidx.lifecycle:lifecycle-process:2.2.0'
-  implementation 'androidx.lifecycle:lifecycle-common-java8:2.2.0'
-  implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
+  implementation 'androidx.core:core:1.17.0'
+  implementation 'androidx.lifecycle:lifecycle-runtime:2.9.3'
+  implementation 'androidx.lifecycle:lifecycle-process:2.9.3'
+  implementation 'androidx.lifecycle:lifecycle-common-java8:2.9.3'
+  implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2'
 
   questApi("com.meta.horizon.platform.ovr:android-platform-sdk:77")
   questApi files('libs/android-platform-sdk-v79.aar')
