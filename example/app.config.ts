@@ -1,4 +1,5 @@
 import 'tsx/cjs';
+import { isQuest } from './utils/isQuest';
 
 module.exports = () => ({
   "expo": {
@@ -25,7 +26,8 @@ module.exports = () => ({
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.jakubswm.questlocation"
+      "package": "com.jakubswm.questlocation",
+      "blockedPermissions": isQuest() ? ["android.permission.SYSTEM_ALERT_WINDOW"] : []
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -52,7 +54,6 @@ module.exports = () => ({
                 }
             }
         ],
-        ["./plugins/withPlugin.ts"],
     ]
   }
 })

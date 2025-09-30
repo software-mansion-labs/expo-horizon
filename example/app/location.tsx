@@ -64,27 +64,21 @@ export default function LocationScreen() {
 
   const setupTaskManager = () => {
     // Define background tasks
-    TaskManager.defineTask(
-      "test-location-task",
-      ({ data, error }: { data: any; error: any }) => {
-        if (error) {
-          console.error("Location task error:", error);
-          return;
-        }
-        console.log("Location task data:", data);
+    TaskManager.defineTask("test-location-task", ({ data, error }: { data: any; error: any }) => {
+      if (error) {
+        console.error("Location task error:", error);
+        return;
       }
-    );
+      console.log("Location task data:", data);
+    });
 
-    TaskManager.defineTask(
-      "test-geofencing-task",
-      ({ data, error }: { data: any; error: any }) => {
-        if (error) {
-          console.error("Geofencing task error:", error);
-          return;
-        }
-        console.log("Geofencing task data:", data);
+    TaskManager.defineTask("test-geofencing-task", ({ data, error }: { data: any; error: any }) => {
+      if (error) {
+        console.error("Geofencing task error:", error);
+        return;
       }
-    );
+      console.log("Geofencing task data:", data);
+    });
   };
 
   const checkInitialStatus = async () => {
@@ -102,8 +96,11 @@ export default function LocationScreen() {
       const perms = await Location.getForegroundPermissionsAsync();
       setPermissions(perms);
 
-      const bgPerms = await Location.getBackgroundPermissionsAsync();
-      setBackgroundPermissions(bgPerms);
+      // Quest does not support background permissions
+      if (!Location.isQuest) {
+        const bgPerms = await Location.getBackgroundPermissionsAsync();
+        setBackgroundPermissions(bgPerms);
+      }
     } catch (error) {
       console.error("Error checking initial status:", error);
     } finally {
@@ -146,12 +143,12 @@ export default function LocationScreen() {
   const getCurrentPosition = async () => {
     try {
       setLoading("getCurrentPosition", true);
-
+      
       // Check if location services are enabled
       const servicesEnabled = await Location.hasServicesEnabledAsync();
       if (!servicesEnabled) {
         Alert.alert(
-          "Location Services",
+          "Location Services", 
           "Location services are disabled. Please enable them in device settings."
         );
         return;
@@ -179,10 +176,7 @@ export default function LocationScreen() {
       );
     } catch (error) {
       console.error("Get current position error:", error);
-      Alert.alert(
-        "Error",
-        `Failed to get current position: ${error}\n\nFor Android emulator:\n1. Enable location in emulator settings\n2. Set a route in Extended Controls\n3. Start route playback`
-      );
+      Alert.alert("Error", `Failed to get current position: ${error}\n\nFor Android emulator:\n1. Enable location in emulator settings\n2. Set a route in Extended Controls\n3. Start route playback`);
     } finally {
       setLoading("getCurrentPosition", false);
     }
@@ -214,12 +208,12 @@ export default function LocationScreen() {
   const startLocationWatching = async () => {
     try {
       setLoading("startLocationWatching", true);
-
+      
       // Check if location services are enabled
       const servicesEnabled = await Location.hasServicesEnabledAsync();
       if (!servicesEnabled) {
         Alert.alert(
-          "Location Services",
+          "Location Services", 
           "Location services are disabled. Please enable them in device settings."
         );
         return;
@@ -253,16 +247,10 @@ export default function LocationScreen() {
       );
       setLocationSubscription(subscription);
       setLocationUpdatesActive(true);
-      Alert.alert(
-        "Location Watching",
-        "Started watching location updates\n\nMake sure location is enabled in emulator settings."
-      );
+      Alert.alert("Location Watching", "Started watching location updates\n\nMake sure location is enabled in emulator settings.");
     } catch (error) {
       console.error("Location watching error:", error);
-      Alert.alert(
-        "Error",
-        `Failed to start location watching: ${error}\n\nFor Android emulator:\n1. Enable location in emulator settings\n2. Set a route in Extended Controls\n3. Start route playback`
-      );
+      Alert.alert("Error", `Failed to start location watching: ${error}\n\nFor Android emulator:\n1. Enable location in emulator settings\n2. Set a route in Extended Controls\n3. Start route playback`);
     } finally {
       setLoading("startLocationWatching", false);
     }
@@ -433,12 +421,12 @@ export default function LocationScreen() {
   const startGeofencing = async () => {
     try {
       setLoading("startGeofencing", true);
-
+      
       // Check if background location is available
       const isAvailable = await Location.isBackgroundLocationAvailableAsync();
       if (!isAvailable) {
         Alert.alert(
-          "Geofencing",
+          "Geofencing", 
           "Background location is not available on this device"
         );
         return;
@@ -469,10 +457,7 @@ export default function LocationScreen() {
       Alert.alert("Geofencing", "Started geofencing with test region");
     } catch (error) {
       console.error("Geofencing error:", error);
-      Alert.alert(
-        "Error",
-        `Failed to start geofencing: ${error}\n\nMake sure you have:\n1. Background location permissions\n2. TaskManager is properly configured\n3. App is not battery optimized`
-      );
+      Alert.alert("Error", `Failed to start geofencing: ${error}\n\nMake sure you have:\n1. Background location permissions\n2. TaskManager is properly configured\n3. App is not battery optimized`);
     } finally {
       setLoading("startGeofencing", false);
     }
