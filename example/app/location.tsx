@@ -12,6 +12,7 @@ import {
 import { StatusBar } from "expo-status-bar";
 import * as TaskManager from "expo-task-manager";
 import * as Location from "expo-quest-location";
+import { Section, SectionTitle } from "../components/Section";
 
 export default function LocationScreen() {
   const [location, setLocation] = useState<Location.LocationObject | null>(
@@ -63,21 +64,27 @@ export default function LocationScreen() {
 
   const setupTaskManager = () => {
     // Define background tasks
-    TaskManager.defineTask("test-location-task", ({ data, error }: { data: any; error: any }) => {
-      if (error) {
-        console.error("Location task error:", error);
-        return;
+    TaskManager.defineTask(
+      "test-location-task",
+      ({ data, error }: { data: any; error: any }) => {
+        if (error) {
+          console.error("Location task error:", error);
+          return;
+        }
+        console.log("Location task data:", data);
       }
-      console.log("Location task data:", data);
-    });
+    );
 
-    TaskManager.defineTask("test-geofencing-task", ({ data, error }: { data: any; error: any }) => {
-      if (error) {
-        console.error("Geofencing task error:", error);
-        return;
+    TaskManager.defineTask(
+      "test-geofencing-task",
+      ({ data, error }: { data: any; error: any }) => {
+        if (error) {
+          console.error("Geofencing task error:", error);
+          return;
+        }
+        console.log("Geofencing task data:", data);
       }
-      console.log("Geofencing task data:", data);
-    });
+    );
   };
 
   const checkInitialStatus = async () => {
@@ -139,12 +146,12 @@ export default function LocationScreen() {
   const getCurrentPosition = async () => {
     try {
       setLoading("getCurrentPosition", true);
-      
+
       // Check if location services are enabled
       const servicesEnabled = await Location.hasServicesEnabledAsync();
       if (!servicesEnabled) {
         Alert.alert(
-          "Location Services", 
+          "Location Services",
           "Location services are disabled. Please enable them in device settings."
         );
         return;
@@ -172,7 +179,10 @@ export default function LocationScreen() {
       );
     } catch (error) {
       console.error("Get current position error:", error);
-      Alert.alert("Error", `Failed to get current position: ${error}\n\nFor Android emulator:\n1. Enable location in emulator settings\n2. Set a route in Extended Controls\n3. Start route playback`);
+      Alert.alert(
+        "Error",
+        `Failed to get current position: ${error}\n\nFor Android emulator:\n1. Enable location in emulator settings\n2. Set a route in Extended Controls\n3. Start route playback`
+      );
     } finally {
       setLoading("getCurrentPosition", false);
     }
@@ -204,12 +214,12 @@ export default function LocationScreen() {
   const startLocationWatching = async () => {
     try {
       setLoading("startLocationWatching", true);
-      
+
       // Check if location services are enabled
       const servicesEnabled = await Location.hasServicesEnabledAsync();
       if (!servicesEnabled) {
         Alert.alert(
-          "Location Services", 
+          "Location Services",
           "Location services are disabled. Please enable them in device settings."
         );
         return;
@@ -243,10 +253,16 @@ export default function LocationScreen() {
       );
       setLocationSubscription(subscription);
       setLocationUpdatesActive(true);
-      Alert.alert("Location Watching", "Started watching location updates\n\nMake sure location is enabled in emulator settings.");
+      Alert.alert(
+        "Location Watching",
+        "Started watching location updates\n\nMake sure location is enabled in emulator settings."
+      );
     } catch (error) {
       console.error("Location watching error:", error);
-      Alert.alert("Error", `Failed to start location watching: ${error}\n\nFor Android emulator:\n1. Enable location in emulator settings\n2. Set a route in Extended Controls\n3. Start route playback`);
+      Alert.alert(
+        "Error",
+        `Failed to start location watching: ${error}\n\nFor Android emulator:\n1. Enable location in emulator settings\n2. Set a route in Extended Controls\n3. Start route playback`
+      );
     } finally {
       setLoading("startLocationWatching", false);
     }
@@ -417,12 +433,12 @@ export default function LocationScreen() {
   const startGeofencing = async () => {
     try {
       setLoading("startGeofencing", true);
-      
+
       // Check if background location is available
       const isAvailable = await Location.isBackgroundLocationAvailableAsync();
       if (!isAvailable) {
         Alert.alert(
-          "Geofencing", 
+          "Geofencing",
           "Background location is not available on this device"
         );
         return;
@@ -453,7 +469,10 @@ export default function LocationScreen() {
       Alert.alert("Geofencing", "Started geofencing with test region");
     } catch (error) {
       console.error("Geofencing error:", error);
-      Alert.alert("Error", `Failed to start geofencing: ${error}\n\nMake sure you have:\n1. Background location permissions\n2. TaskManager is properly configured\n3. App is not battery optimized`);
+      Alert.alert(
+        "Error",
+        `Failed to start geofencing: ${error}\n\nMake sure you have:\n1. Background location permissions\n2. TaskManager is properly configured\n3. App is not battery optimized`
+      );
     } finally {
       setLoading("startGeofencing", false);
     }
@@ -572,10 +591,7 @@ export default function LocationScreen() {
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
       >
-        <Text style={styles.title}>Expo Horizon Location Test</Text>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Permissions</Text>
+        <Section title="Permissions">
           <TestButton
             title="Request Foreground Permissions"
             onPress={requestForegroundPermissions}
@@ -595,10 +611,9 @@ export default function LocationScreen() {
             label="Background Permissions"
             value={backgroundPermissions?.status}
           />
-        </View>
+        </Section>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Location</Text>
+        <Section title="Location">
           <TestButton
             title="Get Current Position"
             onPress={getCurrentPosition}
@@ -619,7 +634,7 @@ export default function LocationScreen() {
             onPress={stopLocationWatching}
             color="#FF3B30"
           />
-          <Text style={styles.sectionTitle}>Current Location</Text>
+          <SectionTitle title="Current Location" />
           <Text style={styles.dataText}>
             Latitude: {location?.coords?.latitude || "Unknown"}
           </Text>
@@ -643,10 +658,9 @@ export default function LocationScreen() {
             label="Location Updates Active"
             value={locationUpdatesActive}
           />
-        </View>
+        </Section>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Heading</Text>
+        <Section title="Heading">
           <TestButton
             title="Get Heading"
             onPress={getHeading}
@@ -662,7 +676,7 @@ export default function LocationScreen() {
             onPress={stopHeadingWatching}
             color="#FF3B30"
           />
-          <Text style={styles.sectionTitle}>Current Heading</Text>
+          <SectionTitle title="Current Heading" />
           <Text style={styles.dataText}>
             True Heading: {heading?.trueHeading || "Unknown"}°
           </Text>
@@ -672,10 +686,10 @@ export default function LocationScreen() {
           <Text style={styles.dataText}>
             Accuracy: {heading?.accuracy || "Unknown"}
           </Text>
-        </View>
+        </Section>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Geocoding</Text>
+        <Section title="Geocoding">
+          <SectionTitle title="Geocoding" />
           <TestButton
             title="Geocode Address"
             onPress={geocodeAddress}
@@ -686,10 +700,9 @@ export default function LocationScreen() {
             onPress={reverseGeocodeLocation}
             loadingKey="reverseGeocodeLocation"
           />
-        </View>
+        </Section>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Geocoded Address</Text>
+        <Section title="Geocoded Address">
           {geocodedAddress && geocodedAddress.length > 0 ? (
             geocodedAddress.map((address, index) => (
               <View key={index} style={styles.addressContainer}>
@@ -713,10 +726,10 @@ export default function LocationScreen() {
           ) : (
             <Text style={styles.dataText}>No geocoded addresses available</Text>
           )}
-        </View>
+        </Section>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Geocoded Location</Text>
+        <Section title="Geocoded Location">
+          <SectionTitle title="Geocoded Location" />
           {geocodedLocation && geocodedLocation.length > 0 ? (
             geocodedLocation.map((loc, index) => (
               <View key={index} style={styles.locationContainer}>
@@ -730,15 +743,13 @@ export default function LocationScreen() {
           ) : (
             <Text style={styles.dataText}>No geocoded locations available</Text>
           )}
-        </View>
+        </Section>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Status</Text>
+        <Section title="Status">
           <StatusText label="Geofencing Active" value={geofencingActive} />
-        </View>
+        </Section>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Background Services</Text>
+        <Section title="Background Services">
           <TestButton
             title="Start Background Location Updates"
             onPress={startBackgroundLocationUpdates}
@@ -761,10 +772,9 @@ export default function LocationScreen() {
             color="#FF3B30"
             loadingKey="stopGeofencing"
           />
-        </View>
+        </Section>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Utilities</Text>
+        <Section title="Utilities">
           <TestButton
             title="Enable Network Provider"
             onPress={enableNetworkProvider}
@@ -780,7 +790,7 @@ export default function LocationScreen() {
             onPress={checkGeofencingStatus}
             loadingKey="checkGeofencingStatus"
           />
-        </View>
+        </Section>
       </ScrollView>
     </View>
   );
@@ -802,23 +812,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 20,
-    color: "#333",
-  },
-  section: {
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 15,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 10,
     color: "#333",
   },
   button: {
