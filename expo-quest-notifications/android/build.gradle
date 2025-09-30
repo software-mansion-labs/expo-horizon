@@ -7,6 +7,10 @@ plugins {
 group = 'host.exp.exponent'
 version = '0.32.11'
 
+def horizonEnabled = providers.gradleProperty("horizonEnabled")
+    .map { it.toBoolean() }
+    .getOrElse(false)
+
 android {
   namespace "expo.modules.notifications"
   defaultConfig {
@@ -29,6 +33,18 @@ android {
       }
     }
   }
+
+  sourceSets {
+    main {
+      java {
+       if (horizonEnabled) {
+         srcDirs = ['src/main/java', 'src/horizon/java']
+       } else {
+         srcDirs = ['src/main/java', 'src/android/java']
+       }
+      }
+    }
+  }
 }
 
 dependencies {
@@ -38,6 +54,11 @@ dependencies {
   implementation 'androidx.lifecycle:lifecycle-common-java8:2.2.0'
   implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
 
+  if (horizonEnabled) {
+    implementation("com.meta.horizon.platform.ovr:android-platform-sdk:77")
+    implementation files('libs/android-platform-sdk-v79.aar')
+  }
+
   // release notes in https://firebase.google.com/support/release-notes/android - cmd + f "Cloud Messaging version"
   implementation 'com.google.firebase:firebase-messaging:24.0.1'
 
@@ -46,5 +67,11 @@ dependencies {
   if (project.findProject(':expo-modules-test-core')) {
     testImplementation project(':expo-modules-test-core')
     androidTestImplementation project(':expo-modules-test-core')
+  }
+}
+
+if (horizonEnabled) {
+  configurations.all {
+    exclude group: "com.meta.horizon.platform.ovr", module: "android-platform-sdk"
   }
 }
