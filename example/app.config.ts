@@ -31,6 +31,7 @@ module.exports = () => ({
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
+        ["expo-router"],
         [
             "../expo-quest-location/app.plugin.js",
             {

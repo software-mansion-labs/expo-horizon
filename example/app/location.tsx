@@ -13,7 +13,7 @@ import { StatusBar } from "expo-status-bar";
 import * as TaskManager from "expo-task-manager";
 import * as Location from "expo-quest-location";
 
-export default function App() {
+export default function LocationScreen() {
   const [location, setLocation] = useState<Location.LocationObject | null>(
     null
   );
