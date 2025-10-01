@@ -48,7 +48,9 @@ module.exports = () => ({
         [
             "../expo-quest/app.plugin.js",
             {
-                "questAppId": "DEMO_APP_ID"
+                "questAppId": "DEMO_APP_ID",
+                "defaultHeight": "640dp",
+                "defaultWidth": "1024dp"
             }
         ],
         "expo-task-manager",

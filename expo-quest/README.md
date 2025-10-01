@@ -2,33 +2,83 @@
 
 ExpoQuest common features.
 
-# API documentation
-
-- [Documentation for the latest stable release](https://docs.expo.dev/versions/latest/sdk/expo-quest#readme/)
-- [Documentation for the main branch](https://docs.expo.dev/versions/unversioned/sdk/expo-quest#readme/)
-
-# Installation in managed Expo projects
-
-For [managed](https://docs.expo.dev/archive/managed-vs-bare/) Expo projects, please follow the installation instructions in the [API documentation for the latest stable release](#api-documentation). If you follow the link and there is no documentation available then this library is not yet usable within managed projects &mdash; it is likely to be included in an upcoming Expo SDK release.
-
-# Installation in bare React Native projects
-
-For bare React Native projects, you must ensure that you have [installed and configured the `expo` package](https://docs.expo.dev/bare/installing-expo-modules/) before continuing.
-
 ### Add the package to your npm dependencies
 
 ```
 npm install expo-quest
 ```
 
-### Configure for Android
+# Configuration
 
+## Config Plugin
 
+This package includes a config plugin that automatically configures your Android project for Meta Quest when the `EXPO_HORIZON` environment variable is set.
 
+### Setup
 
-### Configure for iOS
+Add the plugin to your `app.json` or `app.config.[js|ts]`:
 
-Run `npx pod-install` after installing the npm package.
+```json
+{
+  "expo": {
+    "plugins": [
+      [
+        "expo-quest",
+        {
+          "questAppId": "your-quest-app-id",
+          "defaultHeight": "640dp",
+          "defaultWidth": "1024dp"
+        }
+      ]
+    ]
+  }
+}
+```
+
+### Options
+
+| Option          | Type     | Required | Default   | Description                                                                                                                             |
+| --------------- | -------- | -------- | --------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `questAppId`    | `string` | No       | `""`      | Your Meta Quest application ID                                                                                                          |
+| `defaultHeight` | `string` | No       | Not added | Default panel height (e.g., `"640dp"`). See [Panel Sizing](https://developers.meta.com/horizon/documentation/android-apps/panel-sizing) |
+| `defaultWidth`  | `string` | No       | Not added | Default panel width (e.g., `"1024dp"`). See [Panel Sizing](https://developers.meta.com/horizon/documentation/android-apps/panel-sizing) |
+
+# Usage
+
+## JavaScript/TypeScript API
+
+The module provides two constants to help you detect Quest devices and access the configured app ID:
+
+```typescript
+import ExpoQuest from 'expo-quest';
+
+// Check if running on a Quest device
+if (ExpoQuest.isQuestDevice) {
+  console.log('Running on Meta Quest!');
+}
+
+// Access the Quest App ID (configured via config plugin)
+const appId = ExpoQuest.questAppId;
+if (appId) {
+  console.log('Quest App ID:', appId);
+} else {
+  console.log('No Quest App ID configured');
+}
+```
+
+## Usage in Custom Native Modules
+
+### Accessing Quest App ID in Android
+
+To access the Quest App ID from your custom Expo modules:
+
+```kotlin
+import expo.modules.quest.BuildConfig
+
+val appId = BuildConfig.META_QUEST_APP_ID
+```
+
+See `ExpoQuestModule.kt` for a complete example.
 
 # Contributing
 
