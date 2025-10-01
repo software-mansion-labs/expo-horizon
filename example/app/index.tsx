@@ -6,6 +6,7 @@ export default function Index() {
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>expo-quest demo</Text>
+      <ModuleButton title="Quest Core" onPress={() => router.push("/quest")} />
       <ModuleButton title="Location" onPress={() => router.push("/location")} />
       <ModuleButton title="Notifications" onPress={() => router.push("/notifications")} />
     </SafeAreaView>

@@ -1,5 +1,6 @@
-import 'tsx/cjs';
-import { isQuest } from './utils/isQuest';
+function isQuest() {
+    return process.env.EXPO_HORIZON === "1";
+}
 
 module.exports = () => ({
   "expo": {
@@ -42,6 +43,12 @@ module.exports = () => ({
                 "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to access your location for background tracking",
                 "locationAlwaysPermission": "Allow $(PRODUCT_NAME) to access your location for background tracking",
                 "locationWhenInUsePermission": "Allow $(PRODUCT_NAME) to access your location"
+            }
+        ],
+        [
+            "../expo-quest/app.plugin.js",
+            {
+                "questAppId": "DEMO_APP_ID"
             }
         ],
         "expo-task-manager",

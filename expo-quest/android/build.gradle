@@ -31,11 +31,14 @@ if (useManagedAndroidSdkVersions) {
   }
 }
 
+def questAppIdConfigField = "\"${project.findProperty('questAppId') ?: ''}\""
+
 android {
   namespace "expo.modules.quest"
   defaultConfig {
     versionCode 1
     versionName "0.1.0"
+    buildConfigField "String", "META_QUEST_APP_ID", questAppIdConfigField
   }
   lintOptions {
     abortOnError false
