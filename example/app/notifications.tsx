@@ -3,6 +3,7 @@ import React from "react";
 import { Section } from "../components/Section";
 import { TestButton } from "../components/TestButton";
 import * as Notifications from "expo-quest-notifications";
+import ExpoQuest from "expo-quest";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => {
@@ -75,6 +76,11 @@ export default function NotificationsScreen() {
             title="Get Push Token"
             onPress={getPushToken}
             loadingKey="registerForRemoteNotifications"
+          />
+          <TestButton
+            title="Get Device Token"
+            onPress={async () => console.log(ExpoQuest.isQuestDevice)}
+            loadingKey="getDeviceToken"
           />
         </Section>
       </ScrollView>
