@@ -25,6 +25,8 @@ import {
   LocationErrorSubscriber,
 } from './LocationSubscribers';
 
+declare let __DEV__: boolean;
+
 // Flag for warning about background services not being available in Expo Go
 let warnAboutExpoGoDisplayed = false;
 

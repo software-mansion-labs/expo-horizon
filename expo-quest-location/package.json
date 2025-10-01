@@ -39,7 +39,9 @@
     "preset": "expo-module-scripts"
   },
   "devDependencies": {
-    "expo-module-scripts": "^5.0.7"
+    "expo-module-scripts": "^4.1.7",
+    "expo-modules-core": "^3.0.19",
+    "expo": "^54.0.11"
   },
   "peerDependencies": {
     "expo": "*"
