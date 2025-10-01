@@ -27,7 +27,9 @@ Add the plugin to your `app.json` or `app.config.[js|ts]`:
         {
           "questAppId": "your-quest-app-id",
           "defaultHeight": "640dp",
-          "defaultWidth": "1024dp"
+          "defaultWidth": "1024dp",
+          "supportedDevices": "quest2|quest3|quest3s",
+          "disableVrHeadtracking": false
         }
       ]
     ]
@@ -37,11 +39,13 @@ Add the plugin to your `app.json` or `app.config.[js|ts]`:
 
 ### Options
 
-| Option          | Type     | Required | Default   | Description                                                                                                                             |
-| --------------- | -------- | -------- | --------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `questAppId`    | `string` | No       | `""`      | Your Meta Quest application ID                                                                                                          |
-| `defaultHeight` | `string` | No       | Not added | Default panel height (e.g., `"640dp"`). See [Panel Sizing](https://developers.meta.com/horizon/documentation/android-apps/panel-sizing) |
-| `defaultWidth`  | `string` | No       | Not added | Default panel width (e.g., `"1024dp"`). See [Panel Sizing](https://developers.meta.com/horizon/documentation/android-apps/panel-sizing) |
+| Option                  | Type      | Required | Default   | Description                                                                                                                                                                                                                             |
+| ----------------------- | --------- | -------- | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `questAppId`            | `string`  | No       | `""`      | Your Meta Quest application ID                                                                                                                                                                                                          |
+| `defaultHeight`         | `string`  | No       | Not added | Default panel height (e.g., `"640dp"`). See [Panel Sizing](https://developers.meta.com/horizon/documentation/android-apps/panel-sizing)                                                                                                 |
+| `defaultWidth`          | `string`  | No       | Not added | Default panel width (e.g., `"1024dp"`). See [Panel Sizing](https://developers.meta.com/horizon/documentation/android-apps/panel-sizing)                                                                                                 |
+| `supportedDevices`      | `string`  | Yes      | None      | Pipe-separated list of supported Quest devices (e.g., `"quest2\|quest3\|quest3s"`). See [Mobile Manifest](https://developers.meta.com/horizon/resources/publish-mobile-manifest/)                                                       |
+| `disableVrHeadtracking` | `boolean` | No       | `false`   | Set to `true` to disable adding the VR headtracking uses-feature. By default, adds `android.hardware.vr.headtracking` to AndroidManifest. See [Mobile Manifest](https://developers.meta.com/horizon/resources/publish-mobile-manifest/) |
 
 # Usage
 

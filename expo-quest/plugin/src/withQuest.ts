@@ -4,6 +4,8 @@ type HorizonOptions = {
   questAppId?: string;
   defaultHeight?: string;
   defaultWidth?: string;
+  supportedDevices?: string;
+  disableVrHeadtracking?: boolean;
 };
 
 const withQuest: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
@@ -12,6 +14,8 @@ const withQuest: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
       config = withQuestEnabled(config);
       config = withQuestAppId(config, options);
       config = withPanelSize(config, options);
+      config = withSupportedDevices(config, options);
+      config = withVrHeadtracking(config, options);
   }
 
   return config;
@@ -31,7 +35,7 @@ const withQuestEnabled: ConfigPlugin = (config) => {
 
 const withQuestAppId: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
   return withGradleProperties(config, (config) => {
-    const questAppId = options.questAppId || '';
+    const questAppId = options.questAppId ?? '';
 
     config.modResults.push({
       type: 'property',
@@ -70,6 +74,59 @@ const withPanelSize: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
       mainActivity.layout.push({
         $: layoutAttrs,
       });
+    }
+
+    return config;
+  });
+};
+
+const withSupportedDevices: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
+  return withAndroidManifest(config, (config) => {
+    // Only add meta-data if supportedDevices is explicitly provided
+    if (!options.supportedDevices) {
+      return config;
+    }
+
+    const application = config.modResults.manifest?.application?.[0];
+
+    if (application) {
+      if (!application['meta-data']) {
+        application['meta-data'] = [];
+      }
+
+      application['meta-data'].push({
+        $: {
+          'android:name': 'com.oculus.supportedDevices',
+          'android:value': options.supportedDevices,
+        },
+      });
+    }
+
+    return config;
+  });
+};
+
+const withVrHeadtracking: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
+  return withAndroidManifest(config, (config) => {
+    // Add VR headtracking by default unless explicitly disabled
+    if (options.disableVrHeadtracking === true) {
+      return config;
+    }
+
+    const manifest = config.modResults.manifest;
+
+    if (manifest) {
+      if (!manifest['uses-feature']) {
+        manifest['uses-feature'] = [];
+      }
+
+      manifest['uses-feature'].push({
+        $: {
+          'android:name': 'android.hardware.vr.headtracking',
+          'android:required': 'true',
+          'android:version': '1',
+        },
+      } as any);
     }
 
     return config;

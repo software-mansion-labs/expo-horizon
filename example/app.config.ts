@@ -50,7 +50,9 @@ module.exports = () => ({
             {
                 "questAppId": "DEMO_APP_ID",
                 "defaultHeight": "640dp",
-                "defaultWidth": "1024dp"
+                "defaultWidth": "1024dp",
+                "supportedDevices": "quest2|quest3|quest3s",
+                "disableVrHeadtracking": false
             }
         ],
         "expo-task-manager",
