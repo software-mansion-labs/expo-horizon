@@ -18,6 +18,12 @@ android {
     consumerProguardFiles("proguard-rules.pro")
   }
 
+  flavorDimensions += "device"
+    productFlavors {
+        quest { dimension "device" }
+        mobile { dimension "device" }
+    }
+
   sourceSets {
     main {
       java {
