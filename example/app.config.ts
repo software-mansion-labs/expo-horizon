@@ -1,7 +1,3 @@
-function isQuest() {
-    return process.env.EXPO_HORIZON === "1";
-}
-
 module.exports = () => ({
   "expo": {
     "name": "expo-quest-demo",
@@ -21,14 +17,13 @@ module.exports = () => ({
       "bundleIdentifier": "com.anonymous.app"
     },
     "android": {
-      "versionCode": 3,
+      "versionCode": 4,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
       "package": "com.jakubswm.questlocation",
-      "blockedPermissions": isQuest() ? ["android.permission.SYSTEM_ALERT_WINDOW"] : []
     },
     "web": {
       "favicon": "./assets/favicon.png"

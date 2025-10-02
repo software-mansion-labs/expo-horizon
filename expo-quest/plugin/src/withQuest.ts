@@ -1,4 +1,5 @@
 import { ConfigPlugin, withGradleProperties, withAndroidManifest } from '@expo/config-plugins';
+import { withProhibitedPermissions } from './withProhibitedPermissions';
 
 type HorizonOptions = {
   questAppId?: string;
@@ -16,6 +17,7 @@ const withQuest: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
       config = withPanelSize(config, options);
       config = withSupportedDevices(config, options);
       config = withVrHeadtracking(config, options);
+      config = withProhibitedPermissions(config);
   }
 
   return config;

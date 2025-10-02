@@ -13,6 +13,7 @@ import { StatusBar } from "expo-status-bar";
 import * as TaskManager from "expo-task-manager";
 import * as Location from "expo-quest-location";
 import { Section, SectionTitle } from "../components/Section";
+import ExpoQuest from 'expo-quest';
 
 export default function LocationScreen() {
   const [location, setLocation] = useState<Location.LocationObject | null>(
@@ -97,7 +98,7 @@ export default function LocationScreen() {
       setPermissions(perms);
 
       // Quest does not support background permissions
-      if (!Location.isQuest) {
+      if (!ExpoQuest.isQuestDevice) {
         const bgPerms = await Location.getBackgroundPermissionsAsync();
         setBackgroundPermissions(bgPerms);
       }
