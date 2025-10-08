@@ -1,0 +1,17 @@
+{
+  "parserOptions": {
+    "ecmaVersion": "2020",
+    "sourceType": "module"
+  },
+  "extends": [
+    "@react-native",
+    "eslint:recommended",
+    "prettier",
+    "plugin:prettier/recommended"
+  ],
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "rules": {}
+}
