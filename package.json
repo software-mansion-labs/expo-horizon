@@ -1,0 +1,17 @@
+{
+  "name": "expo-quest-sdk",
+  "private": true,
+  "workspaces": [
+    "expo-quest",
+    "expo-quest-location",
+    "expo-quest-notifications"
+  ],
+  "scripts": {
+    "build": "yarn workspaces run build",
+    "prepare": "yarn workspaces run prepare",
+    "clean": "yarn workspaces run clean"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0"
+  }
+}

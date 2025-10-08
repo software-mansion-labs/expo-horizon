@@ -5,7 +5,8 @@ This is an example app, that uses the `expo-quest-location` and `expo-quest-noti
 ### Usage
 
 ```bash
-cd ../example
+yarn install # to install dependencies in all expo-quest modules - only if needed
+cd example
 rm -rf android # (Optional) force prebuild by removing the `android` folder:
 yarn # install dependencies
 yarn quest # to run the app on Quest, it uses `EXPO_HORIZON=1` environment variable
