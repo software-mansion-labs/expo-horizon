@@ -5,8 +5,8 @@
   "scripts": {
     "start": "expo start",
     "prebuild": "expo prebuild",
-    "android": "expo run:android --variant mobile",
-    "quest": "expo run:android --variant quest",
+    "android": "expo run:android --variant mobileDebug",
+    "quest": "expo run:android --variant questDebug",
     "ios": "expo run:ios",
     "web": "expo start --web",
     "clean": "rm -rf node_modules && rm -rf android && rm -rf ios",

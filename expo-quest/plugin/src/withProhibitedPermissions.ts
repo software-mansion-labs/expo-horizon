@@ -1,9 +1,6 @@
 import { ConfigPlugin, withAndroidManifest } from "@expo/config-plugins";
 import { PROHIBITED_PERMISSIONS } from "./constants";
 
-// Re-export for backwards compatibility
-export { PROHIBITED_PERMISSIONS };
-
 /**
  * Config plugin that removes prohibited Android permissions from the manifest
  * when building for Meta Quest devices.
