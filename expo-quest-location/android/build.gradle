@@ -6,9 +6,9 @@ plugins {
 group = 'host.exp.exponent'
 version = '19.0.7'
 
-def horizonEnabled = providers.gradleProperty("horizonEnabled")
-    .map { it.toBoolean() }
-    .getOrElse(false)
+expoModule {
+  canBePublished false
+}
 
 android {
   namespace "expo.modules.location"
@@ -18,22 +18,15 @@ android {
     consumerProguardFiles("proguard-rules.pro")
   }
 
-  sourceSets {
-    main {
-      java {
-        if (horizonEnabled) {
-          srcDirs = ['src/main/java', 'src/horizon/java']
-        } else {
-          srcDirs = ['src/main/java', 'src/android/java']
-        }
-      }
-    }
+  flavorDimensions += "device"
+  productFlavors {
+    quest { dimension "device" }
+    mobile { dimension "device" }
   }
 }
 
 dependencies {
-  if (!horizonEnabled) {
-    api 'com.google.android.gms:play-services-location:21.0.1'
-  }
-implementation "androidx.annotation:annotation:1.3.0"
+  implementation 'androidx.core:core:1.6.0'
+  implementation "androidx.annotation:annotation:1.3.0"
+  mobileApi 'com.google.android.gms:play-services-location:21.0.1'
 }

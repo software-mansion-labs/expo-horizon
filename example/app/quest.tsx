@@ -1,19 +1,10 @@
 import React from "react";
-import { Alert, SafeAreaView, ScrollView, StyleSheet } from "react-native";
+import { SafeAreaView, ScrollView, StyleSheet } from "react-native";
 import { Section } from "../components/Section";
-import { TestButton } from "../components/TestButton";
 import ExpoQuest from "expo-quest";
+import { TestProperty } from "../components/TestProperty";
 
 export default function QuestScreen() {
-  const isQuestDevice = async () => {
-    Alert.alert("Is Quest Device", ExpoQuest.isQuestDevice.toString());
-  };
-
-  const getQuestAppID = async () => {
-    const questAppID = await ExpoQuest.questAppId;
-    Alert.alert("Quest App ID", questAppID);
-  };
-
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
@@ -21,8 +12,9 @@ export default function QuestScreen() {
         contentContainerStyle={styles.scrollContent}
       >
       <Section title="Quest">
-        <TestButton title="Is Quest Device" onPress={isQuestDevice} />
-        <TestButton title="Get Quest App ID" onPress={getQuestAppID} />
+        <TestProperty title="Is Quest Device" value={ExpoQuest.isQuestDevice.toString()} />
+        <TestProperty title="Is Quest Build" value={ExpoQuest.isQuestBuild.toString()} />
+        <TestProperty title="Quest App ID" value={ExpoQuest.questAppId?.toString() || "Not set"} />
       </Section>
       </ScrollView>
     </SafeAreaView>

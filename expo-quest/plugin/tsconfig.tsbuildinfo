@@ -1,1 +1,1 @@
-{"root":["./src/withprohibitedpermissions.ts","./src/withquest.ts"],"version":"5.9.3"}
+{"root":["./src/constants.ts","./src/withcustomandroidmanifest.ts","./src/withprohibitedpermissions.ts","./src/withquest.ts"],"version":"5.9.3"}

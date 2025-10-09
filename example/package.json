@@ -4,11 +4,13 @@
   "main": "expo-router/entry",
   "scripts": {
     "start": "expo start",
-    "android": "expo run:android",
-    "quest": "EXPO_HORIZON=1 expo run:android",
+    "prebuild": "expo prebuild",
+    "android": "expo run:android --variant mobileDebug",
+    "quest": "expo run:android --variant questDebug",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "clean": "rm -rf node_modules && rm -rf android && rm -rf ios"
+    "clean": "rm -rf node_modules && rm -rf android && rm -rf ios",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "expo": "~53.0.23",
@@ -21,6 +23,8 @@
     "expo-router": "~5.1.7",
     "expo-status-bar": "~2.2.3",
     "expo-task-manager": "^13.1.6",
+    "patch-package": "^8.0.1",
+    "postinstall-postinstall": "^2.1.0",
     "react": "19.0.0",
     "react-native": "0.79.5",
     "react-native-safe-area-context": "5.4.0",
