@@ -1,13 +1,16 @@
 import { NativeModule } from "expo";
 declare class ExpoQuestModule extends NativeModule {
     /**
-     * Returns true if the currently running device is a Quest device.
-     * @platform android
+     * Returns true if the current device is a Quest device.
      */
     isQuestDevice: boolean;
     /**
-     * The Quest app ID configured in the config plugin. It is null if not set.
-     * @platform android
+     * Returns true if the current build is a Quest build.
+     */
+    isQuestBuild: boolean;
+    /**
+     * The Quest app ID configured via the config plugin. Returns null if not set.
+     * Note: First check if you are on a Quest device using `isQuestDevice`.
      */
     questAppId: string | null;
 }
