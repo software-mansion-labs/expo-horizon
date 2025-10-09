@@ -17,19 +17,16 @@ type HorizonOptions = {
 const USE_EXPERIMENTAL_PLUGIN = true;
 
 const withQuest: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
-
   config = withQuestAppId(config, options);
 
-  if (process.env.EXPO_HORIZON) {
-    if (USE_EXPERIMENTAL_PLUGIN) {
-      config = withCustomAndroidManifest(config, options);
-    } else {
-      config = withQuestEnabled(config);
-      config = withPanelSize(config, options);
-      config = withSupportedDevices(config, options);
-      config = withVrHeadtracking(config, options);
-      config = withProhibitedPermissions(config);
-    }
+  if (USE_EXPERIMENTAL_PLUGIN) {
+    config = withCustomAndroidManifest(config, options);
+  } else if (process.env.EXPO_HORIZON) {
+    config = withQuestEnabled(config);
+    config = withPanelSize(config, options);
+    config = withSupportedDevices(config, options);
+    config = withVrHeadtracking(config, options);
+    config = withProhibitedPermissions(config);
   }
 
   return config;
