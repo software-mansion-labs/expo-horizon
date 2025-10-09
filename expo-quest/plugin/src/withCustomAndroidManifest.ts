@@ -90,8 +90,8 @@ const withQuestFlavorDimensions: ConfigPlugin = (config) => {
     const flavorConfig = `
     flavorDimensions += "device"
     productFlavors {
-        quest { dimension "device" }
         mobile { dimension "device" }
+        quest { dimension "device" }
     }
 `;
     
