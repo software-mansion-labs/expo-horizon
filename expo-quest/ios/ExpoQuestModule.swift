@@ -13,7 +13,7 @@ public class ExpoQuestModule: Module {
     }
 
     Constant("questAppId") {
-      nil
+      nil as String?
     }
   }
 }
