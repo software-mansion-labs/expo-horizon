@@ -23,7 +23,7 @@ yarn add expo-quest
 
 ## Prerequisites
 
-- Expo SDK 54 or higher
+- Expo SDK 54 or later (`expo` package version 54.0.13+).
 - Android development environment configured
 - Meta Quest developer account (for publishing)
 
