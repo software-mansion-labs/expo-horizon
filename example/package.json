@@ -9,11 +9,10 @@
     "quest": "expo run:android --variant questDebug",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "clean": "rm -rf node_modules && rm -rf android && rm -rf ios",
-    "postinstall": "patch-package"
+    "clean": "rm -rf node_modules && rm -rf android && rm -rf ios"
   },
   "dependencies": {
-    "expo": "^54.0.0",
+    "expo": "54.0.13",
     "expo-build-properties": "~1.0.9",
     "expo-constants": "~18.0.9",
     "expo-linking": "~8.0.8",
@@ -23,8 +22,6 @@
     "expo-router": "~6.0.10",
     "expo-status-bar": "~3.0.8",
     "expo-task-manager": "~14.0.7",
-    "patch-package": "^8.0.1",
-    "postinstall-postinstall": "^2.1.0",
     "react": "19.1.0",
     "react-native": "0.81.4",
     "react-native-safe-area-context": "~5.6.0",
