@@ -7,5 +7,13 @@ public class ExpoQuestModule: Module {
     Constant("isQuestDevice") {
       false
     }
+
+    Constant("isQuestBuild") {
+      false
+    }
+
+    Constant("questAppId") {
+      nil as String?
+    }
   }
 }
