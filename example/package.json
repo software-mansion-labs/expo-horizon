@@ -9,7 +9,8 @@
     "quest": "expo run:android --variant questDebug",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "clean": "rm -rf node_modules && rm -rf android && rm -rf ios"
+    "clean": "rm -rf node_modules && rm -rf android && rm -rf ios",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "expo": "54.0.13",
@@ -30,6 +31,8 @@
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@types/react": "~19.1.10",
+    "patch-package": "^8.0.1",
+    "postinstall-postinstall": "^2.1.0",
     "tsx": "^4.20.6",
     "typescript": "~5.9.2"
   },
