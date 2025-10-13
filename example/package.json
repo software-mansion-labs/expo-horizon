@@ -10,7 +10,7 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "clean": "rm -rf node_modules && rm -rf android && rm -rf ios",
-    "postinstall": "patch-package"
+    "postinstall": "patch-package",
     "lint": "eslint '**/*.{js,jsx,ts,tsx}'",
     "ts:check": "tsc -p . --noEmit",
     "prettier:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,css,scss,md}\"",
