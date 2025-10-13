@@ -89,7 +89,8 @@ Add the plugin to your `app.json` or `app.config.[js|ts]`:
           "defaultHeight": "640dp",
           "defaultWidth": "1024dp",
           "supportedDevices": "quest2|quest3|quest3s",
-          "disableVrHeadtracking": false
+          "disableVrHeadtracking": false,
+          "allowBackup": false
         }
       ]
     ]
@@ -99,13 +100,20 @@ Add the plugin to your `app.json` or `app.config.[js|ts]`:
 
 #### Available Options
 
-| Option                  | Type      | Required | Default   | Description                                                                                                                                                                |
-| ----------------------- | --------- | -------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `questAppId`            | `string`  | No       | `""`      | Your Meta Quest application ID. Required for publishing to the Meta Quest Store.                                                                                           |
-| `defaultHeight`         | `string`  | No       | Not added | Default panel height in dp (e.g., `"640dp"`). See [Panel Sizing](https://developers.meta.com/horizon/documentation/android-apps/panel-sizing)                              |
-| `defaultWidth`          | `string`  | No       | Not added | Default panel width in dp (e.g., `"1024dp"`). See [Panel Sizing](https://developers.meta.com/horizon/documentation/android-apps/panel-sizing)                              |
-| `supportedDevices`      | `string`  | Yes      | None      | Pipe-separated list of supported Quest devices: `"quest2\|quest3\|quest3s"`. See [Mobile Manifest](https://developers.meta.com/horizon/resources/publish-mobile-manifest/) |
-| `disableVrHeadtracking` | `boolean` | No       | `false`   | Set to `true` to disable VR headtracking feature. By default, adds `android.hardware.vr.headtracking` to AndroidManifest.                                                  |
+| Option                  | Type      | Required | Default   | Description                                                                                                                                                                                                                      |
+| ----------------------- | --------- | -------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `questAppId`            | `string`  | No       | `""`      | Your Meta Quest application ID. Required for publishing to the Meta Quest Store.                                                                                                                                                 |
+| `defaultHeight`         | `string`  | No       | Not added | Default panel height in dp (e.g., `"640dp"`). See [Panel Sizing](https://developers.meta.com/horizon/documentation/android-apps/panel-sizing)                                                                                    |
+| `defaultWidth`          | `string`  | No       | Not added | Default panel width in dp (e.g., `"1024dp"`). See [Panel Sizing](https://developers.meta.com/horizon/documentation/android-apps/panel-sizing)                                                                                    |
+| `supportedDevices`      | `string`  | Yes      | None      | Pipe-separated list of supported Quest devices: `"quest2\|quest3\|quest3s"`. See [Mobile Manifest](https://developers.meta.com/horizon/resources/publish-mobile-manifest/)                                                       |
+| `disableVrHeadtracking` | `boolean` | No       | `false`   | Set to `true` to disable VR headtracking feature. By default, adds `android.hardware.vr.headtracking` to AndroidManifest.                                                                                                        |
+| `allowBackup`           | `boolean` | No       | `false`   | Set to `true` in the Quest build to enable Android's `allowBackup` feature. The default value is `false` which removes the "allowBackup=true" warning in the Meta Horizon Store. This does not affect your mobile build variant. |
+
+
+> **Meta Horizon Store Recommendation for `allowBackup`:**
+>
+> If the application is storing sensitive information on the device, it is recommended to disable backups by setting `allowBackup="false"` in your application's AndroidManifest.
+>
 
 ### Configuration Examples
 

@@ -12,6 +12,7 @@ type HorizonOptions = {
   defaultWidth?: string;
   supportedDevices?: string;
   disableVrHeadtracking?: boolean;
+  allowBackup?: boolean;
 };
 
 const USE_EXPERIMENTAL_PLUGIN = true;
