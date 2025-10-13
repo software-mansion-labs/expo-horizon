@@ -47,7 +47,8 @@ module.exports = () => ({
                 "defaultHeight": "640dp",
                 "defaultWidth": "1024dp",
                 "supportedDevices": "quest2|quest3|quest3s",
-                "disableVrHeadtracking": false
+                "disableVrHeadtracking": false,
+                "allowBackup": false
             }
         ],
         "expo-task-manager",

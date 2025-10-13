@@ -14,6 +14,7 @@ type QuestManifestOptions = {
   defaultWidth?: string;
   supportedDevices?: string;
   disableVrHeadtracking?: boolean;
+  allowBackup?: boolean;
 };
 
 /**
@@ -180,7 +181,13 @@ function createQuestManifest(
 
   // Create application node with only Quest-specific additions
   const application: any = {
-    $: {},
+    $: {
+      // Default to false for Quest (disabled by default for security, recommended by Meta)
+      // User can enable with allowBackup: true option
+      "android:allowBackup": String(options.allowBackup ?? false),
+      // Tell the manifest merger to replace the `allowBackup` value from main manifest
+      "tools:replace": "android:allowBackup",
+    },
     "meta-data": [],
     activity: [],
   };
@@ -217,10 +224,7 @@ function createQuestManifest(
     });
   }
 
-  // Only add application if it has content
-  if (application["meta-data"].length > 0 || application.activity.length > 0) {
-    manifest.manifest.application!.push(application);
-  }
+  manifest.manifest.application!.push(application);
 
   return manifest;
 }
