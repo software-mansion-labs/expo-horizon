@@ -6,6 +6,7 @@ import expo.modules.kotlin.Promise
 import expo.modules.kotlin.exception.Exceptions
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
+import expo.modules.notifications.BuildConfig
 import expo.modules.notifications.service.delegates.FirebaseMessagingDelegate.Companion.addTokenListener
 import expo.modules.notifications.tokens.interfaces.FirebaseTokenListener
 
@@ -16,7 +17,7 @@ private const val UNREGISTER_FOR_NOTIFICATIONS_FAIL_CODE = "E_UNREGISTER_FOR_NOT
 
 class PushTokenModule : Module(), FirebaseTokenListener {
   private companion object {
-    private const val APP_ID = "31229554193356425"
+    private const val APP_ID = BuildConfig.META_QUEST_APP_ID
   }
 
   /**
