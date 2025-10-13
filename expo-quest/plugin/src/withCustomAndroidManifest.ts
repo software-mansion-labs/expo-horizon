@@ -182,9 +182,9 @@ function createQuestManifest(
   // Create application node with only Quest-specific additions
   const application: any = {
     $: {
-      // Default to true for Quest (disabled by default for security, recommended by Meta)
+      // Default to false for Quest (disabled by default for security, recommended by Meta)
       // User can enable with allowBackup: true option
-      "android:allowBackup": String(options.allowBackup ?? true),
+      "android:allowBackup": String(options.allowBackup ?? false),
       // Tell the manifest merger to replace the `allowBackup` value from main manifest
       "tools:replace": "android:allowBackup",
     },
