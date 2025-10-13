@@ -1,26 +1,32 @@
-import { View, Text, StyleSheet } from "react-native";
-import React from "react";
+import { View, Text, StyleSheet } from 'react-native'
+import React from 'react'
 
-export function Section({ title, children }: { title: string, children: React.ReactNode }) {
+export function Section({
+  title,
+  children,
+}: {
+  title: string
+  children: React.ReactNode
+}) {
   return (
     <View style={styles.section}>
       <SectionTitle title={title} />
       {children}
     </View>
-  );
+  )
 }
 
 export function SectionTitle({ title }: { title: string }) {
-  return <Text style={styles.sectionTitle}>{title}</Text>;
+  return <Text style={styles.sectionTitle}>{title}</Text>
 }
 
 const styles = StyleSheet.create({
-    section: {
-    backgroundColor: "#fff",
+  section: {
+    backgroundColor: '#fff',
     borderRadius: 10,
     padding: 15,
     marginBottom: 15,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -28,8 +34,8 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginBottom: 10,
-    color: "#333",
+    color: '#333',
   },
-});
+})

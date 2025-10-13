@@ -13,5 +13,6 @@
     "browser": true,
     "node": true
   },
-  "rules": {}
+  "rules": {},
+  "ignorePatterns": ["metro.config.js"]
 }
