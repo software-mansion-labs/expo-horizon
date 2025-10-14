@@ -3,21 +3,19 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   View,
-  StyleSheet,
   Text,
   Alert,
 } from 'react-native'
-
+import { GlobalStyles } from '../constants/styles'
+import { Colors } from '../constants/colors'
 export const TestButton = ({
   title,
   onPress,
-  color = '#007AFF',
-  _loadingKey,
+  color = Colors.swmNavy,
 }: {
   title: string
   onPress: () => Promise<void>
   color?: string
-  _loadingKey?: string
 }) => {
   const [isButtonLoading, setIsButtonLoading] = useState(false)
 
@@ -39,49 +37,25 @@ export const TestButton = ({
   return (
     <TouchableOpacity
       style={[
-        styles.button,
+        GlobalStyles.button,
         { backgroundColor: color },
-        isButtonLoading && styles.buttonDisabled,
+        isButtonLoading && GlobalStyles.buttonDisabled,
       ]}
       onPress={() => internalOnPress()}
       disabled={isButtonLoading}
     >
-      <View style={styles.buttonContent}>
+      <View style={GlobalStyles.buttonContent}>
         {isButtonLoading && (
           <ActivityIndicator
             size="small"
             color="#fff"
-            style={styles.loadingIndicator}
+            style={GlobalStyles.loadingIndicator}
           />
         )}
-        <Text style={styles.buttonText}>
+        <Text style={GlobalStyles.buttonText}>
           {isButtonLoading ? `${title}...` : title}
         </Text>
       </View>
     </TouchableOpacity>
   )
 }
-
-const styles = StyleSheet.create({
-  button: {
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 8,
-    alignItems: 'center',
-  },
-  buttonContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  loadingIndicator: {
-    marginRight: 8,
-  },
-  buttonDisabled: {
-    opacity: 0.7,
-  },
-})

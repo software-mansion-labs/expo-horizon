@@ -1,15 +1,16 @@
 import React from 'react'
-import { SafeAreaView, ScrollView, StyleSheet } from 'react-native'
+import { SafeAreaView, ScrollView } from 'react-native'
 import { Section } from '../components/Section'
 import ExpoQuest from 'expo-quest'
 import { TestProperty } from '../components/TestProperty'
+import { GlobalStyles } from '../constants/styles'
 
 export default function QuestScreen() {
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={GlobalStyles.screenContainer}>
       <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
+        style={GlobalStyles.scrollView}
+        contentContainerStyle={GlobalStyles.scrollContent}
       >
         <Section title="Quest">
           <TestProperty
@@ -29,16 +30,3 @@ export default function QuestScreen() {
     </SafeAreaView>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    padding: 20,
-  },
-})

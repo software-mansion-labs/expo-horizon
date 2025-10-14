@@ -1,0 +1,105 @@
+import { StyleSheet } from 'react-native'
+import { Colors } from './colors'
+
+export const GlobalStyles = StyleSheet.create({
+  screenContainer: {
+    flex: 1,
+    backgroundColor: Colors.swmBlue,
+  },
+  centeredContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    backgroundColor: '#f5f5f5',
+  },
+  contentContainer: {
+    padding: 20,
+  },
+
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  infoBox: {
+    backgroundColor: '#f8f8f8',
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    padding: 20,
+  },
+  pageTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 20,
+    color: Colors.swmNavy,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: Colors.swmNavy,
+  },
+  itemTitle: {
+    marginRight: 8,
+    fontWeight: 'bold',
+    color: Colors.swmNavy,
+  },
+  dataText: {
+    fontSize: 14,
+    marginBottom: 3,
+    color: '#333',
+  },
+  statusLabel: {
+    fontWeight: 'bold',
+    color: '#666',
+  },
+  statusValue: {
+    color: Colors.swmNavy,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+
+  button: {
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    marginBottom: 8,
+    alignItems: 'center',
+    width: '100%',
+  },
+  buttonPrimary: {
+    backgroundColor: Colors.swmNavy,
+  },
+  buttonDanger: {
+    backgroundColor: Colors.swmRed,
+  },
+  buttonDisabled: {
+    opacity: 0.7,
+  },
+  buttonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  loadingIndicator: {
+    marginRight: 8,
+  },
+})

@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import {
-  StyleSheet,
   Text,
   View,
   ScrollView,
@@ -14,7 +13,51 @@ import * as TaskManager from 'expo-task-manager'
 import * as Location from 'expo-quest-location'
 import { Section, SectionTitle } from '../components/Section'
 import ExpoQuest from 'expo-quest'
+import { GlobalStyles } from '../constants/styles'
 
+const TestButton = ({
+  title,
+  onPress,
+  color = '#007AFF',
+  isButtonLoading,
+}: {
+  title: string
+  onPress: () => void
+  color?: string
+  isButtonLoading: boolean
+}) => {
+  return (
+    <TouchableOpacity
+      style={[
+        GlobalStyles.button,
+        { backgroundColor: color },
+        isButtonLoading && GlobalStyles.buttonDisabled,
+      ]}
+      onPress={onPress}
+      disabled={isButtonLoading}
+    >
+      <View style={GlobalStyles.buttonContent}>
+        {isButtonLoading && (
+          <ActivityIndicator
+            size="small"
+            color="#fff"
+            style={GlobalStyles.loadingIndicator}
+          />
+        )}
+        <Text style={GlobalStyles.buttonText}>
+          {isButtonLoading ? `${title}...` : title}
+        </Text>
+      </View>
+    </TouchableOpacity>
+  )
+}
+
+const StatusText = ({ label, value }: { label: string; value: any }) => (
+  <Text style={GlobalStyles.dataText}>
+    <Text style={GlobalStyles.statusLabel}>{label}: </Text>
+    <Text style={GlobalStyles.statusValue}>{String(value)}</Text>
+  </Text>
+)
 export default function LocationScreen() {
   const [location, setLocation] = useState<Location.LocationObject | null>(null)
   const [, setLastKnownLocation] = useState<Location.LocationObject | null>(
@@ -57,12 +100,7 @@ export default function LocationScreen() {
   // Helper function to check if operation is loading
   const isLoading = (operation: string) => loadingStates[operation] || false
 
-  useEffect(() => {
-    checkInitialStatus()
-    setupTaskManager()
-  })
-
-  const setupTaskManager = () => {
+  const setupTaskManager = useCallback(() => {
     // Define background tasks
     TaskManager.defineTask(
       'test-location-task',
@@ -85,9 +123,9 @@ export default function LocationScreen() {
         console.log('Geofencing task data:', data)
       }
     )
-  }
+  }, [])
 
-  const checkInitialStatus = async () => {
+  const checkInitialStatus = useCallback(async () => {
     try {
       setLoading('checkInitialStatus', true)
       const status = await Location.getProviderStatusAsync()
@@ -112,9 +150,9 @@ export default function LocationScreen() {
     } finally {
       setLoading('checkInitialStatus', false)
     }
-  }
+  }, [])
 
-  const requestForegroundPermissions = async () => {
+  const requestForegroundPermissions = useCallback(async () => {
     try {
       setLoading('requestForegroundPermissions', true)
       const result = await Location.requestForegroundPermissionsAsync()
@@ -125,9 +163,9 @@ export default function LocationScreen() {
     } finally {
       setLoading('requestForegroundPermissions', false)
     }
-  }
+  }, [])
 
-  const requestBackgroundPermissions = async () => {
+  const requestBackgroundPermissions = useCallback(async () => {
     try {
       setLoading('requestBackgroundPermissions', true)
       const result = await Location.requestBackgroundPermissionsAsync()
@@ -138,9 +176,9 @@ export default function LocationScreen() {
     } finally {
       setLoading('requestBackgroundPermissions', false)
     }
-  }
+  }, [])
 
-  const getCurrentPosition = async () => {
+  const getCurrentPosition = useCallback(async () => {
     try {
       setLoading('getCurrentPosition', true)
 
@@ -182,9 +220,9 @@ export default function LocationScreen() {
     } finally {
       setLoading('getCurrentPosition', false)
     }
-  }
+  }, [])
 
-  const getLastKnownPosition = async () => {
+  const getLastKnownPosition = useCallback(async () => {
     try {
       setLoading('getLastKnownPosition', true)
       const position = await Location.getLastKnownPositionAsync({
@@ -205,9 +243,9 @@ export default function LocationScreen() {
     } finally {
       setLoading('getLastKnownPosition', false)
     }
-  }
+  }, [])
 
-  const startLocationWatching = async () => {
+  const startLocationWatching = useCallback(async () => {
     try {
       setLoading('startLocationWatching', true)
 
@@ -262,18 +300,18 @@ export default function LocationScreen() {
     } finally {
       setLoading('startLocationWatching', false)
     }
-  }
+  }, [])
 
-  const stopLocationWatching = () => {
+  const stopLocationWatching = useCallback(() => {
     if (locationSubscription) {
       locationSubscription.remove()
       setLocationSubscription(null)
       setLocationUpdatesActive(false)
       Alert.alert('Location Watching', 'Stopped watching location updates')
     }
-  }
+  }, [locationSubscription])
 
-  const getHeading = async () => {
+  const getHeading = useCallback(async () => {
     try {
       setLoading('getHeading', true)
       const headingData = await Location.getHeadingAsync()
@@ -287,9 +325,9 @@ export default function LocationScreen() {
     } finally {
       setLoading('getHeading', false)
     }
-  }
+  }, [])
 
-  const startHeadingWatching = async () => {
+  const startHeadingWatching = useCallback(async () => {
     try {
       setLoading('startHeadingWatching', true)
       const subscription = await Location.watchHeadingAsync(
@@ -308,17 +346,17 @@ export default function LocationScreen() {
     } finally {
       setLoading('startHeadingWatching', false)
     }
-  }
+  }, [])
 
-  const stopHeadingWatching = () => {
+  const stopHeadingWatching = useCallback(() => {
     if (headingSubscription) {
       headingSubscription.remove()
       setHeadingSubscription(null)
       Alert.alert('Heading Watching', 'Stopped watching heading updates')
     }
-  }
+  }, [headingSubscription])
 
-  const geocodeAddress = async () => {
+  const geocodeAddress = useCallback(async () => {
     try {
       setLoading('geocodeAddress', true)
       const locations = await Location.geocodeAsync(
@@ -335,9 +373,9 @@ export default function LocationScreen() {
     } finally {
       setLoading('geocodeAddress', false)
     }
-  }
+  }, [])
 
-  const reverseGeocodeLocation = async () => {
+  const reverseGeocodeLocation = useCallback(async () => {
     try {
       setLoading('reverseGeocodeLocation', true)
       const addresses = await Location.reverseGeocodeAsync({
@@ -358,9 +396,9 @@ export default function LocationScreen() {
     } finally {
       setLoading('reverseGeocodeLocation', false)
     }
-  }
+  }, [])
 
-  const startBackgroundLocationUpdates = async () => {
+  const startBackgroundLocationUpdates = useCallback(async () => {
     try {
       setLoading('startBackgroundLocationUpdates', true)
 
@@ -405,9 +443,9 @@ export default function LocationScreen() {
     } finally {
       setLoading('startBackgroundLocationUpdates', false)
     }
-  }
+  }, [])
 
-  const stopBackgroundLocationUpdates = async () => {
+  const stopBackgroundLocationUpdates = useCallback(async () => {
     try {
       setLoading('stopBackgroundLocationUpdates', true)
       await Location.stopLocationUpdatesAsync('test-location-task')
@@ -421,9 +459,9 @@ export default function LocationScreen() {
     } finally {
       setLoading('stopBackgroundLocationUpdates', false)
     }
-  }
+  }, [])
 
-  const startGeofencing = async () => {
+  const startGeofencing = useCallback(async () => {
     try {
       setLoading('startGeofencing', true)
 
@@ -469,9 +507,9 @@ export default function LocationScreen() {
     } finally {
       setLoading('startGeofencing', false)
     }
-  }
+  }, [])
 
-  const stopGeofencing = async () => {
+  const stopGeofencing = useCallback(async () => {
     try {
       setLoading('stopGeofencing', true)
       await Location.stopGeofencingAsync('test-geofencing-task')
@@ -482,9 +520,9 @@ export default function LocationScreen() {
     } finally {
       setLoading('stopGeofencing', false)
     }
-  }
+  }, [])
 
-  const enableNetworkProvider = async () => {
+  const enableNetworkProvider = useCallback(async () => {
     if (Platform.OS === 'android') {
       try {
         setLoading('enableNetworkProvider', true)
@@ -501,9 +539,9 @@ export default function LocationScreen() {
         'This method is only available on Android'
       )
     }
-  }
+  }, [])
 
-  const checkLocationUpdatesStatus = async () => {
+  const checkLocationUpdatesStatus = useCallback(async () => {
     try {
       setLoading('checkLocationUpdatesStatus', true)
       const hasStarted =
@@ -514,9 +552,9 @@ export default function LocationScreen() {
     } finally {
       setLoading('checkLocationUpdatesStatus', false)
     }
-  }
+  }, [])
 
-  const checkGeofencingStatus = async () => {
+  const checkGeofencingStatus = useCallback(async () => {
     try {
       setLoading('checkGeofencingStatus', true)
       const hasStarted = await Location.hasStartedGeofencingAsync(
@@ -528,71 +566,30 @@ export default function LocationScreen() {
     } finally {
       setLoading('checkGeofencingStatus', false)
     }
-  }
+  }, [])
 
-  const TestButton = ({
-    title,
-    onPress,
-    color = '#007AFF',
-    _loadingKey,
-  }: {
-    title: string
-    onPress: () => void
-    color?: string
-    _loadingKey?: string
-  }) => {
-    const isButtonLoading = _loadingKey ? isLoading(_loadingKey) : false
-
-    return (
-      <TouchableOpacity
-        style={[
-          styles.button,
-          { backgroundColor: color },
-          isButtonLoading && styles.buttonDisabled,
-        ]}
-        onPress={onPress}
-        disabled={isButtonLoading}
-      >
-        <View style={styles.buttonContent}>
-          {isButtonLoading && (
-            <ActivityIndicator
-              size="small"
-              color="#fff"
-              style={styles.loadingIndicator}
-            />
-          )}
-          <Text style={styles.buttonText}>
-            {isButtonLoading ? `${title}...` : title}
-          </Text>
-        </View>
-      </TouchableOpacity>
-    )
-  }
-
-  const StatusText = ({ label, value }: { label: string; value: any }) => (
-    <Text style={styles.statusText}>
-      <Text style={styles.statusLabel}>{label}: </Text>
-      <Text style={styles.statusValue}>{String(value)}</Text>
-    </Text>
-  )
+  useEffect(() => {
+    checkInitialStatus()
+    setupTaskManager()
+  }, [checkInitialStatus, setupTaskManager])
 
   return (
-    <View style={styles.container}>
+    <View style={GlobalStyles.screenContainer}>
       <StatusBar style="auto" />
       <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
+        style={GlobalStyles.scrollView}
+        contentContainerStyle={GlobalStyles.scrollContent}
       >
         <Section title="Permissions">
           <TestButton
             title="Request Foreground Permissions"
             onPress={requestForegroundPermissions}
-            _loadingKey="requestForegroundPermissions"
+            isButtonLoading={isLoading('requestForegroundPermissions')}
           />
           <TestButton
             title="Request Background Permissions"
             onPress={requestBackgroundPermissions}
-            _loadingKey="requestBackgroundPermissions"
+            isButtonLoading={isLoading('requestBackgroundPermissions')}
           />
           <StatusText label="Services Enabled" value={servicesEnabled} />
           <StatusText
@@ -609,34 +606,35 @@ export default function LocationScreen() {
           <TestButton
             title="Get Current Position"
             onPress={getCurrentPosition}
-            _loadingKey="getCurrentPosition"
+            isButtonLoading={isLoading('getCurrentPosition')}
           />
           <TestButton
             title="Get Last Known Position"
             onPress={getLastKnownPosition}
-            _loadingKey="getLastKnownPosition"
+            isButtonLoading={isLoading('getLastKnownPosition')}
           />
           <TestButton
             title="Start Location Watching"
             onPress={startLocationWatching}
-            _loadingKey="startLocationWatching"
+            isButtonLoading={isLoading('startLocationWatching')}
           />
           <TestButton
             title="Stop Location Watching"
             onPress={stopLocationWatching}
             color="#FF3B30"
+            isButtonLoading={isLoading('stopLocationWatching')}
           />
           <SectionTitle title="Current Location" />
-          <Text style={styles.dataText}>
+          <Text style={GlobalStyles.dataText}>
             Latitude: {location?.coords?.latitude || 'Unknown'}
           </Text>
-          <Text style={styles.dataText}>
+          <Text style={GlobalStyles.dataText}>
             Longitude: {location?.coords?.longitude || 'Unknown'}
           </Text>
-          <Text style={styles.dataText}>
+          <Text style={GlobalStyles.dataText}>
             Accuracy: {location?.coords?.accuracy || 'Unknown'}m
           </Text>
-          <Text style={styles.dataText}>
+          <Text style={GlobalStyles.dataText}>
             Timestamp:{' '}
             {location?.timestamp
               ? new Date(location.timestamp).toLocaleString()
@@ -656,26 +654,27 @@ export default function LocationScreen() {
           <TestButton
             title="Get Heading"
             onPress={getHeading}
-            _loadingKey="getHeading"
+            isButtonLoading={isLoading('getHeading')}
           />
           <TestButton
             title="Start Heading Watching"
             onPress={startHeadingWatching}
-            _loadingKey="startHeadingWatching"
+            isButtonLoading={isLoading('startHeadingWatching')}
           />
           <TestButton
             title="Stop Heading Watching"
             onPress={stopHeadingWatching}
             color="#FF3B30"
+            isButtonLoading={isLoading('stopHeadingWatching')}
           />
           <SectionTitle title="Current Heading" />
-          <Text style={styles.dataText}>
+          <Text style={GlobalStyles.dataText}>
             True Heading: {heading?.trueHeading || 'Unknown'}°
           </Text>
-          <Text style={styles.dataText}>
+          <Text style={GlobalStyles.dataText}>
             Magnetic Heading: {heading?.magHeading || 'Unknown'}°
           </Text>
-          <Text style={styles.dataText}>
+          <Text style={GlobalStyles.dataText}>
             Accuracy: {heading?.accuracy || 'Unknown'}
           </Text>
         </Section>
@@ -685,38 +684,40 @@ export default function LocationScreen() {
           <TestButton
             title="Geocode Address"
             onPress={geocodeAddress}
-            _loadingKey="geocodeAddress"
+            isButtonLoading={isLoading('geocodeAddress')}
           />
           <TestButton
             title="Reverse Geocode Location"
             onPress={reverseGeocodeLocation}
-            _loadingKey="reverseGeocodeLocation"
+            isButtonLoading={isLoading('reverseGeocodeLocation')}
           />
         </Section>
 
         <Section title="Geocoded Address">
           {geocodedAddress && geocodedAddress.length > 0 ? (
             geocodedAddress.map((address, index) => (
-              <View key={index} style={styles.addressContainer}>
-                <Text style={styles.dataText}>
+              <View key={index} style={GlobalStyles.infoBox}>
+                <Text style={GlobalStyles.dataText}>
                   Name: {address.name || 'N/A'}
                 </Text>
-                <Text style={styles.dataText}>
+                <Text style={GlobalStyles.dataText}>
                   Street: {address.street || ''} {address.streetNumber || ''}
                 </Text>
-                <Text style={styles.dataText}>
+                <Text style={GlobalStyles.dataText}>
                   City: {address.city || 'N/A'}
                 </Text>
-                <Text style={styles.dataText}>
+                <Text style={GlobalStyles.dataText}>
                   Region: {address.region || 'N/A'}
                 </Text>
-                <Text style={styles.dataText}>
+                <Text style={GlobalStyles.dataText}>
                   Country: {address.country || 'N/A'}
                 </Text>
               </View>
             ))
           ) : (
-            <Text style={styles.dataText}>No geocoded addresses available</Text>
+            <Text style={GlobalStyles.dataText}>
+              No geocoded addresses available
+            </Text>
           )}
         </Section>
 
@@ -724,16 +725,22 @@ export default function LocationScreen() {
           <SectionTitle title="Geocoded Location" />
           {geocodedLocation && geocodedLocation.length > 0 ? (
             geocodedLocation.map((loc, index) => (
-              <View key={index} style={styles.locationContainer}>
-                <Text style={styles.dataText}>Latitude: {loc.latitude}</Text>
-                <Text style={styles.dataText}>Longitude: {loc.longitude}</Text>
-                <Text style={styles.dataText}>
+              <View key={index} style={GlobalStyles.infoBox}>
+                <Text style={GlobalStyles.dataText}>
+                  Latitude: {loc.latitude}
+                </Text>
+                <Text style={GlobalStyles.dataText}>
+                  Longitude: {loc.longitude}
+                </Text>
+                <Text style={GlobalStyles.dataText}>
                   Accuracy: {loc.accuracy || 'Unknown'}m
                 </Text>
               </View>
             ))
           ) : (
-            <Text style={styles.dataText}>No geocoded locations available</Text>
+            <Text style={GlobalStyles.dataText}>
+              No geocoded locations available
+            </Text>
           )}
         </Section>
 
@@ -745,24 +752,24 @@ export default function LocationScreen() {
           <TestButton
             title="Start Background Location Updates"
             onPress={startBackgroundLocationUpdates}
-            _loadingKey="startBackgroundLocationUpdates"
+            isButtonLoading={isLoading('startBackgroundLocationUpdates')}
           />
           <TestButton
             title="Stop Background Location Updates"
             onPress={stopBackgroundLocationUpdates}
             color="#FF3B30"
-            _loadingKey="stopBackgroundLocationUpdates"
+            isButtonLoading={isLoading('stopBackgroundLocationUpdates')}
           />
           <TestButton
             title="Start Geofencing"
             onPress={startGeofencing}
-            _loadingKey="startGeofencing"
+            isButtonLoading={isLoading('startGeofencing')}
           />
           <TestButton
             title="Stop Geofencing"
             onPress={stopGeofencing}
             color="#FF3B30"
-            _loadingKey="stopGeofencing"
+            isButtonLoading={isLoading('stopGeofencing')}
           />
         </Section>
 
@@ -770,89 +777,20 @@ export default function LocationScreen() {
           <TestButton
             title="Enable Network Provider"
             onPress={enableNetworkProvider}
-            _loadingKey="enableNetworkProvider"
+            isButtonLoading={isLoading('enableNetworkProvider')}
           />
           <TestButton
             title="Check Location Updates Status"
             onPress={checkLocationUpdatesStatus}
-            _loadingKey="checkLocationUpdatesStatus"
+            isButtonLoading={isLoading('checkLocationUpdatesStatus')}
           />
           <TestButton
             title="Check Geofencing Status"
             onPress={checkGeofencingStatus}
-            _loadingKey="checkGeofencingStatus"
+            isButtonLoading={isLoading('checkGeofencingStatus')}
           />
         </Section>
       </ScrollView>
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 20,
-    color: '#333',
-  },
-  button: {
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 8,
-    alignItems: 'center',
-  },
-  buttonContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  loadingIndicator: {
-    marginRight: 8,
-  },
-  buttonDisabled: {
-    opacity: 0.7,
-  },
-  statusText: {
-    fontSize: 14,
-    marginBottom: 5,
-  },
-  statusLabel: {
-    fontWeight: 'bold',
-    color: '#666',
-  },
-  statusValue: {
-    color: '#333',
-  },
-  dataText: {
-    fontSize: 14,
-    marginBottom: 3,
-    color: '#333',
-  },
-  addressContainer: {
-    backgroundColor: '#f8f8f8',
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 10,
-  },
-  locationContainer: {
-    backgroundColor: '#f8f8f8',
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 10,
-  },
-})
