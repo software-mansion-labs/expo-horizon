@@ -238,9 +238,29 @@ console.log('Quest App ID:', appId ?? 'Not configured');
 
 #### Accessing Quest App ID in Android
 
-You can access the Quest App ID from your custom Expo modules in Kotlin:
+To access the Quest App ID from your custom Expo modules written in Kotlin, follow these steps:
 
-// TODO: Add example
+1. Add the configuration field to your `build.gradle`:
+
+```gradle
+// The `questAppId` property is added by the expo-quest config plugin.
+def questAppIdConfigField = "\"${project.findProperty('questAppId') ?: ''}\""
+
+android {
+  defaultConfig {
+    buildConfigField "String", "META_QUEST_APP_ID", questAppIdConfigField
+  }
+}
+```
+
+2. Access the Quest App ID in your native module code:
+
+```kotlin
+val questAppId = BuildConfig.META_QUEST_APP_ID
+```
+
+Now, `questAppId` will contain the value of your Quest App ID as defined in your build configuration.
+
 
 
 # Resources
