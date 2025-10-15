@@ -11,7 +11,7 @@
     "web": "expo start --web",
     "clean": "rm -rf node_modules && rm -rf android && rm -rf ios",
     "postinstall": "patch-package",
-    "lint": "eslint '**/*.{js,jsx,ts,tsx}'",
+    "lint": "eslint '**/*.{js,jsx,ts,tsx}' --max-warnings 0",
     "ts:check": "tsc -p . --noEmit",
     "prettier:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,css,scss,md}\"",
     "prettier:write": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,scss,md}\""
