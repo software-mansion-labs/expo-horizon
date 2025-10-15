@@ -11,7 +11,7 @@ export const GlobalStyles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: Colors.white,
   },
   contentContainer: {
     padding: 20,
