@@ -66,7 +66,7 @@ export const GlobalStyles = StyleSheet.create({
   },
   statusLabel: {
     fontWeight: 'bold',
-    color: '#666',
+    color: Colors.swmNavy,
   },
   statusValue: {
     color: Colors.swmNavy,
