@@ -183,8 +183,8 @@ export default function LocationScreen() {
       setLoading('getCurrentPosition', true)
 
       // Check if location services are enabled
-      const servicesEnabled = await Location.hasServicesEnabledAsync()
-      if (!servicesEnabled) {
+      const areServicesEnabled = await Location.hasServicesEnabledAsync()
+      if (!areServicesEnabled) {
         Alert.alert(
           'Location Services',
           'Location services are disabled. Please enable them in device settings.'
@@ -193,8 +193,9 @@ export default function LocationScreen() {
       }
 
       // Check permissions
-      const permissions = await Location.getForegroundPermissionsAsync()
-      if (permissions.status !== 'granted') {
+      const foregroundPermissions =
+        await Location.getForegroundPermissionsAsync()
+      if (foregroundPermissions.status !== 'granted') {
         Alert.alert(
           'Permissions Required',
           'Location permissions are required. Please grant them in settings.'
@@ -250,8 +251,8 @@ export default function LocationScreen() {
       setLoading('startLocationWatching', true)
 
       // Check if location services are enabled
-      const servicesEnabled = await Location.hasServicesEnabledAsync()
-      if (!servicesEnabled) {
+      const areServicesEnabled = await Location.hasServicesEnabledAsync()
+      if (!areServicesEnabled) {
         Alert.alert(
           'Location Services',
           'Location services are disabled. Please enable them in device settings.'
@@ -260,8 +261,9 @@ export default function LocationScreen() {
       }
 
       // Check permissions
-      const permissions = await Location.getForegroundPermissionsAsync()
-      if (permissions.status !== 'granted') {
+      const foregroundPermissions =
+        await Location.getForegroundPermissionsAsync()
+      if (foregroundPermissions.status !== 'granted') {
         Alert.alert(
           'Permissions Required',
           'Location permissions are required. Please grant them in settings.'
