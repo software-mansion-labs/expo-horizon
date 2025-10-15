@@ -30,7 +30,7 @@ export const GlobalStyles = StyleSheet.create({
   },
   infoBox: {
     backgroundColor: Colors.white,
-    padding: 10,
+    padding: 12,
     borderRadius: 4,
     marginBottom: 10,
   },
