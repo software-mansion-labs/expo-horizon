@@ -61,7 +61,7 @@ export const GlobalStyles = StyleSheet.create({
   },
   dataText: {
     fontSize: 14,
-    marginBottom: 3,
+    marginBottom: 4,
     color: '#333',
   },
   statusLabel: {
