@@ -1,9 +1,10 @@
-import { Alert, SafeAreaView, ScrollView, StyleSheet } from 'react-native'
+import { Alert, SafeAreaView, ScrollView } from 'react-native'
 import React from 'react'
 import { Section } from '../components/Section'
 import { TestButton } from '../components/TestButton'
 import * as Notifications from 'expo-quest-notifications'
 import ExpoQuest from 'expo-quest'
+import { GlobalStyles } from '../constants/styles'
 
 Notifications.setNotificationHandler({
   handleNotification: async () => {
@@ -47,56 +48,29 @@ export default function NotificationsScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={GlobalStyles.screenContainer}>
       <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
+        style={GlobalStyles.scrollView}
+        contentContainerStyle={GlobalStyles.scrollContent}
       >
         <Section title="Permissions">
           <TestButton
             title="Request Permissions"
             onPress={requestPermissions}
-            _loadingKey="requestPermissions"
           />
-          <TestButton
-            title="Get Permissions"
-            onPress={getPermissions}
-            _loadingKey="getPermissions"
-          />
+          <TestButton title="Get Permissions" onPress={getPermissions} />
         </Section>
         <Section title="Local Notifications">
-          <TestButton
-            title="Send Notification"
-            onPress={sendNotification}
-            _loadingKey="sendNotification"
-          />
+          <TestButton title="Send Notification" onPress={sendNotification} />
         </Section>
         <Section title="Remote Notifications">
-          <TestButton
-            title="Get Push Token"
-            onPress={getPushToken}
-            _loadingKey="registerForRemoteNotifications"
-          />
+          <TestButton title="Get Push Token" onPress={getPushToken} />
           <TestButton
             title="Get Device Token"
             onPress={async () => console.log(ExpoQuest.isQuestDevice)}
-            _loadingKey="getDeviceToken"
           />
         </Section>
       </ScrollView>
     </SafeAreaView>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    padding: 20,
-  },
-})

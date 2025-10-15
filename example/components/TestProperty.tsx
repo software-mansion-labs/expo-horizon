@@ -1,6 +1,6 @@
 import React from 'react'
-import { View, StyleSheet, Text } from 'react-native'
-
+import { View, Text } from 'react-native'
+import { GlobalStyles } from '../constants/styles'
 export const TestProperty = ({
   title,
   value,
@@ -9,20 +9,9 @@ export const TestProperty = ({
   value: string
 }) => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>{title}:</Text>
+    <View style={GlobalStyles.contentContainer}>
+      <Text style={GlobalStyles.itemTitle}>{title}:</Text>
       <Text>{value}</Text>
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 12,
-    flexDirection: 'row',
-  },
-  title: {
-    marginRight: 8,
-    fontWeight: 'bold',
-  },
-})

@@ -1,11 +1,13 @@
 import React from 'react'
-import { Text, TouchableOpacity, SafeAreaView, StyleSheet } from 'react-native'
+import { Text, TouchableOpacity, SafeAreaView } from 'react-native'
 import { router } from 'expo-router'
-
+import { GlobalStyles } from '../constants/styles'
 export default function Index() {
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>expo-quest demo</Text>
+    <SafeAreaView
+      style={[GlobalStyles.centeredContainer, GlobalStyles.screenContainer]}
+    >
+      <Text style={GlobalStyles.pageTitle}>expo-quest demo</Text>
       <ModuleButton title="Quest Core" onPress={() => router.push('/quest')} />
       <ModuleButton title="Location" onPress={() => router.push('/location')} />
       <ModuleButton
@@ -25,39 +27,11 @@ const ModuleButton = ({
 }) => {
   return (
     <TouchableOpacity
-      style={styles.button}
+      style={[GlobalStyles.button, GlobalStyles.buttonPrimary]}
       onPress={onPress}
       activeOpacity={0.85}
     >
-      <Text style={styles.buttonText}>{title}</Text>
+      <Text style={GlobalStyles.buttonText}>{title}</Text>
     </TouchableOpacity>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 24,
-    backgroundColor: '#fff',
-  },
-  title: {
-    fontSize: 24,
-    marginBottom: 32,
-  },
-  button: {
-    backgroundColor: '#007AFF',
-    paddingVertical: 20,
-    paddingHorizontal: 40,
-    borderRadius: 8,
-    width: '100%',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  buttonText: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: 16,
-  },
-})
