@@ -1,7 +1,6 @@
 package expo.modules.notifications.tokens
 
-import com.meta.horizon.platform.ovr.Core
-import com.meta.horizon.platform.ovr.requests.PushNotification
+import android.util.Log
 import expo.modules.kotlin.Promise
 import expo.modules.kotlin.exception.Exceptions
 import expo.modules.kotlin.modules.Module
@@ -9,6 +8,12 @@ import expo.modules.kotlin.modules.ModuleDefinition
 import expo.modules.notifications.BuildConfig
 import expo.modules.notifications.service.delegates.FirebaseMessagingDelegate.Companion.addTokenListener
 import expo.modules.notifications.tokens.interfaces.FirebaseTokenListener
+import horizon.core.android.driver.coroutines.HorizonServiceConnection
+import horizon.platform.pushnotification.PushNotification
+import horizon.platform.pushnotification.models.PushNotificationResult
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 private const val NEW_TOKEN_EVENT_NAME = "onDevicePushToken"
 private const val NEW_TOKEN_EVENT_TOKEN_KEY = "devicePushToken"
@@ -18,6 +23,8 @@ private const val UNREGISTER_FOR_NOTIFICATIONS_FAIL_CODE = "E_UNREGISTER_FOR_NOT
 class PushTokenModule : Module(), FirebaseTokenListener {
   private companion object {
     private const val APP_ID = BuildConfig.META_QUEST_APP_ID
+
+    private const val TAG = "expo-quest-notifications"
   }
 
   /**
@@ -42,8 +49,14 @@ class PushTokenModule : Module(), FirebaseTokenListener {
 
     OnCreate {
       addTokenListener(this@PushTokenModule)
-      val mContext = appContext.reactContext ?: throw Exceptions.ReactContextLost()
-      Core.asyncInitialize(APP_ID, mContext)
+      val context = appContext.reactContext ?: throw Exceptions.ReactContextLost()
+      try {
+        Log.i(TAG, "Connecting to Horizon Service with APP_ID=$APP_ID")
+        HorizonServiceConnection.connect(APP_ID, context)
+        Log.i(TAG, "Successfully connected to Horizon Service!")
+      } catch (e: Exception) {
+        Log.e(TAG, "Failed to connect to Horizon Service", e)
+      }
     }
 
     /**
@@ -52,34 +65,25 @@ class PushTokenModule : Module(), FirebaseTokenListener {
      * @param promise Promise to be resolved with the token.
      */
     AsyncFunction("getDevicePushTokenAsync") { promise: Promise ->
-      if (!Core.isInitialized()) {
-        promise.reject(REGISTRATION_FAIL_CODE, "Horizon Core is not initialized", null)
-        return@AsyncFunction
-      }
-      
-      val pushNotificationRequest = PushNotification.register()
+      CoroutineScope(Dispatchers.IO).launch {
+        try {
+          val pushNotification = PushNotification()
+          val result: PushNotificationResult = pushNotification.register()
 
-      pushNotificationRequest.onSuccess { result ->
-        val token = result.id
-        if (token.isNullOrEmpty()) {
-          promise.reject(REGISTRATION_FAIL_CODE, "Received empty token from Horizon platform", null)
-        } else {
-          promise.resolve(token)
-          onNewToken(token)
+          val token = result.id
+          if (token.isNullOrEmpty()) {
+            promise.reject(REGISTRATION_FAIL_CODE, "Received empty token from Horizon platform", null)
+          } else {
+            promise.resolve(token)
+            onNewToken(token)
+          }
+        } catch (e: Exception) {
+          promise.reject(REGISTRATION_FAIL_CODE, "Failed to register for push notifications: ${e.message ?: "unknown error"}", e)
         }
-      }
-      
-      pushNotificationRequest.onError { error ->
-        promise.reject(REGISTRATION_FAIL_CODE, "Failed to register for push notifications: ${error.message ?: "unknown error"}", null)
       }
     }
 
     AsyncFunction("unregisterForNotificationsAsync") { promise: Promise ->
-      if (!Core.isInitialized()) {
-        promise.reject(UNREGISTER_FOR_NOTIFICATIONS_FAIL_CODE, "Horizon Core is not initialized", null)
-        return@AsyncFunction
-      }
-      
       // TODO: Implement proper unregistration when Horizon platform provides an API for it
       // For now, we can only report that unregistration is not supported
       promise.reject(UNREGISTER_FOR_NOTIFICATIONS_FAIL_CODE, "Unregistration is not currently supported on Horizon platform", null)

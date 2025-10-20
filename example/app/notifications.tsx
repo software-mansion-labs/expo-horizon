@@ -44,7 +44,9 @@ export default function NotificationsScreen() {
 
   const getPushToken = async () => {
     const result = await Notifications.getDevicePushTokenAsync()
-    Alert.alert('Push Token', result.data)
+    const stringifiedResult = JSON.stringify(result, null, 2)
+    Alert.alert('Push Token', stringifiedResult)
+    console.log(stringifiedResult)
   }
 
   return (
