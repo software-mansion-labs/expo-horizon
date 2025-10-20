@@ -12,6 +12,7 @@ yarn # install dependencies
 yarn quest # to run the app on Quest, it uses `EXPO_HORIZON=1` environment variable
 yarn android # to run the app on Android
 yarn ios # to run the app on iOS
+yarn web
 
 # To perform a clean install (removes the `node_modules`, `ios`, and `android` folders):
 yarn clean
