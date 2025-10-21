@@ -20,3 +20,4 @@ yarn clean
 
 > [!NOTE]
 > When switching between `quest`/`android` targets, you need to prebuild the app to see changes reflected in the example app.
+> When changing config in `app.config.ts`, you need to prebuild the app to see changes reflected in the example app.

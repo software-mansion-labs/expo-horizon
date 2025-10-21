@@ -1,7 +1,9 @@
 import React from 'react'
-import { Text, TouchableOpacity, SafeAreaView } from 'react-native'
+import { Text, TouchableOpacity } from 'react-native'
 import { router } from 'expo-router'
 import { GlobalStyles } from '../constants/styles'
+import { SafeAreaView } from 'react-native-safe-area-context'
+
 export default function Index() {
   return (
     <SafeAreaView
