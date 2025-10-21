@@ -3,7 +3,7 @@ module.exports = () => ({
     name: 'expo-quest-demo',
     slug: 'expo-quest-demo',
     version: '1.0.0',
-    orientation: 'portrait',
+    orientation: 'default',
     icon: './assets/icon.png',
     userInterfaceStyle: 'light',
     newArchEnabled: true,

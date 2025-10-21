@@ -134,6 +134,11 @@ Add the plugin to your `app.json` or `app.config.[js|ts]`:
 }
 ```
 
+> **Setting default dimensions:**
+>
+> If your app renders with black bars after setting `defaultWidth` or `defaultHeight`, ensure the orientation value in your app.config.ts is set correctly to match the specified dimensions. For more information, refet to the official (expo documentation)[https://docs.expo.dev/versions/latest/sdk/screen-orientation/]
+
+
 ## Building and Running
 
 The config plugin automatically creates two build flavors for your Android project:
