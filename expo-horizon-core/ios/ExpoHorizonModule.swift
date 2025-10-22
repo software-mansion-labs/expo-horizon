@@ -4,11 +4,11 @@ public class ExpoHorizonModule: Module {
     public func definition() -> ModuleDefinition {
         Name("ExpoHorizon")
 
-        Constant("isHorioznDevice") {
+        Constant("isHorizonDevice") {
             false
         }
 
-        Constant("isHorioznBuild") {
+        Constant("isHorizonBuild") {
             false
         }
 

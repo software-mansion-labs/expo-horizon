@@ -546,7 +546,7 @@ export async function hasStartedGeofencingAsync(
 
 /**
  * Checks if the device is a Horizon device.
- * @return A boolean value indicating whether the device is a Quest.
+ * @return A boolean value indicating whether the device is a Horizon.
  */
 export const isHorizon: boolean | null = ExpoLocation
   ? ExpoLocation.isHorizon
