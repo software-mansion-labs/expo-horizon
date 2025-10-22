@@ -9,8 +9,11 @@ export default function Index() {
     <SafeAreaView
       style={[GlobalStyles.centeredContainer, GlobalStyles.screenContainer]}
     >
-      <Text style={GlobalStyles.pageTitle}>expo-quest demo</Text>
-      <ModuleButton title="Quest Core" onPress={() => router.push('/quest')} />
+      <Text style={GlobalStyles.pageTitle}>expo-horizon demo</Text>
+      <ModuleButton
+        title="Horizon Core"
+        onPress={() => router.push('/horizon')}
+      />
       <ModuleButton title="Location" onPress={() => router.push('/location')} />
       <ModuleButton
         title="Notifications"

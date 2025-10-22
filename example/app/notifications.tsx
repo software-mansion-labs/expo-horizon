@@ -2,8 +2,8 @@ import { Alert, SafeAreaView, ScrollView } from 'react-native'
 import React from 'react'
 import { Section } from '../components/Section'
 import { TestButton } from '../components/TestButton'
-import * as Notifications from 'expo-quest-notifications'
-import ExpoQuest from 'expo-quest'
+import * as Notifications from 'expo-horizon-notifications'
+import ExpoHorizon from 'expo-horizon-core'
 import { GlobalStyles } from '../constants/styles'
 
 Notifications.setNotificationHandler({
@@ -67,7 +67,7 @@ export default function NotificationsScreen() {
           <TestButton title="Get Push Token" onPress={getPushToken} />
           <TestButton
             title="Get Device Token"
-            onPress={async () => console.log(ExpoQuest.isQuestDevice)}
+            onPress={async () => console.log(ExpoHorizon.isHorizonDevice)}
           />
         </Section>
       </ScrollView>
