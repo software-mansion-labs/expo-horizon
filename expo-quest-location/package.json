@@ -1,7 +1,7 @@
 {
-  "name": "expo-quest-location",
+  "name": "expo-horizon-location",
   "version": "18.1.17",
-  "description": "A fork of expo-location that provides two implementations: The default expo-location behavior using Google Play Services. A Meta Quest-compatible implementation that does not rely on Google Play Services.",
+  "description": "A fork of expo-location that provides two implementations: The default expo-location behavior using Google Play Services. A Meta Horizon OS compatible implementation that does not rely on Google Play Services.",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "sideEffects": false,
@@ -22,19 +22,20 @@
     "coords",
     "geocoding",
     "compass",
+    "horizon",
     "heading"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/software-mansion-labs/expo-quest.git",
-    "directory": "expo-quest-location"
+    "url": "https://github.com/software-mansion-labs/expo-horizon.git",
+    "directory": "expo-horizon-location"
   },
   "bugs": {
-    "url": "https://github.com/software-mansion-labs/expo-quest/issues"
+    "url": "https://github.com/software-mansion-labs/expo-horizon/issues"
   },
   "author": "650 Industries, Inc.",
   "license": "MIT",
-  "homepage": "https://www.npmjs.com/package/expo-quest-location",
+  "homepage": "https://www.npmjs.com/package/expo-horizon-location",
   "jest": {
     "preset": "expo-module-scripts"
   },

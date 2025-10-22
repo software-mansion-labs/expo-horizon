@@ -6,7 +6,7 @@ import android.os.Build
 // TODO: In the future, move to use `expo.modules.core.utilities.VRUtilities` when possible.
 class VRUtilities {
   companion object {
-    fun isQuest(): Boolean {
+    fun isHorizon(): Boolean {
       return (Build.MANUFACTURER.equals("Oculus", ignoreCase = true) || Build.MANUFACTURER.equals("Meta", ignoreCase = true)) && Build.MODEL.contains("Quest")
     }
   }
