@@ -97,8 +97,8 @@ class LocationModule : Module(), LifecycleEventListener, SensorEventListener, Ac
       locationHelpers = LocationHelpers(mContext)
     }
 
-    Constant("isQuest") {
-      VRUtilities.isQuest()
+    Constant("isHorizon") {
+      VRUtilities.isHorizon()
     }
 
     Events(HEADING_EVENT_NAME, LOCATION_EVENT_NAME)

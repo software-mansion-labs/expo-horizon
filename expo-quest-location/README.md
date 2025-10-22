@@ -1,26 +1,26 @@
-# expo-quest-location
+# expo-horizon-location
 
 A fork of [`expo-location`](https://github.com/expo/expo/tree/main/packages/expo-location) that provides two implementations:
 - The default `expo-location` behavior using Google Play Services.
-- A Meta Quest–compatible implementation that does not rely on Google Play Services.
+- A Meta Horizon–compatible implementation that does not rely on Google Play Services.
 
 You can choose which implementation to use with the `EXPO_HORIZON` environment variable.
-This makes it compatible with Meta Quest devices, while remaining a drop-in replacement for `expo-location` on Android and iOS.
+This makes it compatible with Meta Horizon devices, while remaining a drop-in replacement for `expo-location` on Android and iOS.
 
 ## Usage
 
 1. Install the package:
 
 ```bash
-npx expo install expo-quest-location
+npx expo install expo-horizon-location
 ```
 
-2. Update your `app.json` / `app.config.js` to replace `expo-location` with `expo-quest-location`.
+2. Update your `app.json` / `app.config.js` to replace `expo-location` with `expo-horizon-location`.
 3. Prebuild your app with the `export EXPO_HORIZON=1` environment variable set (to return to the type just remove the environment variable: `unset EXPO_HORIZON`).
 4. Update your imports:
 
 ```js
-import * as Location from 'expo-quest-location';
+import * as Location from 'expo-horizon-location';
 ```
 
 ## Behavior
@@ -31,12 +31,12 @@ import * as Location from 'expo-quest-location';
 > [!IMPORTANT]
 > The `EXPO_HORIZON` version is intended specifically for Meta Quest devices. Using it on standard Android devices is not recommended, as certain features may be unsupported or behave differently.
 
-This ensures compatibility across Quest, standard Android devices, and iOS.
+This ensures compatibility across Horizon OS, standard Android devices, and iOS.
 
 ## Additional features
-- `Location.isQuest()` → Returns `true` if the device is a Meta Quest device.
+- `Location.isHorizon()` → Returns `true` if the device is a Meta Horizon device.
 
-## Features supported on Meta Quest
+## Features supported on Meta Horizon OS 
 
 | Function Name                                                                                     | Android Devices | Meta Quest      | Notes                                                                                                                                                                                                               |
 | ------------------------------------------------------------------------------------------------- | --------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -57,7 +57,7 @@ This ensures compatibility across Quest, standard Android devices, and iOS.
 1. Build the package:
 
 ```bash
-cd expo-quest-location
+cd expo-horizon-location
 yarn build
 ```
 

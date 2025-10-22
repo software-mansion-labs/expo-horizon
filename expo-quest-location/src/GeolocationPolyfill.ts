@@ -1,8 +1,12 @@
-import { Platform } from 'expo-modules-core';
+import { Platform } from "expo-modules-core";
 
-import ExpoLocation from './ExpoLocation';
-import { LocationObject, LocationAccuracy, LocationOptions } from './Location.types';
-import { LocationSubscriber } from './LocationSubscribers';
+import ExpoLocation from "./ExpoLocation";
+import {
+  LocationObject,
+  LocationAccuracy,
+  LocationOptions,
+} from "./Location.types";
+import { LocationSubscriber } from "./LocationSubscribers";
 
 type GeolocationSuccessCallback = (data: LocationObject) => void;
 type GeolocationErrorCallback = (error: any) => void;
@@ -18,12 +22,12 @@ declare const global: any;
  * Polyfills `navigator.geolocation` for interop with the core React Native and Web API approach to geolocation.
  */
 export function installWebGeolocationPolyfill(): void {
-  if (Platform.OS !== 'web') {
+  if (Platform.OS !== "web") {
     // Make sure `window.navigator` is defined in the global scope.
-    if (!('window' in global)) {
+    if (!("window" in global)) {
       global.window = global;
     }
-    if (!('navigator' in global.window)) {
+    if (!("navigator" in global.window)) {
       global.window.navigator = {};
     }
 
@@ -36,9 +40,13 @@ export function installWebGeolocationPolyfill(): void {
   }
 }
 
-function convertGeolocationOptions(options: GeolocationOptions): LocationOptions {
+function convertGeolocationOptions(
+  options: GeolocationOptions
+): LocationOptions {
   return {
-    accuracy: options.enableHighAccuracy ? LocationAccuracy.High : LocationAccuracy.Balanced,
+    accuracy: options.enableHighAccuracy
+      ? LocationAccuracy.High
+      : LocationAccuracy.Balanced,
   };
 }
 
@@ -59,7 +67,9 @@ async function _getCurrentPositionAsyncWrapper(
 ): Promise<any> {
   try {
     await ExpoLocation.requestPermissionsAsync();
-    const result = await ExpoLocation.getCurrentPositionAsync(convertGeolocationOptions(options));
+    const result = await ExpoLocation.getCurrentPositionAsync(
+      convertGeolocationOptions(options)
+    );
     success(result);
   } catch (e) {
     error(e);
