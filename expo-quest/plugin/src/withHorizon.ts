@@ -7,7 +7,7 @@ import { withProhibitedPermissions } from "./withProhibitedPermissions";
 import withCustomAndroidManifest from "./withCustomAndroidManifest";
 
 type HorizonOptions = {
-  questAppId?: string;
+  horizonAppId?: string;
   defaultHeight?: string;
   defaultWidth?: string;
   supportedDevices?: string;
@@ -17,13 +17,13 @@ type HorizonOptions = {
 
 const USE_EXPERIMENTAL_PLUGIN = true;
 
-const withQuest: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
-  config = withQuestAppId(config, options);
+const withHorizon: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
+  config = withHorizonAppId(config, options);
 
   if (USE_EXPERIMENTAL_PLUGIN) {
     config = withCustomAndroidManifest(config, options);
   } else if (process.env.EXPO_HORIZON) {
-    config = withQuestEnabled(config);
+    config = withHorizonEnabled(config);
     config = withPanelSize(config, options);
     config = withSupportedDevices(config, options);
     config = withVrHeadtracking(config, options);
@@ -33,7 +33,7 @@ const withQuest: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
   return config;
 };
 
-const withQuestEnabled: ConfigPlugin = (config) => {
+const withHorizonEnabled: ConfigPlugin = (config) => {
   return withGradleProperties(config, (config) => {
     config.modResults.push({
       type: "property",
@@ -45,14 +45,17 @@ const withQuestEnabled: ConfigPlugin = (config) => {
   });
 };
 
-const withQuestAppId: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
+const withHorizonAppId: ConfigPlugin<HorizonOptions> = (
+  config,
+  options = {},
+) => {
   return withGradleProperties(config, (config) => {
-    const questAppId = options.questAppId ?? "";
+    const horizonAppId = options.horizonAppId ?? "";
 
     config.modResults.push({
       type: "property",
-      key: "questAppId",
-      value: questAppId,
+      key: "horizonAppId",
+      value: horizonAppId,
     });
 
     return config;
@@ -68,7 +71,7 @@ const withPanelSize: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
 
     const mainActivity =
       config.modResults.manifest?.application?.[0]?.activity?.find(
-        (activity: any) => activity.$?.["android:name"] === ".MainActivity"
+        (activity: any) => activity.$?.["android:name"] === ".MainActivity",
       ) as any;
 
     if (mainActivity) {
@@ -95,7 +98,7 @@ const withPanelSize: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
 
 const withSupportedDevices: ConfigPlugin<HorizonOptions> = (
   config,
-  options = {}
+  options = {},
 ) => {
   return withAndroidManifest(config, (config) => {
     // Only add meta-data if supportedDevices is explicitly provided
@@ -124,7 +127,7 @@ const withSupportedDevices: ConfigPlugin<HorizonOptions> = (
 
 const withVrHeadtracking: ConfigPlugin<HorizonOptions> = (
   config,
-  options = {}
+  options = {},
 ) => {
   return withAndroidManifest(config, (config) => {
     // Add VR headtracking by default unless explicitly disabled
@@ -152,4 +155,4 @@ const withVrHeadtracking: ConfigPlugin<HorizonOptions> = (
   });
 };
 
-export default withQuest;
+export default withHorizon;

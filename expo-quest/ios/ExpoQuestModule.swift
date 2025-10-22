@@ -1,19 +1,19 @@
 import ExpoModulesCore
 
-public class ExpoQuestModule: Module {
-  public func definition() -> ModuleDefinition {
-    Name("ExpoQuest")
+public class ExpoHorizonModule: Module {
+    public func definition() -> ModuleDefinition {
+        Name("ExpoHorizon")
 
-    Constant("isQuestDevice") {
-      false
-    }
+        Constant("isHorioznDevice") {
+            false
+        }
 
-    Constant("isQuestBuild") {
-      false
-    }
+        Constant("isHorioznBuild") {
+            false
+        }
 
-    Constant("questAppId") {
-      nil as String?
+        Constant("horizonAppId") {
+            nil as String?
+        }
     }
-  }
 }

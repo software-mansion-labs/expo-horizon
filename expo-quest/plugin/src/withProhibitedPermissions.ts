@@ -3,7 +3,7 @@ import { PROHIBITED_PERMISSIONS } from "./constants";
 
 /**
  * Config plugin that removes prohibited Android permissions from the manifest
- * when building for Meta Quest devices.
+ * when building for devices running Meta Horizon OS.
  */
 export const withProhibitedPermissions: ConfigPlugin = (config) => {
   return withAndroidManifest(config, (config) => {

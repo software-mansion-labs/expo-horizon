@@ -10,7 +10,7 @@ expoModule {
 def questAppIdConfigField = "\"${project.findProperty('questAppId') ?: ''}\""
 
 android {
-  namespace "expo.modules.quest"
+  namespace "expo.modules.horizon"
   defaultConfig {
     versionCode 1
     versionName "0.1.0"
