@@ -1,18 +1,18 @@
-import { Platform } from 'expo-modules-core';
-import ExpoLocation from './ExpoLocation';
-import { LocationAccuracy } from './Location.types';
-import { LocationSubscriber } from './LocationSubscribers';
+import { Platform } from "expo-modules-core";
+import ExpoLocation from "./ExpoLocation";
+import { LocationAccuracy, } from "./Location.types";
+import { LocationSubscriber } from "./LocationSubscribers";
 // @needsAudit
 /**
  * Polyfills `navigator.geolocation` for interop with the core React Native and Web API approach to geolocation.
  */
 export function installWebGeolocationPolyfill() {
-    if (Platform.OS !== 'web') {
+    if (Platform.OS !== "web") {
         // Make sure `window.navigator` is defined in the global scope.
-        if (!('window' in global)) {
+        if (!("window" in global)) {
             global.window = global;
         }
-        if (!('navigator' in global.window)) {
+        if (!("navigator" in global.window)) {
             global.window.navigator = {};
         }
         // @ts-ignore
@@ -25,7 +25,9 @@ export function installWebGeolocationPolyfill() {
 }
 function convertGeolocationOptions(options) {
     return {
-        accuracy: options.enableHighAccuracy ? LocationAccuracy.High : LocationAccuracy.Balanced,
+        accuracy: options.enableHighAccuracy
+            ? LocationAccuracy.High
+            : LocationAccuracy.Balanced,
     };
 }
 function getCurrentPosition(success, error = () => { }, options = {}) {

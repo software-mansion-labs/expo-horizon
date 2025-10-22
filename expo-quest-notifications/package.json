@@ -1,7 +1,7 @@
 {
-  "name": "expo-quest-notifications",
+  "name": "expo-horizon-notifications",
   "version": "0.0.7",
-  "description": "A fork of [`expo-notifications`](https://github.com/expo/expo/tree/main/packages/expo-notifications) that provides two implementations: - The default `expo-notifications` for Android and iOS platforms. - A Meta Quest-compatible implementation that uses the Meta's push notification service.",
+  "description": "A fork of [`expo-notifications`](https://github.com/expo/expo/tree/main/packages/expo-notifications) that provides two implementations: - The default `expo-notifications` for Android and iOS platforms. - A Meta Horizon-compatible implementation that uses the Meta's push notification service.",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "sideEffects": [
@@ -26,15 +26,15 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/software-mansion-labs/expo-quest.git",
-    "directory": "expo-quest-notifications"
+    "url": "https://github.com/software-mansion-labs/expo-horizon.git",
+    "directory": "expo-horizon-notifications"
   },
   "bugs": {
-    "url": "https://github.com/software-mansion-labs/expo-quest/issues"
+    "url": "https://github.com/software-mansion-labs/expo-horizon/issues"
   },
   "author": "650 Industries, Inc.",
   "license": "MIT",
-  "homepage": "https://www.npmjs.com/package/expo-quest-notifications",
+  "homepage": "https://www.npmjs.com/package/expo-horizon-notifications",
   "jest": {
     "projects": [
       {
