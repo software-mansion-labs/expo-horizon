@@ -1,4 +1,4 @@
-import { ConfigPlugin } from 'expo/config-plugins';
+import { ConfigPlugin } from "expo/config-plugins";
 export type NotificationsPluginProps = {
     /**
      * Local path to an image to use as the icon for push notifications.
@@ -27,7 +27,7 @@ export type NotificationsPluginProps = {
      * @default 'development'
      * @platform ios
      */
-    mode?: 'development' | 'production';
+    mode?: "development" | "production";
     /**
      * Whether to enable background remote notifications, as described in [Apple documentation](https://developer.apple.com/documentation/usernotifications/pushing-background-updates-to-your-app).
      *

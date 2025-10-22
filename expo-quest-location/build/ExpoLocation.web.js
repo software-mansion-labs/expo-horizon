@@ -1,11 +1,11 @@
-import { PermissionStatus, UnavailabilityError } from 'expo-modules-core';
-import { LocationAccuracy, } from './Location.types';
-import { LocationEventEmitter } from './LocationEventEmitter';
+import { PermissionStatus, UnavailabilityError, } from "expo-modules-core";
+import { LocationAccuracy, } from "./Location.types";
+import { LocationEventEmitter } from "./LocationEventEmitter";
 class GeocoderError extends Error {
     code;
     constructor() {
-        super('Geocoder service is not available for this device.');
-        this.code = 'E_NO_GEOCODER';
+        super("Geocoder service is not available for this device.");
+        this.code = "E_NO_GEOCODER";
     }
 }
 /**
@@ -30,10 +30,13 @@ function geolocationPositionToJSON(position) {
  * Checks whether given location didn't exceed given `maxAge` and fits in the required accuracy.
  */
 function isLocationValid(location, options) {
-    const maxAge = typeof options.maxAge === 'number' ? options.maxAge : Infinity;
-    const requiredAccuracy = typeof options.requiredAccuracy === 'number' ? options.requiredAccuracy : Infinity;
+    const maxAge = typeof options.maxAge === "number" ? options.maxAge : Infinity;
+    const requiredAccuracy = typeof options.requiredAccuracy === "number"
+        ? options.requiredAccuracy
+        : Infinity;
     const locationAccuracy = location.coords.accuracy ?? Infinity;
-    return Date.now() - location.timestamp <= maxAge && locationAccuracy <= requiredAccuracy;
+    return (Date.now() - location.timestamp <= maxAge &&
+        locationAccuracy <= requiredAccuracy);
 }
 /**
  * Gets the permission details. The implementation is not very good as it's not
@@ -42,10 +45,10 @@ function isLocationValid(location, options) {
  */
 async function getPermissionsAsync(shouldAsk = false) {
     if (!navigator?.permissions?.query) {
-        throw new UnavailabilityError('expo-location', 'navigator.permissions API is not available');
+        throw new UnavailabilityError("expo-location", "navigator.permissions API is not available");
     }
-    const permission = await navigator.permissions.query({ name: 'geolocation' });
-    if (permission.state === 'granted') {
+    const permission = await navigator.permissions.query({ name: "geolocation" });
+    if (permission.state === "granted") {
         return {
             status: PermissionStatus.GRANTED,
             granted: true,
@@ -53,7 +56,7 @@ async function getPermissionsAsync(shouldAsk = false) {
             expires: 0,
         };
     }
-    if (permission.state === 'denied') {
+    if (permission.state === "denied") {
         return {
             status: PermissionStatus.DENIED,
             granted: false,
@@ -102,7 +105,7 @@ let lastKnownPosition = null;
 export default {
     async getProviderStatusAsync() {
         return {
-            locationServicesEnabled: 'geolocation' in navigator,
+            locationServicesEnabled: "geolocation" in navigator,
         };
     },
     async getLastKnownPositionAsync(options = {}) {
@@ -128,10 +131,10 @@ export default {
         navigator.geolocation.clearWatch(watchId);
     },
     async watchDeviceHeading(_headingId) {
-        console.warn('Location.watchDeviceHeading: is not supported on web');
+        console.warn("Location.watchDeviceHeading: is not supported on web");
     },
     async hasServicesEnabledAsync() {
-        return 'geolocation' in navigator;
+        return "geolocation" in navigator;
     },
     async geocodeAsync() {
         throw new GeocoderError();
@@ -143,7 +146,7 @@ export default {
         return new Promise((resolve) => {
             watchId = navigator.geolocation.watchPosition((position) => {
                 lastKnownPosition = geolocationPositionToJSON(position);
-                LocationEventEmitter.emit('Expo.locationChanged', {
+                LocationEventEmitter.emit("Expo.locationChanged", {
                     watchId,
                     location: lastKnownPosition,
                 });
