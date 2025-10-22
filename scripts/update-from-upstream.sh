@@ -9,10 +9,10 @@ git checkout -B upstream-split upstream/main
 
 # Re-run the filter with the SAME arguments as initial extraction
 git filter-repo \
-  --path packages/expo-location \
-  --path packages/expo-notifications \
-  --path-rename packages/expo-location:expo-quest-location \
-  --path-rename packages/expo-notifications:expo-quest-notifications
+    --path packages/expo-location \
+    --path packages/expo-notifications \
+    --path-rename packages/expo-location:expo-horizon-location \
+    --path-rename packages/expo-notifications:expo-horizon-notifications
 
 # Merge into main
 git checkout main
