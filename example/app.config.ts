@@ -1,7 +1,7 @@
 module.exports = () => ({
   expo: {
-    name: 'expo-quest-demo',
-    slug: 'expo-quest-demo',
+    name: 'expo-horizon-demo',
+    slug: 'expo-horizon-demo',
     version: '1.0.0',
     orientation: 'default',
     icon: './assets/icon.png',
@@ -23,7 +23,7 @@ module.exports = () => ({
         backgroundColor: '#ffffff',
       },
       edgeToEdgeEnabled: true,
-      package: 'com.jakubswm.questlocation',
+      package: 'com.software_mansion.horizon.demo',
     },
     web: {
       favicon: './assets/favicon.png',
@@ -31,7 +31,7 @@ module.exports = () => ({
     plugins: [
       ['expo-router'],
       [
-        '../expo-quest-location/app.plugin.js',
+        '../expo-horizon-location/app.plugin.js',
         {
           isAndroidBackgroundLocationEnabled: true,
           isAndroidForegroundServiceEnabled: true,
@@ -44,9 +44,9 @@ module.exports = () => ({
         },
       ],
       [
-        '../expo-quest/app.plugin.js',
+        '../expo-horizon-core/app.plugin.js',
         {
-          questAppId: 'DEMO_APP_ID',
+          horizonAppId: 'DEMO_APP_ID',
           defaultHeight: '640dp',
           defaultWidth: '1024dp',
           supportedDevices: 'quest2|quest3|quest3s',

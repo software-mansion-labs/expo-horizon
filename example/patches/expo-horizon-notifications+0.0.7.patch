@@ -1,7 +1,7 @@
-diff --git a/node_modules/expo-quest-notifications/android/build.gradle b/node_modules/expo-quest-notifications/android/build.gradle
+diff --git a/node_modules/expo-horizon-notifications/android/build.gradle b/node_modules/expo-horizon-notifications/android/build.gradle
 index ae6a210..66da8cd 100644
---- a/node_modules/expo-quest-notifications/android/build.gradle
-+++ b/node_modules/expo-quest-notifications/android/build.gradle
+--- a/node_modules/expo-horizon-notifications/android/build.gradle
++++ b/node_modules/expo-horizon-notifications/android/build.gradle
 @@ -42,7 +42,7 @@ android {
  }
  

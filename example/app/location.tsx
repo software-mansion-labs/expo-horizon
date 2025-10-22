@@ -10,9 +10,9 @@ import {
 } from 'react-native'
 import { StatusBar } from 'expo-status-bar'
 import * as TaskManager from 'expo-task-manager'
-import * as Location from 'expo-quest-location'
+import * as Location from 'expo-horizon-location'
 import { Section, SectionTitle } from '../components/Section'
-import ExpoQuest from 'expo-quest'
+import ExpoHorizon from 'expo-horizon-core'
 import { GlobalStyles } from '../constants/styles'
 
 const TestButton = ({
@@ -140,8 +140,8 @@ export default function LocationScreen() {
       const perms = await Location.getForegroundPermissionsAsync()
       setPermissions(perms)
 
-      // Quest does not support background permissions
-      if (!ExpoQuest.isQuestDevice) {
+      // Horizon does not support background permissions
+      if (!ExpoHorizon.isHorizonDevice) {
         const bgPerms = await Location.getBackgroundPermissionsAsync()
         setBackgroundPermissions(bgPerms)
       }
@@ -546,8 +546,9 @@ export default function LocationScreen() {
   const checkLocationUpdatesStatus = useCallback(async () => {
     try {
       setLoading('checkLocationUpdatesStatus', true)
-      const hasStarted =
-        await Location.hasStartedLocationUpdatesAsync('test-location-task')
+      const hasStarted = await Location.hasStartedLocationUpdatesAsync(
+        'test-location-task'
+      )
       Alert.alert('Location Updates Status', `Active: ${hasStarted}`)
     } catch (error) {
       Alert.alert('Error', `Failed to check location updates status: ${error}`)
