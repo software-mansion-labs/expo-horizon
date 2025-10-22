@@ -1,16 +1,16 @@
-# expo-quest
+# expo-horizon
 
-This is a fork of some of the `expo` packages which adds a support for Meta Quest devices. It includes an expo-quest common library to prepare your app for Meta Quest devices.
+This is a fork of some of the `expo` packages which adds a support for Meta horizon devices. It includes an expo-horizon-core common library to prepare your app for Meta horizon devices.
 
 ## Included packages
 
-- [`expo-quest`](expo-quest/README.md) - for building Expo applications for Meta Quest devices
-- [`expo-quest-location`](expo-quest-location/README.md) - for location services on Meta Quest devices
-- [`expo-quest-notifications`](expo-quest-notifications/README.md) - for push notifications on Meta Quest devices
+- [`expo-horizon-core`](expo-horizon-core/README.md) - for building Expo applications for Meta horizon devices
+- [`expo-horizon-location`](expo-horizon-location/README.md) - for location services on Meta horizon devices
+- [`expo-horizon-notifications`](expo-horizon-notifications/README.md) - for push notifications on Meta horizon devices
 
 ## Get Started
 
-To get started with developing for Meta Quest devices, you should first add the `expo-quest` package to your project. See the [expo-quest README](expo-quest/README.md) for installation instructions and config plugin configuration.
+To get started with developing for Meta horizon devices, you should first add the `expo-horizon-core` package to your project. See the [expo-horizon-core README](expo-horizon-core/README.md) for installation instructions and config plugin configuration.
 
 Then you can add additional packages as needed for location services and notifications.
 

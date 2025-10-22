@@ -1,10 +1,10 @@
 {
-  "name": "expo-quest-sdk",
+  "name": "expo-horizon-sdk",
   "private": true,
   "workspaces": [
-    "expo-quest",
-    "expo-quest-location",
-    "expo-quest-notifications"
+    "expo-horizon-core",
+    "expo-horizon-location",
+    "expo-horizon-notifications"
   ],
   "scripts": {
     "build": "yarn workspaces run build",

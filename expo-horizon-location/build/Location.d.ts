@@ -247,7 +247,7 @@ export declare function stopGeofencingAsync(taskName: string): Promise<void>;
 export declare function hasStartedGeofencingAsync(taskName: string): Promise<boolean>;
 /**
  * Checks if the device is a Horizon device.
- * @return A boolean value indicating whether the device is a Quest.
+ * @return A boolean value indicating whether the device is a Horizon.
  */
 export declare const isHorizon: boolean | null;
 //# sourceMappingURL=Location.d.ts.map

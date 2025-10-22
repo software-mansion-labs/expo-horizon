@@ -7,14 +7,14 @@ expoModule {
   canBePublished false
 }
 
-def questAppIdConfigField = "\"${project.findProperty('questAppId') ?: ''}\""
+def horizonAppIdConfigField = "\"${project.findProperty('horizonAppId') ?: ''}\""
 
 android {
   namespace "expo.modules.horizon"
   defaultConfig {
     versionCode 1
     versionName "0.1.0"
-    buildConfigField "String", "META_QUEST_APP_ID", questAppIdConfigField
+    buildConfigField "String", "META_HORIZON_APP_ID", horizonAppIdConfigField
   }
   lintOptions {
     abortOnError false

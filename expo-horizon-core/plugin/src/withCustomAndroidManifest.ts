@@ -8,8 +8,8 @@ import * as path from "path";
 import * as fs from "fs";
 import { PROHIBITED_PERMISSIONS } from "./constants";
 
-type QuestManifestOptions = {
-  questAppId?: string;
+type HorizonManifestOptions = {
+  horizonAppId?: string;
   defaultHeight?: string;
   defaultWidth?: string;
   supportedDevices?: string;
@@ -18,18 +18,18 @@ type QuestManifestOptions = {
 };
 
 /**
- * Creates a separate AndroidManifest.xml for the Quest flavor.
+ * Creates a separate AndroidManifest.xml for the Horizon flavor.
  * This plugin uses withDangerousMod to directly manipulate files and
  * modifies the app build.gradle to add flavor dimensions.
  */
-export const withCustomAndroidManifest: ConfigPlugin<QuestManifestOptions> = (
+export const withCustomAndroidManifest: ConfigPlugin<HorizonManifestOptions> = (
   config,
-  options = {},
+  options = {}
 ) => {
   // Add flavor dimensions to build.gradle
   config = withQuestFlavorDimensions(config);
 
-  // Create Quest-specific AndroidManifest
+  // Create Horizon-specific AndroidManifest
   config = withDangerousMod(config, [
     "android",
     async (config) => {
@@ -42,14 +42,14 @@ export const withCustomAndroidManifest: ConfigPlugin<QuestManifestOptions> = (
         "app",
         "src",
         "main",
-        "AndroidManifest.xml",
+        "AndroidManifest.xml"
       );
 
       // Path to the quest flavor AndroidManifest.xml
       const questManifestDir = path.join(androidRoot, "app", "src", "quest");
       const questManifestPath = path.join(
         questManifestDir,
-        "AndroidManifest.xml",
+        "AndroidManifest.xml"
       );
 
       try {
@@ -58,18 +58,18 @@ export const withCustomAndroidManifest: ConfigPlugin<QuestManifestOptions> = (
           fs.mkdirSync(questManifestDir, { recursive: true });
         }
 
-        // Create a minimal Quest manifest with only Quest-specific additions
+        // Create a minimal Horizon manifest with only Horizon-specific additions
         // This prevents conflicts during manifest merging
         const questManifest = createQuestManifest(options);
 
-        // Write the Quest AndroidManifest
+        // Write the Horizon AndroidManifest
         await AndroidConfig.Manifest.writeAndroidManifestAsync(
           questManifestPath,
-          questManifest,
+          questManifest
         );
 
         console.log(
-          `✅ Created Quest-specific AndroidManifest at: ${questManifestPath}`,
+          `✅ Created Horizon-specific AndroidManifest at: ${questManifestPath}`
         );
       } catch (error) {
         console.error("Error creating Quest AndroidManifest:", error);
@@ -130,12 +130,12 @@ const withQuestFlavorDimensions: ConfigPlugin = (config) => {
 };
 
 /**
- * Creates a Quest-specific AndroidManifest with only Quest additions.
+ * Creates a Horizon-specific AndroidManifest with only Horizon additions.
  * This manifest will be merged with the main manifest, so we only include
- * Quest-specific features to avoid conflicts.
+ * Horizon-specific features to avoid conflicts.
  */
 function createQuestManifest(
-  options: QuestManifestOptions,
+  options: HorizonManifestOptions
 ): AndroidConfig.Manifest.AndroidManifest {
   const manifest: AndroidConfig.Manifest.AndroidManifest = {
     manifest: {
@@ -165,7 +165,7 @@ function createQuestManifest(
   }
 
   console.log(
-    `🚫 Blocked ${PROHIBITED_PERMISSIONS.length} prohibited permissions in Quest manifest`,
+    `🚫 Blocked ${PROHIBITED_PERMISSIONS.length} prohibited permissions in Horizon manifest`
   );
 
   // Add VR headtracking feature (unless disabled)
@@ -179,10 +179,10 @@ function createQuestManifest(
     } as any);
   }
 
-  // Create application node with only Quest-specific additions
+  // Create application node with only Horizon-specific additions
   const application: any = {
     $: {
-      // Default to false for Quest (disabled by default for security, recommended by Meta)
+      // Default to false for Horizon (disabled by default for security, recommended by Meta)
       // User can enable with allowBackup: true option
       "android:allowBackup": String(options.allowBackup ?? false),
       // Tell the manifest merger to replace the `allowBackup` value from main manifest

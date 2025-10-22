@@ -5,11 +5,11 @@ This is an example app, that uses the `expo-horizon-location` and `expo-horizon-
 ### Usage
 
 ```bash
-yarn install # to install dependencies in all expo-horizon modules - only if needed
+yarn install # to install dependencies in all expo-horizon-* modules - only if needed
 cd example
 rm -rf android # (Optional) force prebuild by removing the `android` folder:
 yarn # install dependencies
-yarn quest # to run the app on Horizon, it uses `quest` build flavour
+yarn quest # to run the app on Horizon, it uses `quest` build flavor
 yarn android # to run the app on Android
 yarn ios # to run the app on iOS
 yarn web

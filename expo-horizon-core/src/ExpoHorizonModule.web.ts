@@ -1,11 +1,11 @@
 import { registerWebModule, NativeModule } from "expo";
 
 class ExpoHorizonModule extends NativeModule {
-  isQuestDevice = false;
+  isHorizonDevice = false;
 
-  isQuestBuild = false;
+  isHorizonBuild = false;
 
-  questAppId = null;
+  horizonAppId = null;
 }
 
 export default registerWebModule(ExpoHorizonModule, "ExpoHorizonModule");

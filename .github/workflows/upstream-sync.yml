@@ -4,8 +4,8 @@ on:
   workflow_dispatch: {}
 
 permissions:
-  contents: write        # push branch
-  pull-requests: write   # open PR
+  contents: write # push branch
+  pull-requests: write # open PR
   checks: read
   statuses: read
   actions: read
@@ -50,19 +50,19 @@ jobs:
           # Create a temporary directory for the filtered repository
           TEMP_DIR=$(mktemp -d)
           echo "TEMP_DIR=${TEMP_DIR}" >> $GITHUB_ENV
-          
+
           # Clone upstream repo to temp directory
           git clone "${UPSTREAM_REPO}" "${TEMP_DIR}/upstream-repo"
           cd "${TEMP_DIR}/upstream-repo"
-          
+
           # Filter to only keep the two packages and rename them
           git filter-repo \
             --force \
             --path packages/expo-location \
             --path packages/expo-notifications \
-            --path-rename packages/expo-location:expo-quest-location \
-            --path-rename packages/expo-notifications:expo-quest-notifications
-          
+            --path-rename packages/expo-location:expo-horizon-location \
+            --path-rename packages/expo-notifications:expo-horizon-notifications
+
           # Go back to original repo and add the filtered repo as a remote
           cd "${GITHUB_WORKSPACE}"
           git remote add filtered-upstream "${TEMP_DIR}/upstream-repo"
@@ -80,11 +80,11 @@ jobs:
         shell: bash
         run: |
           set -e
-          
+
           # Try the merge and capture the result
           MERGE_OUTPUT=$(git merge --no-commit --no-ff filtered-upstream/main 2>&1) || MERGE_RESULT=$?
           echo "Merge output: $MERGE_OUTPUT"
-          
+
           # Check if merge was already up to date
           if echo "$MERGE_OUTPUT" | grep -q "Already up to date"; then
             echo "conflicts=false" >> "$GITHUB_OUTPUT"
@@ -92,7 +92,7 @@ jobs:
             echo "ℹ️ Already up to date with upstream. No changes to merge." >> $GITHUB_STEP_SUMMARY
             exit 0
           fi
-          
+
           # Check for merge conflicts
           if git diff --name-only --diff-filter=U | grep -q .; then
             echo "conflicts=true" >> "$GITHUB_OUTPUT"
@@ -148,7 +148,7 @@ jobs:
               --base main \
               --head "${BRANCH_NAME}" \
               --title "chore: sync from upstream (filtered) - $(date -u +'%Y-%m-%d')" \
-              --body "This PR merges the latest **filtered** upstream changes from \`expo/expo\` for:\n- \`packages/expo-location\` → \`expo-quest-location\`\n- \`packages/expo-notifications\` → \`expo-quest-notifications\`\n\nCreated automatically. No merge conflicts were detected."
+              --body "This PR merges the latest **filtered** upstream changes from \`expo/expo\` for:\n- \`packages/expo-location\` → \`expo-horizon-location\`\n- \`packages/expo-notifications\` → \`expo-horizon-notifications\`\n\nCreated automatically. No merge conflicts were detected."
             echo "✅ Opened PR from ${BRANCH_NAME} → main." >> $GITHUB_STEP_SUMMARY
           else
             echo "ℹ️ PR from ${BRANCH_NAME} already exists." >> $GITHUB_STEP_SUMMARY

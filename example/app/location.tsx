@@ -546,9 +546,8 @@ export default function LocationScreen() {
   const checkLocationUpdatesStatus = useCallback(async () => {
     try {
       setLoading('checkLocationUpdatesStatus', true)
-      const hasStarted = await Location.hasStartedLocationUpdatesAsync(
-        'test-location-task'
-      )
+      const hasStarted =
+        await Location.hasStartedLocationUpdatesAsync('test-location-task')
       Alert.alert('Location Updates Status', `Active: ${hasStarted}`)
     } catch (error) {
       Alert.alert('Error', `Failed to check location updates status: ${error}`)

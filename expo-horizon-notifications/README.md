@@ -5,7 +5,7 @@ A fork of [`expo-notifications`](https://github.com/expo/expo/tree/main/packages
 - A Meta Horizon–compatible implementation that uses the Meta's push notification service.
 
 You can choose which implementation to use with the `EXPO_HORIZON` environment variable.
-This makes it compatible with Meta Horiozn devices, while remaining a drop-in replacement for `expo-notifications` on Android and iOS.
+This makes it compatible with Meta Horizon devices, while remaining a drop-in replacement for `expo-notifications` on Android and iOS.
 
 ## Usage
 

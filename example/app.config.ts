@@ -23,7 +23,7 @@ module.exports = () => ({
         backgroundColor: '#ffffff',
       },
       edgeToEdgeEnabled: true,
-      package: 'com.software_mansion.horizon.demo',
+      package: 'com.swmansion.horizon.demo',
     },
     web: {
       favicon: './assets/favicon.png',

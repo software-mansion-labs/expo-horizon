@@ -8,7 +8,7 @@ A comprehensive Expo module for building Android applications for Meta Quest dev
 - 📱 **Build Flavors** - Automatically generates Horizon-specific build variants alongside your standard Android builds
 - ✅ **Manifest Alignment** - Ensures your AndroidManifest meets [Meta Horizon requirements](https://developers.meta.com/horizon/resources/publish-mobile-manifest)
 - 🔍 **Runtime Detection** - JavaScript constants to detect Horizon devices and builds at runtime
-- 🛠️ **Native Module Support** - Access Horiozn app ID from custom native modules
+- 🛠️ **Native Module Support** - Access Horizon app ID from custom native modules
 - ⚙️ **Flexible Configuration** - Customize panel sizing, device support, and VR features
 
 ## Installation
@@ -16,9 +16,9 @@ A comprehensive Expo module for building Android applications for Meta Quest dev
 Install the package in your Expo project:
 
 ```bash
-npm install expo-horizon
+npm install expo-horizon-core
 # or
-yarn add expo-horizon
+yarn add expo-horizon-core
 ```
 
 ## Prerequisites
@@ -36,7 +36,7 @@ yarn add expo-horizon
   "expo": {
     "plugins": [
       [
-        "expo-horizon",
+        "expo-horizon-core",
         {
           "horizonAppId": "your-horizon-app-id",
           "supportedDevices": "quest2|quest3|quest3s"
@@ -59,7 +59,7 @@ npx expo prebuild --clean
 import ExpoHorizon from 'expo-horizon-core';
 
 if (ExpoHorizon.isHorizonDevice) {
-  // Quest-specific UI or features
+  // Horizon-specific UI or features
 }
 ```
 
@@ -67,10 +67,10 @@ if (ExpoHorizon.isHorizonDevice) {
 
 ### Config Plugin
 
-The config plugin automatically configures your Android project for Meta Quest by:
+The config plugin automatically configures your Android project for Meta Horizon by:
 
 - Adding a `quest` build flavor to `build.gradle`
-- Creating a Quest-specific `AndroidManifest.xml` with required permissions and features
+- Creating a Horizon-specific `AndroidManifest.xml` with required permissions and features
 - Configuring panel dimensions and supported devices
 - Setting up VR headtracking features
 
@@ -85,7 +85,7 @@ Add the plugin to your `app.json` or `app.config.[js|ts]`:
       [
         "expo-horizon-core",
         {
-          "horizonAppId": "your-quest-app-id",
+          "horizonAppId": "your-horizon-app-id",
           "defaultHeight": "640dp",
           "defaultWidth": "1024dp",
           "supportedDevices": "quest2|quest3|quest3s",
@@ -102,7 +102,7 @@ Add the plugin to your `app.json` or `app.config.[js|ts]`:
 
 | Option                  | Type      | Required | Default   | Description                                                                                                                                                                                                                      |
 | ----------------------- | --------- | -------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `horizonAppId`            | `string`  | No       | `""`      | Your Meta Horizon application ID. Required for publishing to the Meta Quest Store.                                                                                                                                                 |
+| `horizonAppId`            | `string`  | No       | `""`      | Your Meta Horizon application ID. Required for publishing to the Meta Horizon Store.                                                                                                                                                 |
 | `defaultHeight`         | `string`  | No       | Not added | Default panel height in dp (e.g., `"640dp"`). See [Panel Sizing](https://developers.meta.com/horizon/documentation/android-apps/panel-sizing)                                                                                    |
 | `defaultWidth`          | `string`  | No       | Not added | Default panel width in dp (e.g., `"1024dp"`). See [Panel Sizing](https://developers.meta.com/horizon/documentation/android-apps/panel-sizing)                                                                                    |
 | `supportedDevices`      | `string`  | Yes      | None      | Pipe-separated list of supported Quest devices: `"quest2\|quest3\|quest3s"`. See [Mobile Manifest](https://developers.meta.com/horizon/resources/publish-mobile-manifest/)                                                       |
@@ -144,7 +144,7 @@ Add the plugin to your `app.json` or `app.config.[js|ts]`:
 The config plugin automatically creates two build flavors for your Android project:
 
 - **`mobile`** - Standard Android build for phones and tablets
-- **`quest`** - Build optimized for Horizon OS  with VR-specific manifest and configuration
+- **`quest`** - Build prepared for Horizon OS devices with VR-specific manifest and configuration
 
 ### Build Variants
 
@@ -209,7 +209,7 @@ npm run quest:release
 
 ### JavaScript/TypeScript API
 
-The module provides runtime constants and utilities to help you build Quest-aware applications.
+The module provides runtime constants and utilities to help you build Horizon-aware applications.
 
 #### API Reference
 
@@ -217,24 +217,24 @@ The module provides runtime constants and utilities to help you build Quest-awar
 | --------------- | ---------------- | ----------------------------------------------------------------------------- |
 | `isHorizonDevice` | `boolean`        | Returns `true` if the app is running on a physical Horizon device.              |
 | `isHorizonBuild`  | `boolean`        | Returns `true` if the app was built with the Quest build flavor.              |
-| `horizonAppId`    | `string \| null` | The Horizon app ID configured via the config plugin. Returns `null` if not set. |
+| `horizonAppId`    | `string \| null` | The Horizon App ID configured via the config plugin. Returns `null` if not set. |
 
 #### Basic Usage
 
 ```typescript
 import ExpoHorizon from 'expo-horizon-core';
 
-// Check if running on a Quest device
+// Check if running on a Horizon device
 if (ExpoHorizon.isHorizonDevice) {
   console.log('Running on Meta Horizon OS!');
 }
 
-// Check if this is a Quest build
-if (ExpoQuest.isHorizonBuild) {
+// Check if this is a Horizon build
+if (ExpoHorizon.isHorizonBuild) {
   console.log('This is a Horizon build variant');
 }
 
-// Access the Quest App ID
+// Access the Horizon App ID
 const appId = ExpoHorizon.horizonAppId;
 console.log('Horizon App ID:', appId ?? 'Not configured');
 ```
@@ -264,7 +264,7 @@ android {
 val horizonAppId = BuildConfig.META_HORIZON_APP_ID
 ```
 
-Now, `horizonAppId` will contain the value of your Quest App ID as defined in your build configuration.
+Now, `horizonAppId` will contain the value of your Horizon App ID as defined in your build configuration.
 
 
 
