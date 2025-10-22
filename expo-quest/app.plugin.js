@@ -1,1 +1,1 @@
-module.exports = require('./plugin/build/withQuest');
+module.exports = require("./plugin/build/withHorizon");

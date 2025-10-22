@@ -24,7 +24,7 @@ type QuestManifestOptions = {
  */
 export const withCustomAndroidManifest: ConfigPlugin<QuestManifestOptions> = (
   config,
-  options = {}
+  options = {},
 ) => {
   // Add flavor dimensions to build.gradle
   config = withQuestFlavorDimensions(config);
@@ -42,14 +42,14 @@ export const withCustomAndroidManifest: ConfigPlugin<QuestManifestOptions> = (
         "app",
         "src",
         "main",
-        "AndroidManifest.xml"
+        "AndroidManifest.xml",
       );
 
       // Path to the quest flavor AndroidManifest.xml
       const questManifestDir = path.join(androidRoot, "app", "src", "quest");
       const questManifestPath = path.join(
         questManifestDir,
-        "AndroidManifest.xml"
+        "AndroidManifest.xml",
       );
 
       try {
@@ -65,11 +65,11 @@ export const withCustomAndroidManifest: ConfigPlugin<QuestManifestOptions> = (
         // Write the Quest AndroidManifest
         await AndroidConfig.Manifest.writeAndroidManifestAsync(
           questManifestPath,
-          questManifest
+          questManifest,
         );
 
         console.log(
-          `✅ Created Quest-specific AndroidManifest at: ${questManifestPath}`
+          `✅ Created Quest-specific AndroidManifest at: ${questManifestPath}`,
         );
       } catch (error) {
         console.error("Error creating Quest AndroidManifest:", error);
@@ -135,7 +135,7 @@ const withQuestFlavorDimensions: ConfigPlugin = (config) => {
  * Quest-specific features to avoid conflicts.
  */
 function createQuestManifest(
-  options: QuestManifestOptions
+  options: QuestManifestOptions,
 ): AndroidConfig.Manifest.AndroidManifest {
   const manifest: AndroidConfig.Manifest.AndroidManifest = {
     manifest: {
@@ -165,7 +165,7 @@ function createQuestManifest(
   }
 
   console.log(
-    `🚫 Blocked ${PROHIBITED_PERMISSIONS.length} prohibited permissions in Quest manifest`
+    `🚫 Blocked ${PROHIBITED_PERMISSIONS.length} prohibited permissions in Quest manifest`,
   );
 
   // Add VR headtracking feature (unless disabled)

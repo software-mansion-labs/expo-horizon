@@ -1,21 +1,21 @@
-package expo.modules.quest
+package expo.modules.horizon
 
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 
-class ExpoQuestModule : Module() {
+class ExpoHorizonModule : Module() {
   override fun definition() = ModuleDefinition {
     Name("ExpoQuest")
 
-    Constant("isQuestDevice") {
-      Utilities.isQuestDevice()
+    Constant("isHorizonDevice") {
+      Utilities.isHorizonDevice()
     }
 
-    Constant("isQuestBuild") {
-      Config.isQuestBuild
+    Constant("isHorizonBuild") {
+      Config.isHorizonBuild
     }
 
-    Constant("questAppId") {
+    Constant("horizonAppId") {
       if (BuildConfig.META_QUEST_APP_ID == "") null else BuildConfig.META_QUEST_APP_ID
     }
   }

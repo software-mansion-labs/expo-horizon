@@ -1,10 +1,10 @@
-package expo.modules.quest
+package expo.modules.horizon
 
 import android.os.Build
 
 class Utilities {
   companion object {
-    fun isQuestDevice(): Boolean {
+    fun isHorizonDevice(): Boolean {
       return (Build.MANUFACTURER.equals("Oculus", ignoreCase = true) || Build.MANUFACTURER.equals("Meta", ignoreCase = true)) && Build.MODEL.contains("Quest")
     }
   }

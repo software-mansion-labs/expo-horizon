@@ -1,9 +1,9 @@
 {
   "platforms": ["apple", "android", "web"],
   "apple": {
-    "modules": ["ExpoQuestModule"]
+    "modules": ["ExpoHorizonModule"]
   },
   "android": {
-    "modules": ["expo.modules.quest.ExpoQuestModule"]
+    "modules": ["expo.modules.horizon.ExpoHorizonModule"]
   }
 }

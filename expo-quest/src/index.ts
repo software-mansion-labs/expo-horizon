@@ -1,1 +1,1 @@
-export { default } from './ExpoQuestModule';
+export { default } from "./ExpoHorizonModule";

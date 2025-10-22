@@ -1,7 +1,7 @@
 {
-  "name": "expo-quest",
-  "version": "0.3.0",
-  "description": "ExpoQuest common features.",
+  "name": "expo-horizon-core",
+  "version": "1.0.0",
+  "description": "ExpoHorizon common features.",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "scripts": {
@@ -18,16 +18,17 @@
   "keywords": [
     "react-native",
     "expo",
-    "expo-quest",
-    "ExpoQuest"
+    "expo-horizon",
+    "expo-horizon-core",
+    "ExpoHorizon"
   ],
-  "repository": "http://github.com/software-mansion-labs/expo-quest",
+  "repository": "http://github.com/software-mansion-labs/expo-horizon",
   "bugs": {
-    "url": "http://github.com/software-mansion-labs/expo-quest/issues"
+    "url": "http://github.com/software-mansion-labs/expo-horizon/issues"
   },
   "author": "Jakub Kosmydel <jakub.kosmydel@swmansion.com> (https://github.com/kosmydel)",
   "license": "MIT",
-  "homepage": "http://github.com/software-mansion-labs/expo-quest#readme",
+  "homepage": "http://github.com/software-mansion-labs/expo-horizon#readme",
   "dependencies": {},
   "devDependencies": {
     "@types/react": "~19.1.0",

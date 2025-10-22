@@ -1,2 +1,2 @@
-export { default } from './ExpoQuestModule';
+export { default } from "./ExpoHorizonModule";
 //# sourceMappingURL=index.d.ts.map
