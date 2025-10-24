@@ -23,6 +23,9 @@ yarn install
 yarn quest          # Runs the Meta Horizon version of the app
 yarn android        # Runs the Android version of the app
 yarn ios            # Runs the iOS version of the app
+
+# Build and publish the packages
+npm publish --access public
 ```
 
 ## Naming Conventions

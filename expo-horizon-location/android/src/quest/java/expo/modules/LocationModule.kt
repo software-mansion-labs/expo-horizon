@@ -163,7 +163,7 @@ class LocationModule : Module(), LifecycleEventListener, ActivityEventListener {
         promise.reject(QuestFeatureUnavailableException())
         return@AsyncFunction
       }
-      promise.reject(QuestPrebuildEnvironmentException())
+      promise.reject(QuestBuildVariantException())
       return@AsyncFunction
     }
 
@@ -600,14 +600,14 @@ class LocationModule : Module(), LifecycleEventListener, ActivityEventListener {
     if (VRUtilities.isHorizon()) {
       throw QuestFeatureUnavailableException()
     }
-    throw QuestPrebuildEnvironmentException()
+    throw QuestBuildVariantException()
   }
 
   private suspend fun reverseGeocode(location: ReverseGeocodeLocation): List<ReverseGeocodeResponse> {
     if (VRUtilities.isHorizon()) {
       throw QuestFeatureUnavailableException()
     }
-    throw QuestPrebuildEnvironmentException()
+    throw QuestBuildVariantException()
   }
 
   //region private methods

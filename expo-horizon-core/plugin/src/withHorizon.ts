@@ -23,6 +23,8 @@ const withHorizon: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
   if (USE_EXPERIMENTAL_PLUGIN) {
     config = withCustomAndroidManifest(config, options);
   } else if (process.env.EXPO_HORIZON) {
+    // This is the old approach, we should remove it in the future
+    // TODO: Remove this
     config = withHorizonEnabled(config);
     config = withPanelSize(config, options);
     config = withSupportedDevices(config, options);

@@ -4,39 +4,51 @@ A fork of [`expo-location`](https://github.com/expo/expo/tree/main/packages/expo
 - The default `expo-location` behavior using Google Play Services.
 - A Meta Horizon–compatible implementation that does not rely on Google Play Services.
 
-You can choose which implementation to use with the `EXPO_HORIZON` environment variable.
-This makes it compatible with Meta Horizon devices, while remaining a drop-in replacement for `expo-location` on Android and iOS.
+You can choose which implementation to use with the `quest` / `mobile` build variants. See [expo-horizon-core](../expo-horizon-core/README.md) for more details. This makes it compatible with Meta Horizon devices, while remaining a drop-in replacement for `expo-location` on Android and iOS.
+
+## Prerequisites
+- Expo SDK 54 or later (`expo` package version 54.0.13+).
+- `expo-horizon-core` package installed. See [expo-horizon-core](../expo-horizon-core/README.md) for more details.
 
 ## Usage
 
-1. Install the package:
+1. Install the `expo-horizon-core` package:
+```bash
+npx expo install expo-horizon-core
+```
+
+2. Install the package:
 
 ```bash
 npx expo install expo-horizon-location
+
+# and remove the old package:
+npm uninstall expo-location
+# or
+yarn remove expo-location
 ```
 
-2. Update your `app.json` / `app.config.js` to replace `expo-location` with `expo-horizon-location`.
-3. Prebuild your app with the `export EXPO_HORIZON=1` environment variable set (to return to the type just remove the environment variable: `unset EXPO_HORIZON`).
-4. Update your imports:
+3. Update your `app.json` / `app.config.js` to replace `expo-location` with `expo-horizon-location`.
+4. Use the `questDebug` / `questRelease` build variants to run the app on Meta Quest devices. See [expo-horizon-core](../expo-horizon-core/README.md) for more details.
+5. Update your imports:
 
 ```js
 import * as Location from 'expo-horizon-location';
 ```
 
 ## Behavior
-- With `EXPO_HORIZON=1` → Uses the Meta Quest–compatible location API (no Google Play Services).
-- Without `EXPO_HORIZON` → Falls back to the default `expo-location` behavior (Google Play Services Location API).
-- On iOS → The `EXPO_HORIZON` flag has no effect; behavior is always the same as `expo-location`.
+- On Meta Quest devices → Uses the Meta Horizon–compatible push notification service.
+- On standard Android devices → Falls back to the default `expo-location` behavior using Google Play Services.
+- On iOS it should have no effect; behavior is always the same as `expo-location`.
 
 > [!IMPORTANT]
-> The `EXPO_HORIZON` version is intended specifically for Meta Quest devices. Using it on standard Android devices is not recommended, as certain features may be unsupported or behave differently.
-
-This ensures compatibility across Horizon OS, standard Android devices, and iOS.
+> The `quest` build variants are intended specifically for Meta Quest devices. Using them on standard Android devices is not recommended, as certain features may be unsupported or behave differently.
 
 ## Additional features
-- `Location.isHorizon()` → Returns `true` if the device is a Meta Horizon device.
 
-## Features supported on Meta Horizon OS 
+You might need additional features like `isHorizonDevice` or `isHorizonBuild` to check if the device is a Meta Horizon device. See [expo-horizon-core](../expo-horizon-core/README.md) for more details.
+
+## Features supported on Meta Horizon OS
 
 | Function Name                                                                                     | Android Devices | Meta Quest      | Notes                                                                                                                                                                                                               |
 | ------------------------------------------------------------------------------------------------- | --------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -52,19 +64,15 @@ This ensures compatibility across Horizon OS, standard Android devices, and iOS.
 | `startGeofencingAsync` <br> `stopGeofencingAsync` <br> `hasStartedGeofencingAsync`                | ✅ Supported     | ❌ Not supported | Meta Horizon Store doesn't support `ACCESS_BACKGROUND_LOCATION` Android permission.                                                                                                                                 |
 | `startLocationUpdatesAsync` <br> `stopLocationUpdatesAsync` <br> `hasStartedLocationUpdatesAsync` | ✅ Supported     | ❌ Not supported | Meta Horizon Store doesn't support `ACCESS_BACKGROUND_LOCATION` Android permission.                                                                                                                                 |
 
-## Contributing
+## Expo Horizon Location is created by Software Mansion
 
-1. Build the package:
+[![swm](https://logo.swmansion.com/logo?color=white&variant=desktop&width=150&tag=expo-horizon-location-github "Software Mansion")](https://swmansion.com)
 
-```bash
-cd expo-horizon-location
-yarn build
-```
+Since 2012 [Software Mansion](https://swmansion.com) is a software agency with
+experience in building web and mobile apps. We are Core React Native
+Contributors and experts in dealing with all kinds of React Native issues. We
+can help you build your next dream product –
+[Hire us](https://swmansion.com/contact/projects?utm_source=expo-horizon-location&utm_medium=readme).
 
-2. Install, run and test the library using the example app. See [example/README.md](../example/README.md) for more details.
-
-3. Publish the package:
-
-```bash
-npm publish --access public
-```
+Made by [@software-mansion](https://github.com/software-mansion) and
+[community](https://github.com/software-mansion-labs/expo-horizon/graphs/contributors) 💛
