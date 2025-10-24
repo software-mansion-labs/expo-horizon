@@ -98,7 +98,7 @@ class LocationModule : Module(), LifecycleEventListener, SensorEventListener, Ac
     }
 
     Constant("isHorizon") {
-      VRUtilities.isHorizon()
+      Utilities.isHorizonDevice()
     }
 
     Events(HEADING_EVENT_NAME, LOCATION_EVENT_NAME)
