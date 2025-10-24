@@ -64,19 +64,15 @@ You might need additional features like `isHorizonDevice` or `isHorizonBuild` to
 | `startGeofencingAsync` <br> `stopGeofencingAsync` <br> `hasStartedGeofencingAsync`                | ✅ Supported     | ❌ Not supported | Meta Horizon Store doesn't support `ACCESS_BACKGROUND_LOCATION` Android permission.                                                                                                                                 |
 | `startLocationUpdatesAsync` <br> `stopLocationUpdatesAsync` <br> `hasStartedLocationUpdatesAsync` | ✅ Supported     | ❌ Not supported | Meta Horizon Store doesn't support `ACCESS_BACKGROUND_LOCATION` Android permission.                                                                                                                                 |
 
-## Contributing
+## Expo Horizon Location is created by Software Mansion
 
-1. Build the package:
+[![swm](https://logo.swmansion.com/logo?color=white&variant=desktop&width=150&tag=expo-horizon-location-github "Software Mansion")](https://swmansion.com)
 
-```bash
-cd expo-horizon-location
-yarn build
-```
+Since 2012 [Software Mansion](https://swmansion.com) is a software agency with
+experience in building web and mobile apps. We are Core React Native
+Contributors and experts in dealing with all kinds of React Native issues. We
+can help you build your next dream product –
+[Hire us](https://swmansion.com/contact/projects?utm_source=expo-horizon-location&utm_medium=readme).
 
-2. Install, run and test the library using the example app. See [example/README.md](../example/README.md) for more details.
-
-3. Publish the package:
-
-```bash
-npm publish --access public
-```
+Made by [@software-mansion](https://github.com/software-mansion) and
+[community](https://github.com/software-mansion-labs/expo-horizon/graphs/contributors) 💛

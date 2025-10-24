@@ -102,7 +102,7 @@ Add the plugin to your `app.json` or `app.config.[js|ts]`:
 
 | Option                  | Type      | Required | Default   | Description                                                                                                                                                                                                                      |
 | ----------------------- | --------- | -------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `horizonAppId`            | `string`  | No       | `""`      | Your Meta Horizon application ID. Required for publishing to the Meta Horizon Store.                                                                                                                                                 |
+| `horizonAppId`          | `string`  | No       | `""`      | Your Meta Horizon application ID. Required for publishing to the Meta Horizon Store.                                                                                                                                             |
 | `defaultHeight`         | `string`  | No       | Not added | Default panel height in dp (e.g., `"640dp"`). See [Panel Sizing](https://developers.meta.com/horizon/documentation/android-apps/panel-sizing)                                                                                    |
 | `defaultWidth`          | `string`  | No       | Not added | Default panel width in dp (e.g., `"1024dp"`). See [Panel Sizing](https://developers.meta.com/horizon/documentation/android-apps/panel-sizing)                                                                                    |
 | `supportedDevices`      | `string`  | Yes      | None      | Pipe-separated list of supported Quest devices: `"quest2\|quest3\|quest3s"`. See [Mobile Manifest](https://developers.meta.com/horizon/resources/publish-mobile-manifest/)                                                       |
@@ -150,12 +150,12 @@ The config plugin automatically creates two build flavors for your Android proje
 
 Each flavor has debug and release variants:
 
-| Variant         | Description                                   |
-| --------------- | --------------------------------------------- |
-| `mobileDebug`   | Debug build for standard Android devices      |
-| `mobileRelease` | Production build for standard Android devices |
-| `horizonDebug`    | Debug build for Meta Horizon OS devices            |
-| `horizonRelease`  | Production build for Meta Horizon OS devices       |
+| Variant          | Description                                   |
+| ---------------- | --------------------------------------------- |
+| `mobileDebug`    | Debug build for standard Android devices      |
+| `mobileRelease`  | Production build for standard Android devices |
+| `horizonDebug`   | Debug build for Meta Horizon OS devices       |
+| `horizonRelease` | Production build for Meta Horizon OS devices  |
 
 ### Running on Different Platforms
 
@@ -213,10 +213,10 @@ The module provides runtime constants and utilities to help you build Horizon-aw
 
 #### API Reference
 
-| Property        | Type             | Description                                                                   |
-| --------------- | ---------------- | ----------------------------------------------------------------------------- |
+| Property          | Type             | Description                                                                     |
+| ----------------- | ---------------- | ------------------------------------------------------------------------------- |
 | `isHorizonDevice` | `boolean`        | Returns `true` if the app is running on a physical Horizon device.              |
-| `isHorizonBuild`  | `boolean`        | Returns `true` if the app was built with the Quest build flavor.              |
+| `isHorizonBuild`  | `boolean`        | Returns `true` if the app was built with the Quest build flavor.                |
 | `horizonAppId`    | `string \| null` | The Horizon App ID configured via the config plugin. Returns `null` if not set. |
 
 #### Basic Usage
@@ -278,3 +278,16 @@ Now, `horizonAppId` will contain the value of your Horizon App ID as defined in 
 # Contributing
 
 Contributions are very welcome! Please refer to guidelines described in the [contributing guide]( https://github.com/expo/expo#contributing).
+
+## Expo Horizon Core is created by Software Mansion
+
+[![swm](https://logo.swmansion.com/logo?color=white&variant=desktop&width=150&tag=expo-horizon-core-github "Software Mansion")](https://swmansion.com)
+
+Since 2012 [Software Mansion](https://swmansion.com) is a software agency with
+experience in building web and mobile apps. We are Core React Native
+Contributors and experts in dealing with all kinds of React Native issues. We
+can help you build your next dream product –
+[Hire us](https://swmansion.com/contact/projects?utm_source=expo-horizon-core&utm_medium=readme).
+
+Made by [@software-mansion](https://github.com/software-mansion) and
+[community](https://github.com/software-mansion-labs/expo-horizon/graphs/contributors) 💛
