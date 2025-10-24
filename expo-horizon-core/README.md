@@ -23,7 +23,7 @@ yarn add expo-horizon-core
 
 ## Prerequisites
 
-- Expo SDK 54 or later (`expo` package version 54.0.13+).
+- Expo SDK 54 or later (`expo` package version 54.0.13+)
 - Android development environment configured
 - Meta Quest developer account (for publishing)
 
@@ -277,7 +277,7 @@ Now, `horizonAppId` will contain the value of your Horizon App ID as defined in 
 
 # Contributing
 
-Contributions are very welcome! Please refer to guidelines described in the [contributing guide]( https://github.com/expo/expo#contributing).
+Contributions are very welcome! Please refer to the guidelines described in the [contributing guide]( https://github.com/expo/expo#contributing).
 
 ## Expo Horizon Core is created by Software Mansion
 

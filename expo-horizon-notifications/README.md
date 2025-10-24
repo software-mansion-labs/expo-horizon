@@ -7,8 +7,8 @@ A fork of [`expo-notifications`](https://github.com/expo/expo/tree/main/packages
 You can choose which implementation to use with the `quest` / `mobile` build variants. See [expo-horizon-core](../expo-horizon-core/README.md) for more details. This makes it compatible with Meta Horizon devices, while remaining a drop-in replacement for `expo-notifications` on Android and iOS.
 
 ## Prerequisites
-- Expo SDK 54 or later (`expo` package version 54.0.13+).
-- `expo-horizon-core` package installed. See [expo-horizon-core](../expo-horizon-core/README.md) for more details.
+- Expo SDK 54 or later (`expo` package version 54.0.13+)
+- `expo-horizon-core` package installed. See [expo-horizon-core](../expo-horizon-core/README.md) for more details
 
 ## Usage
 
