@@ -31,8 +31,8 @@ export default function NotificationsScreen() {
   const sendNotification = async () => {
     const result = await Notifications.scheduleNotificationAsync({
       content: {
-        title: 'Hello',
-        body: 'World',
+        title: 'Hello Horizon OS!',
+        body: 'This is a notification sent from Expo application!',
       },
       trigger: {
         type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
