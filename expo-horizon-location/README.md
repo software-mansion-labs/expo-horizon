@@ -4,8 +4,7 @@ A fork of [`expo-location`](https://github.com/expo/expo/tree/main/packages/expo
 - The default `expo-location` behavior using Google Play Services.
 - A Meta Horizon–compatible implementation that does not rely on Google Play Services.
 
-You can choose which implementation to use with the `EXPO_HORIZON` environment variable.
-This makes it compatible with Meta Horizon devices, while remaining a drop-in replacement for `expo-location` on Android and iOS.
+You can choose which implementation to use with the `quest` / `mobile` build variants. See [expo-horizon-core](../expo-horizon-core/README.md) for more details. This makes it compatible with Meta Horizon devices, while remaining a drop-in replacement for `expo-location` on Android and iOS.
 
 ## Usage
 
@@ -16,7 +15,7 @@ npx expo install expo-horizon-location
 ```
 
 2. Update your `app.json` / `app.config.js` to replace `expo-location` with `expo-horizon-location`.
-3. Prebuild your app with the `export EXPO_HORIZON=1` environment variable set (to return to the type just remove the environment variable: `unset EXPO_HORIZON`).
+3. Use the `questDebug` / `questRelease` build variants to run the app on Meta Quest devices. See [expo-horizon-core](../expo-horizon-core/README.md) for more details.
 4. Update your imports:
 
 ```js
@@ -24,19 +23,17 @@ import * as Location from 'expo-horizon-location';
 ```
 
 ## Behavior
-- With `EXPO_HORIZON=1` → Uses the Meta Quest–compatible location API (no Google Play Services).
-- Without `EXPO_HORIZON` → Falls back to the default `expo-location` behavior (Google Play Services Location API).
-- On iOS → The `EXPO_HORIZON` flag has no effect; behavior is always the same as `expo-location`.
+- On Meta Quest devices → Uses the Meta Horizon–compatible push notification service.
+- On standard Android devices → Falls back to the default `expo-location` behavior using Google Play Services.
+- On iOS it should have no effect; behavior is always the same as `expo-location`.
 
 > [!IMPORTANT]
-> The `EXPO_HORIZON` version is intended specifically for Meta Quest devices. Using it on standard Android devices is not recommended, as certain features may be unsupported or behave differently.
-
-This ensures compatibility across Horizon OS, standard Android devices, and iOS.
+> The `quest` build variants are intended specifically for Meta Quest devices. Using them on standard Android devices is not recommended, as certain features may be unsupported or behave differently.
 
 ## Additional features
 - `Location.isHorizon()` → Returns `true` if the device is a Meta Horizon device.
 
-## Features supported on Meta Horizon OS 
+## Features supported on Meta Horizon OS
 
 | Function Name                                                                                     | Android Devices | Meta Quest      | Notes                                                                                                                                                                                                               |
 | ------------------------------------------------------------------------------------------------- | --------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

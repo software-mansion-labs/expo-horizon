@@ -4,8 +4,7 @@ A fork of [`expo-notifications`](https://github.com/expo/expo/tree/main/packages
 - The default `expo-notifications` for Android and iOS platforms.
 - A Meta Horizon–compatible implementation that uses the Meta's push notification service.
 
-You can choose which implementation to use with the `EXPO_HORIZON` environment variable.
-This makes it compatible with Meta Horizon devices, while remaining a drop-in replacement for `expo-notifications` on Android and iOS.
+You can choose which implementation to use with the `quest` / `mobile` build variants. See [expo-horizon-core](../expo-horizon-core/README.md) for more details. This makes it compatible with Meta Horizon devices, while remaining a drop-in replacement for `expo-notifications` on Android and iOS.
 
 ## Usage
 
@@ -16,7 +15,7 @@ npx expo install expo-horizon-notifications
 ```
 
 2. Update your `app.json` / `app.config.js` to replace `expo-notifications` with `expo-horizon-notifications`.
-3. Prebuild your app with the `export EXPO_HORIZON=1` environment variable set (to return to the type just remove the environment variable: `unset EXPO_HORIZON`).
+3. Use the `questDebug` / `questRelease` build variants to run the app on Meta Quest devices. See [expo-horizon-core](../expo-horizon-core/README.md) for more details.
 4. Update your imports:
 
 ```js
@@ -25,13 +24,11 @@ import * as Notifications from 'expo-horizon-notifications';
 ```
 
 ## Behavior
-- With `EXPO_HORIZON=1` → Uses the Meta Horizon–compatible push notification service.
-- Without `EXPO_HORIZON` → Falls back to the default `expo-notifications` behavior.
-- On iOS → The `EXPO_HORIZON` flag has no effect; behavior is always the same as `expo-notifications`.
+- On Meta Quest devices → Uses the Meta Horizon–compatible push notification service.
+- On standard Android devices → Falls back to the default `expo-notifications` behavior using Firebase Cloud Messaging.
+- On iOS it should have no effect; behavior is always the same as `expo-notifications`.
 
-This ensures compatibility across Horizon OS, standard Android devices, and iOS.
-
-## Features supported on Meta Horizon OS 
+## Features supported on Meta Horizon OS
 
 | Function Name                                                                    | Meta Quest          | Notes                                                                                                         |
 | -------------------------------------------------------------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------- |
@@ -56,3 +53,19 @@ This ensures compatibility across Horizon OS, standard Android devices, and iOS.
 | `getLastNotificationResponse` <br> `getLastNotificationResponseAsync`            | 🔍 Not tested yet    |                                                                                                               |
 | `unregisterForNotificationsAsync`                                                | 🔍 Not tested yet    |                                                                                                               |
 
+## Contributing
+
+1. Build the package:
+
+```bash
+cd expo-horizon-notifications
+yarn build
+```
+
+2. Install, run and test the library using the example app. See [example/README.md](../example/README.md) for more details.
+
+3. Publish the package:
+
+```bash
+npm publish --access public
+```
