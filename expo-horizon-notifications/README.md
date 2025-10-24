@@ -12,6 +12,11 @@ You can choose which implementation to use with the `quest` / `mobile` build var
 
 ```bash
 npx expo install expo-horizon-notifications
+
+# and remove the old package:
+npm uninstall expo-notifications
+# or
+yarn remove expo-notifications
 ```
 
 2. Update your `app.json` / `app.config.js` to replace `expo-notifications` with `expo-horizon-notifications`.
