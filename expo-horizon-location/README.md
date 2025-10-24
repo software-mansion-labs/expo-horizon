@@ -6,9 +6,18 @@ A fork of [`expo-location`](https://github.com/expo/expo/tree/main/packages/expo
 
 You can choose which implementation to use with the `quest` / `mobile` build variants. See [expo-horizon-core](../expo-horizon-core/README.md) for more details. This makes it compatible with Meta Horizon devices, while remaining a drop-in replacement for `expo-location` on Android and iOS.
 
+## Prerequisites
+- Expo SDK 54 or later (`expo` package version 54.0.13+).
+- `expo-horizon-core` package installed. See [expo-horizon-core](../expo-horizon-core/README.md) for more details.
+
 ## Usage
 
-1. Install the package:
+1. Install the `expo-horizon-core` package:
+```bash
+npx expo install expo-horizon-core
+```
+
+2. Install the package:
 
 ```bash
 npx expo install expo-horizon-location
@@ -19,9 +28,9 @@ npm uninstall expo-location
 yarn remove expo-location
 ```
 
-2. Update your `app.json` / `app.config.js` to replace `expo-location` with `expo-horizon-location`.
-3. Use the `questDebug` / `questRelease` build variants to run the app on Meta Quest devices. See [expo-horizon-core](../expo-horizon-core/README.md) for more details.
-4. Update your imports:
+3. Update your `app.json` / `app.config.js` to replace `expo-location` with `expo-horizon-location`.
+4. Use the `questDebug` / `questRelease` build variants to run the app on Meta Quest devices. See [expo-horizon-core](../expo-horizon-core/README.md) for more details.
+5. Update your imports:
 
 ```js
 import * as Location from 'expo-horizon-location';
@@ -36,7 +45,8 @@ import * as Location from 'expo-horizon-location';
 > The `quest` build variants are intended specifically for Meta Quest devices. Using them on standard Android devices is not recommended, as certain features may be unsupported or behave differently.
 
 ## Additional features
-- `Location.isHorizon()` → Returns `true` if the device is a Meta Horizon device.
+
+You might need additional features like `isHorizonDevice` or `isHorizonBuild` to check if the device is a Meta Horizon device. See [expo-horizon-core](../expo-horizon-core/README.md) for more details.
 
 ## Features supported on Meta Horizon OS
 
