@@ -89,7 +89,7 @@ class LocationModule : Module(), LifecycleEventListener, ActivityEventListener {
     }
 
     Constant("isHorizon") {
-      VRUtilities.isHorizon()
+      Utilities.isHorizonDevice()
     }
 
     Events(HEADING_EVENT_NAME, LOCATION_EVENT_NAME, LOCATION_ERROR_EVENT_NAME)
@@ -159,7 +159,7 @@ class LocationModule : Module(), LifecycleEventListener, ActivityEventListener {
     }
 
     AsyncFunction("watchDeviceHeading") { _: Int, promise: Promise ->
-      if (VRUtilities.isHorizon()) {
+      if (Utilities.isHorizonDevice()) {
         promise.reject(QuestFeatureUnavailableException())
         return@AsyncFunction
       }
@@ -583,7 +583,7 @@ class LocationModule : Module(), LifecycleEventListener, ActivityEventListener {
   private suspend fun getLastKnownLocation(): Location? {
     return suspendCoroutine { continuation ->
       try {
-        val provider = if (VRUtilities.isHorizon()) LocationManager.NETWORK_PROVIDER else LocationManager.GPS_PROVIDER
+        val provider = if (Utilities.isHorizonDevice()) LocationManager.NETWORK_PROVIDER else LocationManager.GPS_PROVIDER
         if (mLocationManager.isProviderEnabled(provider)) {
           val location = mLocationManager.getLastKnownLocation(provider)
           continuation.resume(location)
@@ -597,14 +597,14 @@ class LocationModule : Module(), LifecycleEventListener, ActivityEventListener {
   }
 
   private suspend fun geocode(address: String): List<GeocodeResponse> {
-    if (VRUtilities.isHorizon()) {
+    if (Utilities.isHorizonDevice()) {
       throw QuestFeatureUnavailableException()
     }
     throw QuestBuildVariantException()
   }
 
   private suspend fun reverseGeocode(location: ReverseGeocodeLocation): List<ReverseGeocodeResponse> {
-    if (VRUtilities.isHorizon()) {
+    if (Utilities.isHorizonDevice()) {
       throw QuestFeatureUnavailableException()
     }
     throw QuestBuildVariantException()

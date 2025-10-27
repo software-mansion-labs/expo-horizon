@@ -1,5 +1,4 @@
-package expo.modules.horizon
-
+package expo.modules.location
 import expo.modules.core.utilities.VRUtilities
 
 class Utilities {
