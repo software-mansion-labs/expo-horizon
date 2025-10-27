@@ -9,12 +9,14 @@ module.exports = {
   env: {
     node: true,
   },
-
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
     'prettier',
     'plugin:prettier/recommended',
+    'universe/native',
+    'universe/node',
+    'universe/web',
   ],
   rules: {},
 

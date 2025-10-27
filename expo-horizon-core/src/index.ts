@@ -1,1 +1,1 @@
-export { default } from "./ExpoHorizonModule";
+export { default } from './ExpoHorizonModule';

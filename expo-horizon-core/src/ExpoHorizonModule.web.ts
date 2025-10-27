@@ -1,4 +1,4 @@
-import { registerWebModule, NativeModule } from "expo";
+import { registerWebModule, NativeModule } from 'expo';
 
 class ExpoHorizonModule extends NativeModule {
   isHorizonDevice = false;
@@ -8,4 +8,4 @@ class ExpoHorizonModule extends NativeModule {
   horizonAppId = null;
 }
 
-export default registerWebModule(ExpoHorizonModule, "ExpoHorizonModule");
+export default registerWebModule(ExpoHorizonModule, 'ExpoHorizonModule');

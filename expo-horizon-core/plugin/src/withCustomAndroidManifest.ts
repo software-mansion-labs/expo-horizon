@@ -3,10 +3,11 @@ import {
   withDangerousMod,
   withAppBuildGradle,
   AndroidConfig,
-} from "@expo/config-plugins";
-import * as path from "path";
-import * as fs from "fs";
-import { PROHIBITED_PERMISSIONS } from "./constants";
+} from '@expo/config-plugins';
+import * as fs from 'fs';
+import * as path from 'path';
+
+import { PROHIBITED_PERMISSIONS } from './constants';
 
 type HorizonManifestOptions = {
   horizonAppId?: string;
@@ -31,26 +32,14 @@ export const withCustomAndroidManifest: ConfigPlugin<HorizonManifestOptions> = (
 
   // Create Horizon-specific AndroidManifest
   config = withDangerousMod(config, [
-    "android",
+    'android',
     async (config) => {
       const projectRoot = config.modRequest.projectRoot;
-      const androidRoot = path.join(projectRoot, "android");
-
-      // Path to the main AndroidManifest.xml
-      const mainManifestPath = path.join(
-        androidRoot,
-        "app",
-        "src",
-        "main",
-        "AndroidManifest.xml"
-      );
+      const androidRoot = path.join(projectRoot, 'android');
 
       // Path to the quest flavor AndroidManifest.xml
-      const questManifestDir = path.join(androidRoot, "app", "src", "quest");
-      const questManifestPath = path.join(
-        questManifestDir,
-        "AndroidManifest.xml"
-      );
+      const questManifestDir = path.join(androidRoot, 'app', 'src', 'quest');
+      const questManifestPath = path.join(questManifestDir, 'AndroidManifest.xml');
 
       try {
         // Ensure the quest directory exists
@@ -63,16 +52,11 @@ export const withCustomAndroidManifest: ConfigPlugin<HorizonManifestOptions> = (
         const questManifest = createQuestManifest(options);
 
         // Write the Horizon AndroidManifest
-        await AndroidConfig.Manifest.writeAndroidManifestAsync(
-          questManifestPath,
-          questManifest
-        );
+        await AndroidConfig.Manifest.writeAndroidManifestAsync(questManifestPath, questManifest);
 
-        console.log(
-          `✅ Created Horizon-specific AndroidManifest at: ${questManifestPath}`
-        );
+        console.log(`✅ Created Horizon-specific AndroidManifest at: ${questManifestPath}`);
       } catch (error) {
-        console.error("Error creating Quest AndroidManifest:", error);
+        console.error('Error creating Quest AndroidManifest:', error);
         throw error;
       }
 
@@ -91,11 +75,8 @@ const withQuestFlavorDimensions: ConfigPlugin = (config) => {
     const buildGradle = config.modResults.contents;
 
     // Check if flavor dimensions already exist
-    if (
-      buildGradle.includes("flavorDimensions") &&
-      buildGradle.includes("productFlavors")
-    ) {
-      console.log("⚠️  Flavor dimensions already exist in build.gradle");
+    if (buildGradle.includes('flavorDimensions') && buildGradle.includes('productFlavors')) {
+      console.log('⚠️  Flavor dimensions already exist in build.gradle');
       return config;
     }
 
@@ -104,7 +85,7 @@ const withQuestFlavorDimensions: ConfigPlugin = (config) => {
     const match = buildGradle.match(androidBlockRegex);
 
     if (!match) {
-      console.warn("⚠️  Could not find android block in build.gradle");
+      console.warn('⚠️  Could not find android block in build.gradle');
       return config;
     }
 
@@ -119,11 +100,9 @@ const withQuestFlavorDimensions: ConfigPlugin = (config) => {
     // Insert after the android block opening
     const insertPosition = match.index! + match[0].length;
     config.modResults.contents =
-      buildGradle.slice(0, insertPosition) +
-      flavorConfig +
-      buildGradle.slice(insertPosition);
+      buildGradle.slice(0, insertPosition) + flavorConfig + buildGradle.slice(insertPosition);
 
-    console.log("✅ Added flavor dimensions to app build.gradle");
+    console.log('✅ Added flavor dimensions to app build.gradle');
 
     return config;
   });
@@ -140,26 +119,26 @@ function createQuestManifest(
   const manifest: AndroidConfig.Manifest.AndroidManifest = {
     manifest: {
       $: {
-        "xmlns:android": "http://schemas.android.com/apk/res/android",
-        "xmlns:tools": "http://schemas.android.com/tools",
+        'xmlns:android': 'http://schemas.android.com/apk/res/android',
+        'xmlns:tools': 'http://schemas.android.com/tools',
       },
       queries: [],
-      "uses-permission": [],
-      "uses-feature": [],
+      'uses-permission': [],
+      'uses-feature': [],
       application: [],
     },
   };
 
   // Block prohibited permissions
   for (const permission of PROHIBITED_PERMISSIONS) {
-    const fullPermissionName = permission.includes(".")
+    const fullPermissionName = permission.includes('.')
       ? permission
       : `android.permission.${permission}`;
 
-    manifest.manifest["uses-permission"]!.push({
+    manifest.manifest['uses-permission']!.push({
       $: {
-        "android:name": fullPermissionName,
-        "tools:node": "remove",
+        'android:name': fullPermissionName,
+        'tools:node': 'remove',
       },
     } as any);
   }
@@ -170,11 +149,11 @@ function createQuestManifest(
 
   // Add VR headtracking feature (unless disabled)
   if (options.disableVrHeadtracking !== true) {
-    manifest.manifest["uses-feature"]!.push({
+    manifest.manifest['uses-feature']!.push({
       $: {
-        "android:name": "android.hardware.vr.headtracking",
-        "android:required": "true",
-        "android:version": "1",
+        'android:name': 'android.hardware.vr.headtracking',
+        'android:required': 'true',
+        'android:version': '1',
       },
     } as any);
   }
@@ -184,20 +163,20 @@ function createQuestManifest(
     $: {
       // Default to false for Horizon (disabled by default for security, recommended by Meta)
       // User can enable with allowBackup: true option
-      "android:allowBackup": String(options.allowBackup ?? false),
+      'android:allowBackup': String(options.allowBackup ?? false),
       // Tell the manifest merger to replace the `allowBackup` value from main manifest
-      "tools:replace": "android:allowBackup",
+      'tools:replace': 'android:allowBackup',
     },
-    "meta-data": [],
+    'meta-data': [],
     activity: [],
   };
 
   // Add supported devices meta-data
   if (options.supportedDevices) {
-    application["meta-data"].push({
+    application['meta-data'].push({
       $: {
-        "android:name": "com.oculus.supportedDevices",
-        "android:value": options.supportedDevices,
+        'android:name': 'com.oculus.supportedDevices',
+        'android:value': options.supportedDevices,
       },
     });
   }
@@ -206,15 +185,15 @@ function createQuestManifest(
   if (options.defaultHeight || options.defaultWidth) {
     const layoutAttrs: any = {};
     if (options.defaultHeight) {
-      layoutAttrs["android:defaultHeight"] = options.defaultHeight;
+      layoutAttrs['android:defaultHeight'] = options.defaultHeight;
     }
     if (options.defaultWidth) {
-      layoutAttrs["android:defaultWidth"] = options.defaultWidth;
+      layoutAttrs['android:defaultWidth'] = options.defaultWidth;
     }
 
     application.activity.push({
       $: {
-        "android:name": ".MainActivity",
+        'android:name': '.MainActivity',
       },
       layout: [
         {

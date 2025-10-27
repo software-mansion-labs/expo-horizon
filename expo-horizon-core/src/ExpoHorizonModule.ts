@@ -1,4 +1,4 @@
-import { NativeModule, requireNativeModule } from "expo";
+import { NativeModule, requireNativeModule } from 'expo';
 
 declare class ExpoHorizonModule extends NativeModule {
   /**
@@ -18,4 +18,4 @@ declare class ExpoHorizonModule extends NativeModule {
   horizonAppId: string | null;
 }
 
-export default requireNativeModule<ExpoHorizonModule>("ExpoHorizon");
+export default requireNativeModule<ExpoHorizonModule>('ExpoHorizon');

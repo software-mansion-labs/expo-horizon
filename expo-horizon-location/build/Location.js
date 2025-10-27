@@ -1,8 +1,8 @@
-import { isRunningInExpoGo } from "expo";
-import { createPermissionHook, Platform, } from "expo-modules-core";
-import ExpoLocation from "./ExpoLocation";
-import { LocationAccuracy, } from "./Location.types";
-import { LocationSubscriber, HeadingSubscriber, LocationErrorSubscriber, } from "./LocationSubscribers";
+import { isRunningInExpoGo } from 'expo';
+import { createPermissionHook, Platform } from 'expo-modules-core';
+import ExpoLocation from './ExpoLocation';
+import { LocationAccuracy, } from './Location.types';
+import { LocationSubscriber, HeadingSubscriber, LocationErrorSubscriber, } from './LocationSubscribers';
 // Flag for warning about background services not being available in Expo Go
 let warnAboutExpoGoDisplayed = false;
 // @needsAudit
@@ -26,7 +26,7 @@ export async function enableNetworkProviderAsync() {
     // Android's location provider may not give you any results. Use this method in order to ask the user
     // to change the location mode to "High accuracy" which uses Google Play services and enables network provider.
     // `getCurrentPositionAsync` and `watchPositionAsync` are doing it automatically anyway.
-    if (Platform.OS === "android") {
+    if (Platform.OS === 'android') {
         return ExpoLocation.enableNetworkProviderAsync();
     }
 }
@@ -72,8 +72,7 @@ export async function getLastKnownPositionAsync(options = {}) {
  */
 export async function watchPositionAsync(options, callback, errorHandler) {
     const watchId = LocationSubscriber.registerCallback(callback);
-    errorHandler &&
-        LocationErrorSubscriber.registerCallbackForId(watchId, errorHandler);
+    errorHandler && LocationErrorSubscriber.registerCallbackForId(watchId, errorHandler);
     await ExpoLocation.watchPositionImplAsync(watchId, options);
     return {
         remove() {
@@ -126,8 +125,7 @@ export async function getHeadingAsync() {
  */
 export async function watchHeadingAsync(callback, errorHandler) {
     const watchId = HeadingSubscriber.registerCallback(callback);
-    errorHandler &&
-        LocationErrorSubscriber.registerCallbackForId(watchId, errorHandler);
+    errorHandler && LocationErrorSubscriber.registerCallbackForId(watchId, errorHandler);
     await ExpoLocation.watchDeviceHeading(watchId);
     return {
         remove() {
@@ -156,13 +154,13 @@ export async function watchHeadingAsync(callback, errorHandler) {
  * @platform ios
  */
 export async function geocodeAsync(address) {
-    if (typeof address !== "string") {
+    if (typeof address !== 'string') {
         throw new TypeError(`Address to geocode must be a string. Got ${address} instead.`);
     }
-    if (Platform.OS === "web") {
+    if (Platform.OS === 'web') {
         if (__DEV__) {
-            console.warn("The Geocoding API has been removed in SDK 49, use Place Autocomplete service instead" +
-                "(https://developers.google.com/maps/documentation/places/web-service/autocomplete)");
+            console.warn('The Geocoding API has been removed in SDK 49, use Place Autocomplete service instead' +
+                '(https://developers.google.com/maps/documentation/places/web-service/autocomplete)');
         }
         return [];
     }
@@ -187,14 +185,13 @@ export async function geocodeAsync(address) {
  * @platform ios
  */
 export async function reverseGeocodeAsync(location) {
-    if (typeof location.latitude !== "number" ||
-        typeof location.longitude !== "number") {
-        throw new TypeError("Location to reverse-geocode must be an object with number properties `latitude` and `longitude`.");
+    if (typeof location.latitude !== 'number' || typeof location.longitude !== 'number') {
+        throw new TypeError('Location to reverse-geocode must be an object with number properties `latitude` and `longitude`.');
     }
-    if (Platform.OS === "web") {
+    if (Platform.OS === 'web') {
         if (__DEV__) {
-            console.warn("The Geocoding API has been removed in SDK 49, use Place Autocomplete service instead" +
-                "(https://developers.google.com/maps/documentation/places/web-service/autocomplete)");
+            console.warn('The Geocoding API has been removed in SDK 49, use Place Autocomplete service instead' +
+                '(https://developers.google.com/maps/documentation/places/web-service/autocomplete)');
         }
         return [];
     }
@@ -278,15 +275,15 @@ export async function hasServicesEnabledAsync() {
 }
 // --- Background location updates
 function _validate(taskName) {
-    if (!taskName || typeof taskName !== "string") {
+    if (!taskName || typeof taskName !== 'string') {
         throw new Error(`\`taskName\` must be a non-empty string. Got ${taskName} instead.`);
     }
     if (isRunningInExpoGo()) {
         if (!warnAboutExpoGoDisplayed) {
-            const message = "Background location is limited in Expo Go:\n" +
-                "On Android, it is not available at all.\n" +
-                "On iOS, it works when running in the Simulator.\n" +
-                "You can use this API, and all others, in a development build. Learn more: https://expo.fyi/dev-client.";
+            const message = 'Background location is limited in Expo Go:\n' +
+                'On Android, it is not available at all.\n' +
+                'On iOS, it works when running in the Simulator.\n' +
+                'You can use this API, and all others, in a development build. Learn more: https://expo.fyi/dev-client.';
             console.warn(message);
             warnAboutExpoGoDisplayed = true;
         }
@@ -351,16 +348,16 @@ export async function hasStartedLocationUpdatesAsync(taskName) {
 // --- Geofencing
 function _validateRegions(regions) {
     if (!regions || regions.length === 0) {
-        throw new Error("Regions array cannot be empty. Use `stopGeofencingAsync` if you want to stop geofencing all regions");
+        throw new Error('Regions array cannot be empty. Use `stopGeofencingAsync` if you want to stop geofencing all regions');
     }
     for (const region of regions) {
-        if (typeof region.latitude !== "number") {
+        if (typeof region.latitude !== 'number') {
             throw new TypeError(`Region's latitude must be a number. Got '${region.latitude}' instead.`);
         }
-        if (typeof region.longitude !== "number") {
+        if (typeof region.longitude !== 'number') {
             throw new TypeError(`Region's longitude must be a number. Got '${region.longitude}' instead.`);
         }
-        if (typeof region.radius !== "number") {
+        if (typeof region.radius !== 'number') {
             throw new TypeError(`Region's radius must be a number. Got '${region.radius}' instead.`);
         }
     }
@@ -432,7 +429,5 @@ export async function hasStartedGeofencingAsync(taskName) {
  * Checks if the device is a Horizon device.
  * @return A boolean value indicating whether the device is a Horizon.
  */
-export const isHorizon = ExpoLocation
-    ? ExpoLocation.isHorizon
-    : null;
+export const isHorizon = ExpoLocation ? ExpoLocation.isHorizon : null;
 //# sourceMappingURL=Location.js.map

@@ -1,5 +1,5 @@
-import { PermissionResponse } from "expo-modules-core";
-import { LocationErrorCallback, LocationCallback, LocationGeocodedAddress, LocationGeocodedLocation, LocationHeadingCallback, LocationHeadingObject, LocationLastKnownOptions, LocationObject, LocationOptions, LocationPermissionResponse, LocationProviderStatus, LocationRegion, LocationSubscription, LocationTaskOptions } from "./Location.types";
+import { PermissionResponse } from 'expo-modules-core';
+import { LocationErrorCallback, LocationCallback, LocationGeocodedAddress, LocationGeocodedLocation, LocationHeadingCallback, LocationHeadingObject, LocationLastKnownOptions, LocationObject, LocationOptions, LocationPermissionResponse, LocationProviderStatus, LocationRegion, LocationSubscription, LocationTaskOptions } from './Location.types';
 /**
  * Check status of location providers.
  * @return A promise which fulfills with an object of type [`LocationProviderStatus`](#locationproviderstatus).
@@ -102,7 +102,7 @@ export declare function geocodeAsync(address: string): Promise<LocationGeocodedL
  * @platform android
  * @platform ios
  */
-export declare function reverseGeocodeAsync(location: Pick<LocationGeocodedLocation, "latitude" | "longitude">): Promise<LocationGeocodedAddress[]>;
+export declare function reverseGeocodeAsync(location: Pick<LocationGeocodedLocation, 'latitude' | 'longitude'>): Promise<LocationGeocodedAddress[]>;
 /**
  * Checks user's permissions for accessing location while the app is in the foreground.
  * @return A promise that fulfills with an object of type [`LocationPermissionResponse`](#locationpermissionresponse).

@@ -1,18 +1,21 @@
 # expo-horizon-notifications
 
 A fork of [`expo-notifications`](https://github.com/expo/expo/tree/main/packages/expo-notifications) that provides two implementations:
+
 - The default `expo-notifications` for Android and iOS platforms.
 - A Meta Horizon–compatible implementation that uses the Meta's push notification service.
 
 You can choose which implementation to use with the `quest` / `mobile` build variants. See [expo-horizon-core](../expo-horizon-core/README.md) for more details. This makes it compatible with Meta Horizon devices, while remaining a drop-in replacement for `expo-notifications` on Android and iOS.
 
 ## Prerequisites
+
 - Expo SDK 54 or later (`expo` package version 54.0.13+).
 - `expo-horizon-core` package installed. See [expo-horizon-core](../expo-horizon-core/README.md) for more details.
 
 ## Usage
 
 1. Install the `expo-horizon-core` package:
+
 ```bash
 npx expo install expo-horizon-core
 ```
@@ -38,6 +41,7 @@ import * as Notifications from 'expo-horizon-notifications';
 ```
 
 ## Behavior
+
 - On Meta Quest devices → Uses the Meta Horizon–compatible push notification service.
 - On standard Android devices → Falls back to the default `expo-notifications` behavior using Firebase Cloud Messaging.
 - On iOS it should have no effect; behavior is always the same as `expo-notifications`.
@@ -51,8 +55,8 @@ You might need additional features like `isHorizonDevice` or `isHorizonBuild` to
 
 ## Features supported on Meta Horizon OS
 
-| Function Name                                                                    | Meta Quest          | Notes                                                                                                         |
-| -------------------------------------------------------------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------- |
+| Function Name                                                                    | Meta Quest           | Notes                                                                                                         |
+| -------------------------------------------------------------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------- |
 | `addPushTokenListener`                                                           | 🛠️ Under development |                                                                                                               |
 | `getDevicePushTokenAsync`                                                        | 🛠️ Under development |                                                                                                               |
 | `getExpoPushTokenAsync`                                                          | ❌ Not supported     | Currently, support for the Expo Push Service is not planned.                                                  |
@@ -76,7 +80,7 @@ You might need additional features like `isHorizonDevice` or `isHorizonBuild` to
 
 ## Expo Horizon Notifications is created by Software Mansion
 
-[![swm](https://logo.swmansion.com/logo?color=white&variant=desktop&width=150&tag=expo-horizon-notifications-github "Software Mansion")](https://swmansion.com)
+[![swm](https://logo.swmansion.com/logo?color=white&variant=desktop&width=150&tag=expo-horizon-notifications-github 'Software Mansion')](https://swmansion.com)
 
 Since 2012 [Software Mansion](https://swmansion.com) is a software agency with
 experience in building web and mobile apps. We are Core React Native
