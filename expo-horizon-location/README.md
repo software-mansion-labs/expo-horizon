@@ -1,5 +1,7 @@
 # expo-horizon-location
 
+![expo-horizon-location](https://img.shields.io/npm/v/expo-horizon-location.svg)
+
 A fork of [`expo-location`](https://github.com/expo/expo/tree/main/packages/expo-location) that provides two implementations:
 
 - The default `expo-location` behavior using Google Play Services.

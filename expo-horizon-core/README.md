@@ -1,4 +1,6 @@
-# expo-horizon-core
+![Expo Horizon Core logo](docs/images/cover_image.png)
+
+![expo-horizon-core](https://img.shields.io/npm/v/expo-horizon-core.svg)
 
 A comprehensive Expo module for building Android applications for Meta Quest devices. This package streamlines Horizon development by automatically configuring your project with the necessary build flavors, manifest settings, and providing runtime utilities to detect and interact with Horizon devices.
 
