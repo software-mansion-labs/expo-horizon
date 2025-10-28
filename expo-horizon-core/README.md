@@ -1,4 +1,4 @@
-![Expo Horizon Core logo](docs/images/cover_image.png)
+![Expo Horizon Core logo](https://raw.githubusercontent.com/software-mansion-labs/expo-horizon/refs/heads/main/expo-horizon-core/docs/images/cover_image.png)
 
 ![expo-horizon-core](https://img.shields.io/npm/v/expo-horizon-core.svg)
 
