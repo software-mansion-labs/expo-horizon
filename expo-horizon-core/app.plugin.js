@@ -1,1 +1,1 @@
-module.exports = require("./plugin/build/withHorizon");
+module.exports = require('./plugin/build/withHorizon');

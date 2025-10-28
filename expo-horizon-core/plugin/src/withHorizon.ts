@@ -1,10 +1,7 @@
-import {
-  ConfigPlugin,
-  withGradleProperties,
-  withAndroidManifest,
-} from "@expo/config-plugins";
-import { withProhibitedPermissions } from "./withProhibitedPermissions";
-import withCustomAndroidManifest from "./withCustomAndroidManifest";
+import { ConfigPlugin, withGradleProperties, withAndroidManifest } from '@expo/config-plugins';
+
+import withCustomAndroidManifest from './withCustomAndroidManifest';
+import { withProhibitedPermissions } from './withProhibitedPermissions';
 
 type HorizonOptions = {
   horizonAppId?: string;
@@ -38,25 +35,22 @@ const withHorizon: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
 const withHorizonEnabled: ConfigPlugin = (config) => {
   return withGradleProperties(config, (config) => {
     config.modResults.push({
-      type: "property",
-      key: "horizonEnabled",
-      value: "true",
+      type: 'property',
+      key: 'horizonEnabled',
+      value: 'true',
     });
 
     return config;
   });
 };
 
-const withHorizonAppId: ConfigPlugin<HorizonOptions> = (
-  config,
-  options = {},
-) => {
+const withHorizonAppId: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
   return withGradleProperties(config, (config) => {
-    const horizonAppId = options.horizonAppId ?? "";
+    const horizonAppId = options.horizonAppId ?? '';
 
     config.modResults.push({
-      type: "property",
-      key: "horizonAppId",
+      type: 'property',
+      key: 'horizonAppId',
       value: horizonAppId,
     });
 
@@ -71,10 +65,9 @@ const withPanelSize: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
       return config;
     }
 
-    const mainActivity =
-      config.modResults.manifest?.application?.[0]?.activity?.find(
-        (activity: any) => activity.$?.["android:name"] === ".MainActivity",
-      ) as any;
+    const mainActivity = config.modResults.manifest?.application?.[0]?.activity?.find(
+      (activity: any) => activity.$?.['android:name'] === '.MainActivity'
+    ) as any;
 
     if (mainActivity) {
       if (!mainActivity.layout) {
@@ -83,10 +76,10 @@ const withPanelSize: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
 
       const layoutAttrs: any = {};
       if (options.defaultHeight) {
-        layoutAttrs["android:defaultHeight"] = options.defaultHeight;
+        layoutAttrs['android:defaultHeight'] = options.defaultHeight;
       }
       if (options.defaultWidth) {
-        layoutAttrs["android:defaultWidth"] = options.defaultWidth;
+        layoutAttrs['android:defaultWidth'] = options.defaultWidth;
       }
 
       mainActivity.layout.push({
@@ -98,10 +91,7 @@ const withPanelSize: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
   });
 };
 
-const withSupportedDevices: ConfigPlugin<HorizonOptions> = (
-  config,
-  options = {},
-) => {
+const withSupportedDevices: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
   return withAndroidManifest(config, (config) => {
     // Only add meta-data if supportedDevices is explicitly provided
     if (!options.supportedDevices) {
@@ -111,14 +101,14 @@ const withSupportedDevices: ConfigPlugin<HorizonOptions> = (
     const application = config.modResults.manifest?.application?.[0];
 
     if (application) {
-      if (!application["meta-data"]) {
-        application["meta-data"] = [];
+      if (!application['meta-data']) {
+        application['meta-data'] = [];
       }
 
-      application["meta-data"].push({
+      application['meta-data'].push({
         $: {
-          "android:name": "com.oculus.supportedDevices",
-          "android:value": options.supportedDevices,
+          'android:name': 'com.oculus.supportedDevices',
+          'android:value': options.supportedDevices,
         },
       });
     }
@@ -127,10 +117,7 @@ const withSupportedDevices: ConfigPlugin<HorizonOptions> = (
   });
 };
 
-const withVrHeadtracking: ConfigPlugin<HorizonOptions> = (
-  config,
-  options = {},
-) => {
+const withVrHeadtracking: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
   return withAndroidManifest(config, (config) => {
     // Add VR headtracking by default unless explicitly disabled
     if (options.disableVrHeadtracking === true) {
@@ -140,15 +127,15 @@ const withVrHeadtracking: ConfigPlugin<HorizonOptions> = (
     const manifest = config.modResults.manifest;
 
     if (manifest) {
-      if (!manifest["uses-feature"]) {
-        manifest["uses-feature"] = [];
+      if (!manifest['uses-feature']) {
+        manifest['uses-feature'] = [];
       }
 
-      manifest["uses-feature"].push({
+      manifest['uses-feature'].push({
         $: {
-          "android:name": "android.hardware.vr.headtracking",
-          "android:required": "true",
-          "android:version": "1",
+          'android:name': 'android.hardware.vr.headtracking',
+          'android:required': 'true',
+          'android:version': '1',
         },
       } as any);
     }

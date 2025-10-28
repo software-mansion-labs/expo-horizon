@@ -1,9 +1,9 @@
-import { ConfigPlugin, createRunOncePlugin } from "expo/config-plugins";
+import { ConfigPlugin, createRunOncePlugin } from 'expo/config-plugins';
 
-import { withNotificationsAndroid } from "./withNotificationsAndroid";
-import { withNotificationsIOS } from "./withNotificationsIOS";
+import { withNotificationsAndroid } from './withNotificationsAndroid';
+import { withNotificationsIOS } from './withNotificationsIOS';
 
-const pkg = require("expo-horizon-notifications/package.json");
+const pkg = require('expo-horizon-notifications/package.json');
 
 export type NotificationsPluginProps = {
   /**
@@ -33,7 +33,7 @@ export type NotificationsPluginProps = {
    * @default 'development'
    * @platform ios
    */
-  mode?: "development" | "production";
+  mode?: 'development' | 'production';
 
   /**
    * Whether to enable background remote notifications, as described in [Apple documentation](https://developer.apple.com/documentation/usernotifications/pushing-background-updates-to-your-app).
@@ -45,10 +45,7 @@ export type NotificationsPluginProps = {
   enableBackgroundRemoteNotifications?: boolean;
 };
 
-const withNotifications: ConfigPlugin<NotificationsPluginProps | void> = (
-  config,
-  props
-) => {
+const withNotifications: ConfigPlugin<NotificationsPluginProps | void> = (config, props) => {
   config = withNotificationsAndroid(config, props || {});
   config = withNotificationsIOS(config, props || {});
   return config;

@@ -39,8 +39,7 @@ module.exports = () => ({
             'Allow $(PRODUCT_NAME) to access your location for background tracking',
           locationAlwaysPermission:
             'Allow $(PRODUCT_NAME) to access your location for background tracking',
-          locationWhenInUsePermission:
-            'Allow $(PRODUCT_NAME) to access your location',
+          locationWhenInUsePermission: 'Allow $(PRODUCT_NAME) to access your location',
         },
       ],
       [
@@ -66,4 +65,4 @@ module.exports = () => ({
       ],
     ],
   },
-})
+});

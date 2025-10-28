@@ -7,20 +7,20 @@ const withHorizon = (config) => {
     // Add horizonEnabled=true to gradle.properties
     config = (0, config_plugins_1.withGradleProperties)(config, (config) => {
         // Check if horizonEnabled already exists
-        const existingProperty = config.modResults.find((item) => item.type === "property" && item.key === "horizonEnabled");
+        const existingProperty = config.modResults.find((item) => item.type === 'property' && item.key === 'horizonEnabled');
         if (!existingProperty) {
             // Add the horizonEnabled property
             config.modResults.push({
-                type: "property",
-                key: "horizonEnabled",
-                value: "true",
+                type: 'property',
+                key: 'horizonEnabled',
+                value: 'true',
             });
             if (!hasLoggedPluginExecution) {
-                console.log("🌅 expo-horizon-location: Added horizonEnabled=true to gradle.properties");
+                console.log('🌅 expo-horizon-location: Added horizonEnabled=true to gradle.properties');
             }
         }
         else {
-            console.log("🌅 expo-horizon-location: horizonEnabled already exists in gradle.properties");
+            console.log('🌅 expo-horizon-location: horizonEnabled already exists in gradle.properties');
         }
         return config;
     });

@@ -139,10 +139,10 @@ class LocationHelpers(context: Context) {
 
     internal fun mapPriorityToProvider(priority: Int): String {
       return when (priority) {
-        LocationModule.ACCURACY_HIGHEST -> if (VRUtilities.isHorizon()) LocationManager.NETWORK_PROVIDER else LocationManager.GPS_PROVIDER
+        LocationModule.ACCURACY_HIGHEST -> if (Utilities.isHorizonDevice()) LocationManager.NETWORK_PROVIDER else LocationManager.GPS_PROVIDER
         LocationModule.ACCURACY_BALANCED -> LocationManager.NETWORK_PROVIDER
         LocationModule.ACCURACY_LOWEST -> LocationManager.PASSIVE_PROVIDER
-        else -> if (VRUtilities.isHorizon()) LocationManager.NETWORK_PROVIDER else LocationManager.GPS_PROVIDER
+        else -> if (Utilities.isHorizonDevice()) LocationManager.NETWORK_PROVIDER else LocationManager.GPS_PROVIDER
       }
     }
 

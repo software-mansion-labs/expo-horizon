@@ -1,6 +1,7 @@
 # expo-horizon-location
 
 A fork of [`expo-location`](https://github.com/expo/expo/tree/main/packages/expo-location) that provides two implementations:
+
 - The default `expo-location` behavior using Google Play Services.
 - A Meta Horizon–compatible implementation that does not rely on Google Play Services.
 
@@ -13,6 +14,7 @@ You can choose which implementation to use with the `quest` / `mobile` build var
 ## Usage
 
 1. Install the `expo-horizon-core` package:
+
 ```bash
 npx expo install expo-horizon-core
 ```
@@ -37,6 +39,7 @@ import * as Location from 'expo-horizon-location';
 ```
 
 ## Behavior
+
 - On Meta Quest devices → Uses the Meta Horizon–compatible push notification service.
 - On standard Android devices → Falls back to the default `expo-location` behavior using Google Play Services.
 - On iOS it should have no effect; behavior is always the same as `expo-location`.
@@ -50,23 +53,31 @@ You might need additional features like `isHorizonDevice` or `isHorizonBuild` to
 
 ## Features supported on Meta Horizon OS
 
-| Function Name                                                                                     | Android Devices | Meta Quest      | Notes                                                                                                                                                                                                               |
-| ------------------------------------------------------------------------------------------------- | --------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `enableNetworkProviderAsync`                                                                      | ✅ Supported     | ✅ Supported     |                                                                                                                                                                                                                     |
-| `getProviderStatusAsync`                                                                          | ✅ Supported     | ✅ Supported     |                                                                                                                                                                                                                     |
-| `hasServicesEnabledAsync`                                                                         | ✅ Supported     | ✅ Supported     |                                                                                                                                                                                                                     |
-| `requestForegroundPermissionsAsync` <br> `requestBackgroundPermissionsAsync`                      | ✅ Supported     | ✅ Supported     |                                                                                                                                                                                                                     |
-| `getForegroundPermissionsAsync` <br> `getBackgroundPermissionsAsync`                              | ✅ Supported     | ✅ Supported     |                                                                                                                                                                                                                     |
-| `getCurrentPositionAsync` <br> `watchPositionAsync`                                               | ✅ Supported     | ✅ Supported     | The GPS provider is not available on Quest devices. If selected, the network provider will be used instead. Note that, based on experiments, the network provider updates no more frequently than every 10 minutes. |
-| `getLastKnownPositionAsync`                                                                       | ✅ Supported     | ✅ Supported     |                                                                                                                                                                                                                     |
-| `watchHeadingAsync` <br> `getHeadingAsync`                                                        | ✅ Supported     | ❌ Not supported | Magnetic and accelerometer sensors are not available on Quest.                                                                                                                                                      |
-| `geocodeAsync` <br> `reverseGeocodeAsync`                                                         | ✅ Supported     | ❌ Not supported | The [`Geocoder`](https://developer.android.com/reference/android/location/Geocoder) is not present on Quest.                                                                                                        |
-| `startGeofencingAsync` <br> `stopGeofencingAsync` <br> `hasStartedGeofencingAsync`                | ✅ Supported     | ❌ Not supported | Meta Horizon Store doesn't support `ACCESS_BACKGROUND_LOCATION` Android permission.                                                                                                                                 |
-| `startLocationUpdatesAsync` <br> `stopLocationUpdatesAsync` <br> `hasStartedLocationUpdatesAsync` | ✅ Supported     | ❌ Not supported | Meta Horizon Store doesn't support `ACCESS_BACKGROUND_LOCATION` Android permission.                                                                                                                                 |
+| Function Name                                                                                     | Android Devices | Meta Quest       | Notes                                                                                                                                                                                                               |
+| ------------------------------------------------------------------------------------------------- | --------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `enableNetworkProviderAsync`                                                                      | ✅ Supported    | ✅ Supported     |                                                                                                                                                                                                                     |
+| `getProviderStatusAsync`                                                                          | ✅ Supported    | ✅ Supported     |                                                                                                                                                                                                                     |
+| `hasServicesEnabledAsync`                                                                         | ✅ Supported    | ✅ Supported     |                                                                                                                                                                                                                     |
+| `requestForegroundPermissionsAsync` <br> `requestBackgroundPermissionsAsync`                      | ✅ Supported    | ✅ Supported     |                                                                                                                                                                                                                     |
+| `getForegroundPermissionsAsync` <br> `getBackgroundPermissionsAsync`                              | ✅ Supported    | ✅ Supported     |                                                                                                                                                                                                                     |
+| `getCurrentPositionAsync` <br> `watchPositionAsync`                                               | ✅ Supported    | ✅ Supported     | The GPS provider is not available on Quest devices. If selected, the network provider will be used instead. Note that, based on experiments, the network provider updates no more frequently than every 10 minutes. |
+| `getLastKnownPositionAsync`                                                                       | ✅ Supported    | ✅ Supported     |                                                                                                                                                                                                                     |
+| `watchHeadingAsync` <br> `getHeadingAsync`                                                        | ✅ Supported    | ❌ Not supported | Magnetic and accelerometer sensors are not available on Quest.                                                                                                                                                      |
+| `geocodeAsync` <br> `reverseGeocodeAsync`                                                         | ✅ Supported    | ❌ Not supported | The [`Geocoder`](https://developer.android.com/reference/android/location/Geocoder) is not present on Quest.                                                                                                        |
+| `startGeofencingAsync` <br> `stopGeofencingAsync` <br> `hasStartedGeofencingAsync`                | ✅ Supported    | ❌ Not supported | Meta Horizon Store doesn't support `ACCESS_BACKGROUND_LOCATION` Android permission.                                                                                                                                 |
+| `startLocationUpdatesAsync` <br> `stopLocationUpdatesAsync` <br> `hasStartedLocationUpdatesAsync` | ✅ Supported    | ❌ Not supported | Meta Horizon Store doesn't support `ACCESS_BACKGROUND_LOCATION` Android permission.                                                                                                                                 |
+
+## Version compatibility
+
+Our goal is to align the version numbers of `expo-horizon-location` and `expo-location` for easier upgrades. However, since this fork is still under development, we are currently using a separate versioning scheme.
+
+| `expo-horizon-location` | `expo-location` |
+| ----------------------- | --------------- |
+| 0.0.2                   | 18.1.17         |
 
 ## Expo Horizon Location is created by Software Mansion
 
-[![swm](https://logo.swmansion.com/logo?color=white&variant=desktop&width=150&tag=expo-horizon-location-github "Software Mansion")](https://swmansion.com)
+[![swm](https://logo.swmansion.com/logo?color=white&variant=desktop&width=150&tag=expo-horizon-location-github 'Software Mansion')](https://swmansion.com)
 
 Since 2012 [Software Mansion](https://swmansion.com) is a software agency with
 experience in building web and mobile apps. We are Core React Native
