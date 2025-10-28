@@ -1,0 +1,72 @@
+name: Modules CI
+
+on:
+  pull_request:
+    paths:
+      - 'expo-horizon-core/**'
+      - 'expo-horizon-location/**'
+      - 'expo-horizon-notifications/**'
+      - '.github/workflows/modules_ci.yml'
+
+      # --- Shared paths for BOTH workflows ---
+      - 'package.json'
+      - 'yarn.lock'
+      - '.eslintrc.js'
+      - '.prettierrc.json'
+      - 'tsconfig.base.json'
+  push:
+    branches:
+      - main
+    paths:
+      - 'expo-horizon-core/**'
+      - 'expo-horizon-location/**'
+      - 'expo-horizon-notifications/**'
+      - '.github/workflows/modules_ci.yml'
+
+      # --- Shared paths for BOTH workflows ---
+      - 'package.json'
+      - 'yarn.lock'
+      - '.eslintrc.js'
+      - '.prettierrc.json'
+      - 'tsconfig.base.json'
+
+jobs:
+  quality-checks:
+    name: Libs Quality Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🏗 Setup repo
+        uses: actions/checkout@v4
+
+      - name: 📦 Install Yarn
+        run: npm install -g yarn
+
+      - name: 🌿 Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+          cache-dependency-path: '**/yarn.lock'
+
+      - name: 📦 Install all dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: 🤓 Run ESLint
+        run: |
+          yarn eslint expo-horizon-core/ \
+                      expo-horizon-location/ \
+                      expo-horizon-notifications/ \
+                      --ext .js,.jsx,.ts,.tsx
+
+      - name: ✨ Run Prettier check
+        run: |
+          yarn prettier --check expo-horizon-core/ \
+                                expo-horizon-location/ \
+                                expo-horizon-notifications/
+
+      - name: 🔍 Run TypeScript check
+        run: |
+          yarn tsc --project expo-horizon-core/tsconfig.json --noEmit
+          yarn tsc --project expo-horizon-location/tsconfig.json --noEmit
+          yarn tsc --project expo-horizon-notifications/tsconfig.json --noEmit

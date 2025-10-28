@@ -109,11 +109,9 @@ Add the plugin to your `app.json` or `app.config.[js|ts]`:
 | `disableVrHeadtracking` | `boolean` | No       | `false`   | Set to `true` to disable VR headtracking feature. By default, adds `android.hardware.vr.headtracking` to AndroidManifest.                                                                                                        |
 | `allowBackup`           | `boolean` | No       | `false`   | Set to `true` in the Quest build to enable Android's `allowBackup` feature. The default value is `false` which removes the "allowBackup=true" warning in the Meta Horizon Store. This does not affect your mobile build variant. |
 
-
 > **Meta Horizon Store Recommendation for `allowBackup`:**
 >
 > If the application is storing sensitive information on the device, it is recommended to disable backups by setting `allowBackup="false"` in your application's AndroidManifest.
->
 
 ### Configuration Examples
 
@@ -137,7 +135,6 @@ Add the plugin to your `app.json` or `app.config.[js|ts]`:
 > **Setting default dimensions:**
 >
 > If your app renders with black bars after setting `defaultWidth` or `defaultHeight`, ensure the orientation value in your `app.config.ts` is set correctly to match the specified dimensions. For more information, refer to the official (expo documentation)[https://docs.expo.dev/versions/latest/sdk/screen-orientation/]
-
 
 ## Building and Running
 
@@ -165,7 +162,7 @@ Each flavor has debug and release variants:
 npx expo run:android --variant mobileDebug
 ```
 
-#### Run on Meta Horizon devices 
+#### Run on Meta Horizon devices
 
 ```bash
 npx expo run:android --variant questDebug
@@ -266,8 +263,6 @@ val horizonAppId = BuildConfig.META_HORIZON_APP_ID
 
 Now, `horizonAppId` will contain the value of your Horizon App ID as defined in your build configuration.
 
-
-
 # Resources
 
 - [Meta Horizon Mobile App Development](https://developers.meta.com/horizon/documentation/android-apps/mobile-overview)
@@ -277,11 +272,11 @@ Now, `horizonAppId` will contain the value of your Horizon App ID as defined in 
 
 # Contributing
 
-Contributions are very welcome! Please refer to guidelines described in the [contributing guide]( https://github.com/expo/expo#contributing).
+Contributions are very welcome! Please refer to guidelines described in the [contributing guide](https://github.com/expo/expo#contributing).
 
 ## Expo Horizon Core is created by Software Mansion
 
-[![swm](https://logo.swmansion.com/logo?color=white&variant=desktop&width=150&tag=expo-horizon-core-github "Software Mansion")](https://swmansion.com)
+[![swm](https://logo.swmansion.com/logo?color=white&variant=desktop&width=150&tag=expo-horizon-core-github 'Software Mansion')](https://swmansion.com)
 
 Since 2012 [Software Mansion](https://swmansion.com) is a software agency with
 experience in building web and mobile apps. We are Core React Native

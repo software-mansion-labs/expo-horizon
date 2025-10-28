@@ -1,3 +1,4 @@
+.eslintignore
 node_modules
-dist
 build
+dist

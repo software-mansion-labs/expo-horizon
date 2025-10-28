@@ -1,5 +1,6 @@
-import { StyleSheet } from 'react-native'
-import { Colors } from './colors'
+import { StyleSheet } from 'react-native';
+
+import { Colors } from './colors';
 
 export const GlobalStyles = StyleSheet.create({
   screenContainer: {
@@ -102,4 +103,4 @@ export const GlobalStyles = StyleSheet.create({
   loadingIndicator: {
     marginRight: 8,
   },
-})
+});
