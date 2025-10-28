@@ -75,15 +75,15 @@ npx expo install expo-build-properties
 {
   "expo": {
     "plugins": [
-        [
+      [
         "expo-build-properties",
-            {
-                "android": {
-                    "compileSdkVersion": 34,
-                    "targetSdkVersion": 34,
-                }
-            }
-        ],
+        {
+          "android": {
+            "compileSdkVersion": 34,
+            "targetSdkVersion": 34
+          }
+        }
+      ]
     ]
   }
 }
@@ -181,12 +181,12 @@ The config plugin automatically creates two build flavors for your Android proje
 
 Each flavor has debug and release variants:
 
-| Variant          | Description                                   |
-| ---------------- | --------------------------------------------- |
-| `mobileDebug`    | Debug build for standard Android devices      |
-| `mobileRelease`  | Production build for standard Android devices |
-| `questDebug`   | Debug build for Meta Horizon OS devices       |
-| `questRelease` | Production build for Meta Horizon OS devices  |
+| Variant         | Description                                   |
+| --------------- | --------------------------------------------- |
+| `mobileDebug`   | Debug build for standard Android devices      |
+| `mobileRelease` | Production build for standard Android devices |
+| `questDebug`    | Debug build for Meta Horizon OS devices       |
+| `questRelease`  | Production build for Meta Horizon OS devices  |
 
 ### Running on Different Platforms
 
