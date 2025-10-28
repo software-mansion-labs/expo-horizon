@@ -1,4 +1,4 @@
-# expo-horizon
+# expo-horizon-core
 
 A comprehensive Expo module for building Android applications for Meta Quest devices. This package streamlines Horizon development by automatically configuring your project with the necessary build flavors, manifest settings, and providing runtime utilities to detect and interact with Horizon devices.
 
@@ -23,7 +23,7 @@ yarn add expo-horizon-core
 
 ## Prerequisites
 
-- Expo SDK 54 or later (`expo` package version 54.0.13+).
+- Expo SDK 54 or later (`expo` package version 54.0.13+)
 - Android development environment configured
 - Meta Quest developer account (for publishing)
 
@@ -62,6 +62,40 @@ if (ExpoHorizon.isHorizonDevice) {
   // Horizon-specific UI or features
 }
 ```
+
+4. (Temporarily) downgrade the Android SDK version to 34:
+
+Until official SDK 36 support for Meta Quest is released, you’ll need to manually set the `targetSdkVersion` to 34 in your `app.config.[js|ts]` when publishing to the Meta Horizon OS Store. This ensures your app meets current Meta Horizon requirements. Once Meta Quest support is fully compatible with SDK 36, this manual configuration will no longer be necessary.
+
+```bash
+npx expo install expo-build-properties
+```
+
+```json
+{
+  "expo": {
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 34,
+            "targetSdkVersion": 34
+          }
+        }
+      ]
+    ]
+  }
+}
+```
+
+> [!IMPORTANT]
+> Downgrading the SDK version may cause compatibility issues with some of your library dependencies. Therefore, you should consider the following options:
+>
+> 1. **Wait until Meta releases Android SDK 36 support in the Horizon Store** (they mentioned it should happen in the coming days or weeks), and in the meantime temporarily downgrade the library dependencies — for example, as shown here: [expo-horizon-notifications patch](../expo-horizon-notifications/README.md)
+> 2. **Ignore the SDK 34 requirement for now during development.** You can remove the `targetSdkVersion` and `compileSdkVersion` fields from `expo-build-properties` (or set them to 36). Once Meta releases SDK 36 support, you’ll be able to upload the app.
+>
+> For more details, refer to [the official Expo documentation](https://docs.expo.dev/versions/latest/sdk/build-properties/).
 
 ## Configuration
 
@@ -147,12 +181,12 @@ The config plugin automatically creates two build flavors for your Android proje
 
 Each flavor has debug and release variants:
 
-| Variant          | Description                                   |
-| ---------------- | --------------------------------------------- |
-| `mobileDebug`    | Debug build for standard Android devices      |
-| `mobileRelease`  | Production build for standard Android devices |
-| `horizonDebug`   | Debug build for Meta Horizon OS devices       |
-| `horizonRelease` | Production build for Meta Horizon OS devices  |
+| Variant         | Description                                   |
+| --------------- | --------------------------------------------- |
+| `mobileDebug`   | Debug build for standard Android devices      |
+| `mobileRelease` | Production build for standard Android devices |
+| `questDebug`    | Debug build for Meta Horizon OS devices       |
+| `questRelease`  | Production build for Meta Horizon OS devices  |
 
 ### Running on Different Platforms
 
@@ -272,7 +306,7 @@ Now, `horizonAppId` will contain the value of your Horizon App ID as defined in 
 
 # Contributing
 
-Contributions are very welcome! Please refer to guidelines described in the [contributing guide](https://github.com/expo/expo#contributing).
+Contributions are very welcome! Please refer to the guidelines described in the [contributing guide](https://github.com/expo/expo#contributing).
 
 ## Expo Horizon Core is created by Software Mansion
 

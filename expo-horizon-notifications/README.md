@@ -9,8 +9,8 @@ You can choose which implementation to use with the `quest` / `mobile` build var
 
 ## Prerequisites
 
-- Expo SDK 54 or later (`expo` package version 54.0.13+).
-- `expo-horizon-core` package installed. See [expo-horizon-core](../expo-horizon-core/README.md) for more details.
+- Expo SDK 54 or later (`expo` package version 54.0.13+)
+- `expo-horizon-core` package installed. See [expo-horizon-core](../expo-horizon-core/README.md) for more details
 
 ## Usage
 
