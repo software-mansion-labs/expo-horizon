@@ -7,4 +7,4 @@ export const Colors = {
   swmRed: '#FFB2ad',
   swmYellow: '#FFF096',
   swmBlue: '#A0D5EF',
-}
+};

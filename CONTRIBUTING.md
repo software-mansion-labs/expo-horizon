@@ -44,6 +44,7 @@ For changes made to the libraries, it's recommended to squash your commits befor
 ## Upstream Sync
 
 You can sync the packages from the upstream Expo repository in two ways:
+
 - Using GitHub Actions (recommended)
 - Using a local script (for manual sync and conflict resolution)
 
@@ -67,12 +68,14 @@ When the automated sync encounters conflicts, you can use the local sync script 
 ```
 
 The script will:
+
 - Create a new branch for the sync
 - Attempt to merge upstream changes
 - If conflicts occur, leave you on the branch to resolve them manually
 - If no conflicts, provide instructions for creating a PR
 
 **Requirements:**
+
 - `git-filter-repo`: Install with `pip install git-filter-repo`
 - `gh` CLI tool: For creating PRs automatically
 

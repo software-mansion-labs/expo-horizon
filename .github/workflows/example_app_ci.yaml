@@ -3,12 +3,28 @@ name: Example App CI
 on:
   pull_request:
     paths:
-      - "example/**"
+      - 'example/**'
+      - '.github/workflows/example_app_ci.yml'
+
+      # --- Shared paths for BOTH workflows ---
+      - 'package.json'
+      - 'yarn.lock'
+      - '.eslintrc.js'
+      - '.prettierrc.json'
+      - 'tsconfig.base.json'
   push:
     branches:
       - main
     paths:
-      - "example/**"
+      - 'example/**'
+      - '.github/workflows/example-app-ci.yml'
+
+      # --- Shared paths for BOTH workflows ---
+      - 'package.json'
+      - 'yarn.lock'
+      - '.eslintrc.js'
+      - '.prettierrc.json'
+      - 'tsconfig.base.json'
 
 jobs:
   quality-checks:
@@ -25,9 +41,9 @@ jobs:
       - name: 🌿 Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version-file: "example/.nvmrc"
-          cache: "yarn"
-          cache-dependency-path: "**/yarn.lock"
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+          cache-dependency-path: '**/yarn.lock'
 
       - name: 📦 Install root dependencies
         run: yarn install --frozen-lockfile

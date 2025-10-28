@@ -1,11 +1,7 @@
-import { isRunningInExpoGo } from "expo";
-import {
-  PermissionResponse,
-  createPermissionHook,
-  Platform,
-} from "expo-modules-core";
+import { isRunningInExpoGo } from 'expo';
+import { PermissionResponse, createPermissionHook, Platform } from 'expo-modules-core';
 
-import ExpoLocation from "./ExpoLocation";
+import ExpoLocation from './ExpoLocation';
 import {
   LocationErrorCallback,
   LocationAccuracy,
@@ -22,12 +18,12 @@ import {
   LocationRegion,
   LocationSubscription,
   LocationTaskOptions,
-} from "./Location.types";
+} from './Location.types';
 import {
   LocationSubscriber,
   HeadingSubscriber,
   LocationErrorSubscriber,
-} from "./LocationSubscribers";
+} from './LocationSubscribers';
 
 declare let __DEV__: boolean;
 
@@ -57,7 +53,7 @@ export async function enableNetworkProviderAsync(): Promise<void> {
   // to change the location mode to "High accuracy" which uses Google Play services and enables network provider.
   // `getCurrentPositionAsync` and `watchPositionAsync` are doing it automatically anyway.
 
-  if (Platform.OS === "android") {
+  if (Platform.OS === 'android') {
     return ExpoLocation.enableNetworkProviderAsync();
   }
 }
@@ -114,8 +110,7 @@ export async function watchPositionAsync(
   errorHandler?: LocationErrorCallback
 ): Promise<LocationSubscription> {
   const watchId = LocationSubscriber.registerCallback(callback);
-  errorHandler &&
-    LocationErrorSubscriber.registerCallbackForId(watchId, errorHandler);
+  errorHandler && LocationErrorSubscriber.registerCallbackForId(watchId, errorHandler);
 
   await ExpoLocation.watchPositionImplAsync(watchId, options);
 
@@ -177,8 +172,7 @@ export async function watchHeadingAsync(
   errorHandler?: LocationErrorCallback
 ): Promise<LocationSubscription> {
   const watchId = HeadingSubscriber.registerCallback(callback);
-  errorHandler &&
-    LocationErrorSubscriber.registerCallbackForId(watchId, errorHandler);
+  errorHandler && LocationErrorSubscriber.registerCallbackForId(watchId, errorHandler);
 
   await ExpoLocation.watchDeviceHeading(watchId);
 
@@ -209,20 +203,16 @@ export async function watchHeadingAsync(
  * @platform android
  * @platform ios
  */
-export async function geocodeAsync(
-  address: string
-): Promise<LocationGeocodedLocation[]> {
-  if (typeof address !== "string") {
-    throw new TypeError(
-      `Address to geocode must be a string. Got ${address} instead.`
-    );
+export async function geocodeAsync(address: string): Promise<LocationGeocodedLocation[]> {
+  if (typeof address !== 'string') {
+    throw new TypeError(`Address to geocode must be a string. Got ${address} instead.`);
   }
 
-  if (Platform.OS === "web") {
+  if (Platform.OS === 'web') {
     if (__DEV__) {
       console.warn(
-        "The Geocoding API has been removed in SDK 49, use Place Autocomplete service instead" +
-          "(https://developers.google.com/maps/documentation/places/web-service/autocomplete)"
+        'The Geocoding API has been removed in SDK 49, use Place Autocomplete service instead' +
+          '(https://developers.google.com/maps/documentation/places/web-service/autocomplete)'
       );
     }
     return [];
@@ -250,22 +240,19 @@ export async function geocodeAsync(
  * @platform ios
  */
 export async function reverseGeocodeAsync(
-  location: Pick<LocationGeocodedLocation, "latitude" | "longitude">
+  location: Pick<LocationGeocodedLocation, 'latitude' | 'longitude'>
 ): Promise<LocationGeocodedAddress[]> {
-  if (
-    typeof location.latitude !== "number" ||
-    typeof location.longitude !== "number"
-  ) {
+  if (typeof location.latitude !== 'number' || typeof location.longitude !== 'number') {
     throw new TypeError(
-      "Location to reverse-geocode must be an object with number properties `latitude` and `longitude`."
+      'Location to reverse-geocode must be an object with number properties `latitude` and `longitude`.'
     );
   }
 
-  if (Platform.OS === "web") {
+  if (Platform.OS === 'web') {
     if (__DEV__) {
       console.warn(
-        "The Geocoding API has been removed in SDK 49, use Place Autocomplete service instead" +
-          "(https://developers.google.com/maps/documentation/places/web-service/autocomplete)"
+        'The Geocoding API has been removed in SDK 49, use Place Autocomplete service instead' +
+          '(https://developers.google.com/maps/documentation/places/web-service/autocomplete)'
       );
     }
     return [];
@@ -361,18 +348,16 @@ export async function hasServicesEnabledAsync(): Promise<boolean> {
 // --- Background location updates
 
 function _validate(taskName: string) {
-  if (!taskName || typeof taskName !== "string") {
-    throw new Error(
-      `\`taskName\` must be a non-empty string. Got ${taskName} instead.`
-    );
+  if (!taskName || typeof taskName !== 'string') {
+    throw new Error(`\`taskName\` must be a non-empty string. Got ${taskName} instead.`);
   }
   if (isRunningInExpoGo()) {
     if (!warnAboutExpoGoDisplayed) {
       const message =
-        "Background location is limited in Expo Go:\n" +
-        "On Android, it is not available at all.\n" +
-        "On iOS, it works when running in the Simulator.\n" +
-        "You can use this API, and all others, in a development build. Learn more: https://expo.fyi/dev-client.";
+        'Background location is limited in Expo Go:\n' +
+        'On Android, it is not available at all.\n' +
+        'On iOS, it works when running in the Simulator.\n' +
+        'You can use this API, and all others, in a development build. Learn more: https://expo.fyi/dev-client.';
       console.warn(message);
       warnAboutExpoGoDisplayed = true;
     }
@@ -426,9 +411,7 @@ export async function startLocationUpdatesAsync(
  * @param taskName Name of the background location task to stop.
  * @return A promise resolving as soon as the task is unregistered.
  */
-export async function stopLocationUpdatesAsync(
-  taskName: string
-): Promise<void> {
+export async function stopLocationUpdatesAsync(taskName: string): Promise<void> {
   _validate(taskName);
   await ExpoLocation.stopLocationUpdatesAsync(taskName);
 }
@@ -439,9 +422,7 @@ export async function stopLocationUpdatesAsync(
  * @return A promise which fulfills with boolean value indicating whether the location task is
  * started or not.
  */
-export async function hasStartedLocationUpdatesAsync(
-  taskName: string
-): Promise<boolean> {
+export async function hasStartedLocationUpdatesAsync(taskName: string): Promise<boolean> {
   _validate(taskName);
   return ExpoLocation.hasStartedLocationUpdatesAsync(taskName);
 }
@@ -451,24 +432,20 @@ export async function hasStartedLocationUpdatesAsync(
 function _validateRegions(regions: LocationRegion[]) {
   if (!regions || regions.length === 0) {
     throw new Error(
-      "Regions array cannot be empty. Use `stopGeofencingAsync` if you want to stop geofencing all regions"
+      'Regions array cannot be empty. Use `stopGeofencingAsync` if you want to stop geofencing all regions'
     );
   }
   for (const region of regions) {
-    if (typeof region.latitude !== "number") {
-      throw new TypeError(
-        `Region's latitude must be a number. Got '${region.latitude}' instead.`
-      );
+    if (typeof region.latitude !== 'number') {
+      throw new TypeError(`Region's latitude must be a number. Got '${region.latitude}' instead.`);
     }
-    if (typeof region.longitude !== "number") {
+    if (typeof region.longitude !== 'number') {
       throw new TypeError(
         `Region's longitude must be a number. Got '${region.longitude}' instead.`
       );
     }
-    if (typeof region.radius !== "number") {
-      throw new TypeError(
-        `Region's radius must be a number. Got '${region.radius}' instead.`
-      );
+    if (typeof region.radius !== 'number') {
+      throw new TypeError(`Region's radius must be a number. Got '${region.radius}' instead.`);
     }
   }
 }
@@ -537,9 +514,7 @@ export async function stopGeofencingAsync(taskName: string): Promise<void> {
  * @return A promise which fulfills with boolean value indicating whether the geofencing task is
  * started or not.
  */
-export async function hasStartedGeofencingAsync(
-  taskName: string
-): Promise<boolean> {
+export async function hasStartedGeofencingAsync(taskName: string): Promise<boolean> {
   _validate(taskName);
   return ExpoLocation.hasStartedGeofencingAsync(taskName);
 }
@@ -548,6 +523,4 @@ export async function hasStartedGeofencingAsync(
  * Checks if the device is a Horizon device.
  * @return A boolean value indicating whether the device is a Horizon.
  */
-export const isHorizon: boolean | null = ExpoLocation
-  ? ExpoLocation.isHorizon
-  : null;
+export const isHorizon: boolean | null = ExpoLocation ? ExpoLocation.isHorizon : null;

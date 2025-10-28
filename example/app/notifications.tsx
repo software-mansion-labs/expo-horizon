@@ -8,6 +8,7 @@ import { GlobalStyles } from '../constants/styles'
 import NotificationResponseSection from '../sections/notifications/notification-response'
 import BackgroundTaskSection from '../sections/notifications/background-task'
 
+
 Notifications.setNotificationHandler({
   handleNotification: async () => {
     return {
@@ -15,20 +16,20 @@ Notifications.setNotificationHandler({
       shouldSetBadge: true,
       shouldShowBanner: true,
       shouldShowList: true,
-    }
+    };
   },
-})
+});
 
 export default function NotificationsScreen() {
   const requestPermissions = async () => {
-    const result = await Notifications.requestPermissionsAsync()
-    console.log(result)
-  }
+    const result = await Notifications.requestPermissionsAsync();
+    console.log(result);
+  };
 
   const getPermissions = async () => {
-    const result = await Notifications.getPermissionsAsync()
-    console.log(result)
-  }
+    const result = await Notifications.getPermissionsAsync();
+    console.log(result);
+  };
 
   const sendNotification = async () => {
     const result = await Notifications.scheduleNotificationAsync({
@@ -40,26 +41,22 @@ export default function NotificationsScreen() {
         type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
         seconds: 2,
       },
-    })
-    console.log(result)
-  }
+    });
+    console.log(result);
+  };
 
   const getPushToken = async () => {
-    const result = await Notifications.getDevicePushTokenAsync()
-    Alert.alert('Push Token', result.data)
-  }
+    const result = await Notifications.getDevicePushTokenAsync();
+    Alert.alert('Push Token', result.data);
+  };
 
   return (
     <SafeAreaView style={GlobalStyles.screenContainer}>
       <ScrollView
         style={GlobalStyles.scrollView}
-        contentContainerStyle={GlobalStyles.scrollContent}
-      >
+        contentContainerStyle={GlobalStyles.scrollContent}>
         <Section title="Permissions">
-          <TestButton
-            title="Request Permissions"
-            onPress={requestPermissions}
-          />
+          <TestButton title="Request Permissions" onPress={requestPermissions} />
           <TestButton title="Get Permissions" onPress={getPermissions} />
         </Section>
         <Section title="Local Notifications">
@@ -76,5 +73,5 @@ export default function NotificationsScreen() {
         </Section>
       </ScrollView>
     </SafeAreaView>
-  )
+  );
 }
