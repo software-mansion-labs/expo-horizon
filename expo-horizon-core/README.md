@@ -151,8 +151,8 @@ Each flavor has debug and release variants:
 | ---------------- | --------------------------------------------- |
 | `mobileDebug`    | Debug build for standard Android devices      |
 | `mobileRelease`  | Production build for standard Android devices |
-| `horizonDebug`   | Debug build for Meta Horizon OS devices       |
-| `horizonRelease` | Production build for Meta Horizon OS devices  |
+| `questDebug`   | Debug build for Meta Horizon OS devices       |
+| `questRelease` | Production build for Meta Horizon OS devices  |
 
 ### Running on Different Platforms
 
