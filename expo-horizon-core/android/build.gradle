@@ -1,0 +1,28 @@
+plugins {
+  id 'com.android.library'
+  id 'expo-module-gradle-plugin'
+}
+
+expoModule {
+  canBePublished false
+}
+
+def horizonAppIdConfigField = "\"${project.findProperty('horizonAppId') ?: ''}\""
+
+android {
+  namespace "expo.modules.horizon"
+  defaultConfig {
+    versionCode 1
+    versionName "0.1.0"
+    buildConfigField "String", "META_HORIZON_APP_ID", horizonAppIdConfigField
+  }
+  lintOptions {
+    abortOnError false
+  }
+
+  flavorDimensions += "device"
+  productFlavors {
+    quest { dimension "device" }
+    mobile { dimension "device" }
+  }
+}

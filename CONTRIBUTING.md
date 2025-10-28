@@ -19,28 +19,32 @@ rm -rf node_modules android ios
 # Install example app dependencies
 yarn install
 
-# Build and launch the Expo Quest app on your device or emulator
-yarn quest          # Runs the Meta Quest version of the app
+# Build and launch the Expo Horizon app on your device or emulator
+yarn quest          # Runs the Meta Horizon version of the app
 yarn android        # Runs the Android version of the app
 yarn ios            # Runs the iOS version of the app
+
+# Build and publish the packages
+npm publish --access public
 ```
 
 ## Naming Conventions
 
 Name your PRs using the format: `[package] type: <description>`
 
-Where `package` is one of: `example`, `expo-quest`, `expo-quest-location`, or `expo-quest-notifications`.
+Where `package` is one of: `example`, `expo-horizon-core`, `expo-horizon-location`, or `expo-horizon-notifications`.
 
 Use a brief type (such as `feat`, `fix`, `docs`, `chore`, `style`, `ci`, etc.) and a short, clear description.
 
 Example:
-`[expo-quest] feat: add hand tracking support`
+`[expo-horizon-core] Feat: add hand tracking support`
 
 For changes made to the libraries, it's recommended to squash your commits before merging. This helps keep the commit history clean and easier to follow.
 
 ## Upstream Sync
 
 You can sync the packages from the upstream Expo repository in two ways:
+
 - Using GitHub Actions (recommended)
 - Using a local script (for manual sync and conflict resolution)
 
@@ -64,12 +68,14 @@ When the automated sync encounters conflicts, you can use the local sync script 
 ```
 
 The script will:
+
 - Create a new branch for the sync
 - Attempt to merge upstream changes
 - If conflicts occur, leave you on the branch to resolve them manually
 - If no conflicts, provide instructions for creating a PR
 
 **Requirements:**
+
 - `git-filter-repo`: Install with `pip install git-filter-repo`
 - `gh` CLI tool: For creating PRs automatically
 

@@ -1,0 +1,9 @@
+{
+  "platforms": ["apple", "android", "web"],
+  "apple": {
+    "modules": ["ExpoHorizonModule"]
+  },
+  "android": {
+    "modules": ["expo.modules.horizon.ExpoHorizonModule"]
+  }
+}

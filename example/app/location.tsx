@@ -1,4 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import ExpoHorizon from 'expo-horizon-core';
+import * as Location from 'expo-horizon-location';
+import { StatusBar } from 'expo-status-bar';
+import * as TaskManager from 'expo-task-manager';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Text,
   View,
@@ -7,13 +11,10 @@ import {
   Alert,
   Platform,
   ActivityIndicator,
-} from 'react-native'
-import { StatusBar } from 'expo-status-bar'
-import * as TaskManager from 'expo-task-manager'
-import * as Location from 'expo-quest-location'
-import { Section, SectionTitle } from '../components/Section'
-import ExpoQuest from 'expo-quest'
-import { GlobalStyles } from '../constants/styles'
+} from 'react-native';
+
+import { Section, SectionTitle } from '../components/Section';
+import { GlobalStyles } from '../constants/styles';
 
 const TestButton = ({
   title,
@@ -21,10 +22,10 @@ const TestButton = ({
   color = '#007AFF',
   isButtonLoading,
 }: {
-  title: string
-  onPress: () => void
-  color?: string
-  isButtonLoading: boolean
+  title: string;
+  onPress: () => void;
+  color?: string;
+  isButtonLoading: boolean;
 }) => {
   return (
     <TouchableOpacity
@@ -34,241 +35,230 @@ const TestButton = ({
         isButtonLoading && GlobalStyles.buttonDisabled,
       ]}
       onPress={onPress}
-      disabled={isButtonLoading}
-    >
+      disabled={isButtonLoading}>
       <View style={GlobalStyles.buttonContent}>
         {isButtonLoading && (
-          <ActivityIndicator
-            size="small"
-            color="#fff"
-            style={GlobalStyles.loadingIndicator}
-          />
+          <ActivityIndicator size="small" color="#fff" style={GlobalStyles.loadingIndicator} />
         )}
-        <Text style={GlobalStyles.buttonText}>
-          {isButtonLoading ? `${title}...` : title}
-        </Text>
+        <Text style={GlobalStyles.buttonText}>{isButtonLoading ? `${title}...` : title}</Text>
       </View>
     </TouchableOpacity>
-  )
-}
-
+  );
+};
+//eslint-disable-next-line  @typescript-eslint/no-explicit-any
 const StatusText = ({ label, value }: { label: string; value: any }) => (
   <Text style={GlobalStyles.dataText}>
     <Text style={GlobalStyles.statusLabel}>{label}: </Text>
     <Text style={GlobalStyles.statusValue}>{String(value)}</Text>
   </Text>
-)
+);
 export default function LocationScreen() {
-  const [location, setLocation] = useState<Location.LocationObject | null>(null)
-  const [, setLastKnownLocation] = useState<Location.LocationObject | null>(
+  const [location, setLocation] = useState<Location.LocationObject | null>(null);
+  const [, setLastKnownLocation] = useState<Location.LocationObject | null>(null);
+  const [heading, setHeading] = useState<Location.LocationHeadingObject | null>(null);
+  const [, setProviderStatus] = useState<Location.LocationProviderStatus | null>(null);
+  const [permissions, setPermissions] = useState<Location.LocationPermissionResponse | null>(null);
+  const [backgroundPermissions, setBackgroundPermissions] =
+    useState<Location.LocationPermissionResponse | null>(null);
+  const [servicesEnabled, setServicesEnabled] = useState<boolean | null>(null);
+  const [backgroundLocationAvailable, setBackgroundLocationAvailable] = useState<boolean | null>(
     null
-  )
-  const [heading, setHeading] = useState<Location.LocationHeadingObject | null>(
+  );
+  const [locationUpdatesActive, setLocationUpdatesActive] = useState(false);
+  const [geofencingActive, setGeofencingActive] = useState(false);
+  const [geocodedAddress, setGeocodedAddress] = useState<Location.LocationGeocodedAddress[] | null>(
     null
-  )
-  const [, setProviderStatus] =
-    useState<Location.LocationProviderStatus | null>(null)
-  const [permissions, setPermissions] =
-    useState<Location.LocationPermissionResponse | null>(null)
-  const [backgroundPermissions, setBackgroundPermissions] = useState<any>(null)
-  const [servicesEnabled, setServicesEnabled] = useState<boolean | null>(null)
-  const [backgroundLocationAvailable, setBackgroundLocationAvailable] =
-    useState<boolean | null>(null)
-  const [locationUpdatesActive, setLocationUpdatesActive] = useState(false)
-  const [geofencingActive, setGeofencingActive] = useState(false)
-  const [geocodedAddress, setGeocodedAddress] = useState<
-    Location.LocationGeocodedAddress[] | null
-  >(null)
+  );
   const [geocodedLocation, setGeocodedLocation] = useState<
     Location.LocationGeocodedLocation[] | null
-  >(null)
+  >(null);
   const [locationSubscription, setLocationSubscription] =
-    useState<Location.LocationSubscription | null>(null)
+    useState<Location.LocationSubscription | null>(null);
   const [headingSubscription, setHeadingSubscription] =
-    useState<Location.LocationSubscription | null>(null)
+    useState<Location.LocationSubscription | null>(null);
 
   // Loading states for async operations
   const [loadingStates, setLoadingStates] = useState<{
-    [key: string]: boolean
-  }>({})
+    [key: string]: boolean;
+  }>({});
 
   // Helper function to set loading state
   const setLoading = (operation: string, isLoading: boolean) => {
-    setLoadingStates((prev) => ({ ...prev, [operation]: isLoading }))
-  }
+    setLoadingStates((prev) => ({ ...prev, [operation]: isLoading }));
+  };
 
   // Helper function to check if operation is loading
-  const isLoading = (operation: string) => loadingStates[operation] || false
+  const isLoading = (operation: string) => loadingStates[operation] || false;
 
   const setupTaskManager = useCallback(() => {
     // Define background tasks
     TaskManager.defineTask(
       'test-location-task',
+      //eslint-disable-next-line  @typescript-eslint/no-explicit-any
       async ({ data, error }: { data: any; error: any }) => {
         if (error) {
-          console.error('Location task error:', error)
-          return
+          console.error('Location task error:', error);
+          return;
         }
-        console.log('Location task data:', data)
+        console.log('Location task data:', data);
       }
-    )
+    );
 
     TaskManager.defineTask(
       'test-geofencing-task',
+      //eslint-disable-next-line  @typescript-eslint/no-explicit-any
       async ({ data, error }: { data: any; error: any }) => {
         if (error) {
-          console.error('Geofencing task error:', error)
-          return
+          console.error('Geofencing task error:', error);
+          return;
         }
-        console.log('Geofencing task data:', data)
+        console.log('Geofencing task data:', data);
       }
-    )
-  }, [])
+    );
+  }, []);
 
   const checkInitialStatus = useCallback(async () => {
     try {
-      setLoading('checkInitialStatus', true)
-      const status = await Location.getProviderStatusAsync()
-      setProviderStatus(status)
+      setLoading('checkInitialStatus', true);
+      const status = await Location.getProviderStatusAsync();
+      setProviderStatus(status);
 
-      const services = await Location.hasServicesEnabledAsync()
-      setServicesEnabled(services)
+      const services = await Location.hasServicesEnabledAsync();
+      setServicesEnabled(services);
 
-      const available = await Location.isBackgroundLocationAvailableAsync()
-      setBackgroundLocationAvailable(available)
+      const available = await Location.isBackgroundLocationAvailableAsync();
+      setBackgroundLocationAvailable(available);
 
-      const perms = await Location.getForegroundPermissionsAsync()
-      setPermissions(perms)
+      const perms = await Location.getForegroundPermissionsAsync();
+      setPermissions(perms);
 
-      // Quest does not support background permissions
-      if (!ExpoQuest.isQuestDevice) {
-        const bgPerms = await Location.getBackgroundPermissionsAsync()
-        setBackgroundPermissions(bgPerms)
+      // Horizon does not support background permissions
+      if (!ExpoHorizon.isHorizonDevice) {
+        const bgPerms = await Location.getBackgroundPermissionsAsync();
+        setBackgroundPermissions(bgPerms);
       }
     } catch (error) {
-      console.error('Error checking initial status:', error)
+      console.error('Error checking initial status:', error);
     } finally {
-      setLoading('checkInitialStatus', false)
+      setLoading('checkInitialStatus', false);
     }
-  }, [])
+  }, []);
 
   const requestForegroundPermissions = useCallback(async () => {
     try {
-      setLoading('requestForegroundPermissions', true)
-      const result = await Location.requestForegroundPermissionsAsync()
-      setPermissions(result)
-      Alert.alert('Foreground Permissions', `Status: ${result.status}`)
+      setLoading('requestForegroundPermissions', true);
+      const result = await Location.requestForegroundPermissionsAsync();
+      setPermissions(result);
+      Alert.alert('Foreground Permissions', `Status: ${result.status}`);
     } catch (error) {
-      Alert.alert('Error', `Failed to request foreground permissions: ${error}`)
+      Alert.alert('Error', `Failed to request foreground permissions: ${error}`);
     } finally {
-      setLoading('requestForegroundPermissions', false)
+      setLoading('requestForegroundPermissions', false);
     }
-  }, [])
+  }, []);
 
   const requestBackgroundPermissions = useCallback(async () => {
     try {
-      setLoading('requestBackgroundPermissions', true)
-      const result = await Location.requestBackgroundPermissionsAsync()
-      setBackgroundPermissions(result)
-      Alert.alert('Background Permissions', `Status: ${result.status}`)
+      setLoading('requestBackgroundPermissions', true);
+      const result = await Location.requestBackgroundPermissionsAsync();
+      setBackgroundPermissions(result);
+      Alert.alert('Background Permissions', `Status: ${result.status}`);
     } catch (error) {
-      Alert.alert('Error', `Failed to request background permissions: ${error}`)
+      Alert.alert('Error', `Failed to request background permissions: ${error}`);
     } finally {
-      setLoading('requestBackgroundPermissions', false)
+      setLoading('requestBackgroundPermissions', false);
     }
-  }, [])
+  }, []);
 
   const getCurrentPosition = useCallback(async () => {
     try {
-      setLoading('getCurrentPosition', true)
+      setLoading('getCurrentPosition', true);
 
       // Check if location services are enabled
-      const areServicesEnabled = await Location.hasServicesEnabledAsync()
+      const areServicesEnabled = await Location.hasServicesEnabledAsync();
       if (!areServicesEnabled) {
         Alert.alert(
           'Location Services',
           'Location services are disabled. Please enable them in device settings.'
-        )
-        return
+        );
+        return;
       }
 
       // Check permissions
-      const foregroundPermissions =
-        await Location.getForegroundPermissionsAsync()
+      const foregroundPermissions = await Location.getForegroundPermissionsAsync();
       if (foregroundPermissions.status !== 'granted') {
         Alert.alert(
           'Permissions Required',
           'Location permissions are required. Please grant them in settings.'
-        )
-        return
+        );
+        return;
       }
 
       const position = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.High,
         timeInterval: 20000, // 20 second timeout for emulator
-      })
-      setLocation(position)
+      });
+      setLocation(position);
       Alert.alert(
         'Current Position',
         `Lat: ${position.coords.latitude}, Lng: ${position.coords.longitude}\nAccuracy: ${position.coords.accuracy}m`
-      )
+      );
     } catch (error) {
-      console.error('Get current position error:', error)
+      console.error('Get current position error:', error);
       Alert.alert(
         'Error',
         `Failed to get current position: ${error}\n\nFor Android emulator:\n1. Enable location in emulator settings\n2. Set a route in Extended Controls\n3. Start route playback`
-      )
+      );
     } finally {
-      setLoading('getCurrentPosition', false)
+      setLoading('getCurrentPosition', false);
     }
-  }, [])
+  }, []);
 
   const getLastKnownPosition = useCallback(async () => {
     try {
-      setLoading('getLastKnownPosition', true)
+      setLoading('getLastKnownPosition', true);
       const position = await Location.getLastKnownPositionAsync({
         maxAge: 60000, // 1 minute
         requiredAccuracy: 100, // 100 meters
-      })
-      setLastKnownLocation(position)
+      });
+      setLastKnownLocation(position);
       if (position) {
         Alert.alert(
           'Last Known Position',
           `Lat: ${position.coords.latitude}, Lng: ${position.coords.longitude}`
-        )
+        );
       } else {
-        Alert.alert('Last Known Position', 'No last known position available')
+        Alert.alert('Last Known Position', 'No last known position available');
       }
     } catch (error) {
-      Alert.alert('Error', `Failed to get last known position: ${error}`)
+      Alert.alert('Error', `Failed to get last known position: ${error}`);
     } finally {
-      setLoading('getLastKnownPosition', false)
+      setLoading('getLastKnownPosition', false);
     }
-  }, [])
+  }, []);
 
   const startLocationWatching = useCallback(async () => {
     try {
-      setLoading('startLocationWatching', true)
+      setLoading('startLocationWatching', true);
 
       // Check if location services are enabled
-      const areServicesEnabled = await Location.hasServicesEnabledAsync()
+      const areServicesEnabled = await Location.hasServicesEnabledAsync();
       if (!areServicesEnabled) {
         Alert.alert(
           'Location Services',
           'Location services are disabled. Please enable them in device settings.'
-        )
-        return
+        );
+        return;
       }
 
       // Check permissions
-      const foregroundPermissions =
-        await Location.getForegroundPermissionsAsync()
+      const foregroundPermissions = await Location.getForegroundPermissionsAsync();
       if (foregroundPermissions.status !== 'granted') {
         Alert.alert(
           'Permissions Required',
           'Location permissions are required. Please grant them in settings.'
-        )
-        return
+        );
+        return;
       }
 
       const subscription = await Location.watchPositionAsync(
@@ -279,149 +269,141 @@ export default function LocationScreen() {
           mayShowUserSettingsDialog: true, // Allow user to adjust settings
         },
         (newLocation: Location.LocationObject) => {
-          setLocation(newLocation)
-          console.log('Location update:', newLocation)
+          setLocation(newLocation);
+          console.log('Location update:', newLocation);
         },
         (error: string) => {
-          console.error('Location watch error:', error)
-          Alert.alert('Location Error', `Location watch error: ${error}`)
+          console.error('Location watch error:', error);
+          Alert.alert('Location Error', `Location watch error: ${error}`);
         }
-      )
-      setLocationSubscription(subscription)
-      setLocationUpdatesActive(true)
+      );
+      setLocationSubscription(subscription);
+      setLocationUpdatesActive(true);
       Alert.alert(
         'Location Watching',
         'Started watching location updates\n\nMake sure location is enabled in emulator settings.'
-      )
+      );
     } catch (error) {
-      console.error('Location watching error:', error)
+      console.error('Location watching error:', error);
       Alert.alert(
         'Error',
         `Failed to start location watching: ${error}\n\nFor Android emulator:\n1. Enable location in emulator settings\n2. Set a route in Extended Controls\n3. Start route playback`
-      )
+      );
     } finally {
-      setLoading('startLocationWatching', false)
+      setLoading('startLocationWatching', false);
     }
-  }, [])
+  }, []);
 
   const stopLocationWatching = useCallback(() => {
     if (locationSubscription) {
-      locationSubscription.remove()
-      setLocationSubscription(null)
-      setLocationUpdatesActive(false)
-      Alert.alert('Location Watching', 'Stopped watching location updates')
+      locationSubscription.remove();
+      setLocationSubscription(null);
+      setLocationUpdatesActive(false);
+      Alert.alert('Location Watching', 'Stopped watching location updates');
     }
-  }, [locationSubscription])
+  }, [locationSubscription]);
 
   const getHeading = useCallback(async () => {
     try {
-      setLoading('getHeading', true)
-      const headingData = await Location.getHeadingAsync()
-      setHeading(headingData)
+      setLoading('getHeading', true);
+      const headingData = await Location.getHeadingAsync();
+      setHeading(headingData);
       Alert.alert(
         'Heading',
         `True: ${headingData.trueHeading}°, Magnetic: ${headingData.magHeading}°`
-      )
+      );
     } catch (error) {
-      Alert.alert('Error', `Failed to get heading: ${error}`)
+      Alert.alert('Error', `Failed to get heading: ${error}`);
     } finally {
-      setLoading('getHeading', false)
+      setLoading('getHeading', false);
     }
-  }, [])
+  }, []);
 
   const startHeadingWatching = useCallback(async () => {
     try {
-      setLoading('startHeadingWatching', true)
+      setLoading('startHeadingWatching', true);
       const subscription = await Location.watchHeadingAsync(
         (newHeading: Location.LocationHeadingObject) => {
-          setHeading(newHeading)
-          console.log('Heading update:', newHeading)
+          setHeading(newHeading);
+          console.log('Heading update:', newHeading);
         },
         (error: string) => {
-          console.error('Heading watch error:', error)
+          console.error('Heading watch error:', error);
         }
-      )
-      setHeadingSubscription(subscription)
-      Alert.alert('Heading Watching', 'Started watching heading updates')
+      );
+      setHeadingSubscription(subscription);
+      Alert.alert('Heading Watching', 'Started watching heading updates');
     } catch (error) {
-      Alert.alert('Error', `Failed to start heading watching: ${error}`)
+      Alert.alert('Error', `Failed to start heading watching: ${error}`);
     } finally {
-      setLoading('startHeadingWatching', false)
+      setLoading('startHeadingWatching', false);
     }
-  }, [])
+  }, []);
 
   const stopHeadingWatching = useCallback(() => {
     if (headingSubscription) {
-      headingSubscription.remove()
-      setHeadingSubscription(null)
-      Alert.alert('Heading Watching', 'Stopped watching heading updates')
+      headingSubscription.remove();
+      setHeadingSubscription(null);
+      Alert.alert('Heading Watching', 'Stopped watching heading updates');
     }
-  }, [headingSubscription])
+  }, [headingSubscription]);
 
   const geocodeAddress = useCallback(async () => {
     try {
-      setLoading('geocodeAddress', true)
-      const locations = await Location.geocodeAsync(
-        '1600 Pennsylvania Avenue NW, Washington, DC'
-      )
-      setGeocodedLocation(locations)
+      setLoading('geocodeAddress', true);
+      const locations = await Location.geocodeAsync('1600 Pennsylvania Avenue NW, Washington, DC');
+      setGeocodedLocation(locations);
       if (locations.length > 0) {
-        Alert.alert('Geocoding Result', `Found ${locations.length} location(s)`)
+        Alert.alert('Geocoding Result', `Found ${locations.length} location(s)`);
       } else {
-        Alert.alert('Geocoding Result', 'No locations found')
+        Alert.alert('Geocoding Result', 'No locations found');
       }
     } catch (error) {
-      Alert.alert('Error', `Failed to geocode address: ${error}`)
+      Alert.alert('Error', `Failed to geocode address: ${error}`);
     } finally {
-      setLoading('geocodeAddress', false)
+      setLoading('geocodeAddress', false);
     }
-  }, [])
+  }, []);
 
   const reverseGeocodeLocation = useCallback(async () => {
     try {
-      setLoading('reverseGeocodeLocation', true)
+      setLoading('reverseGeocodeLocation', true);
       const addresses = await Location.reverseGeocodeAsync({
         latitude: 38.8977,
         longitude: -77.0365,
-      })
-      setGeocodedAddress(addresses)
+      });
+      setGeocodedAddress(addresses);
       if (addresses.length > 0) {
-        Alert.alert(
-          'Reverse Geocoding Result',
-          `Found ${addresses.length} address(es)`
-        )
+        Alert.alert('Reverse Geocoding Result', `Found ${addresses.length} address(es)`);
       } else {
-        Alert.alert('Reverse Geocoding Result', 'No addresses found')
+        Alert.alert('Reverse Geocoding Result', 'No addresses found');
       }
     } catch (error) {
-      Alert.alert('Error', `Failed to reverse geocode location: ${error}`)
+      Alert.alert('Error', `Failed to reverse geocode location: ${error}`);
     } finally {
-      setLoading('reverseGeocodeLocation', false)
+      setLoading('reverseGeocodeLocation', false);
     }
-  }, [])
+  }, []);
 
   const startBackgroundLocationUpdates = useCallback(async () => {
     try {
-      setLoading('startBackgroundLocationUpdates', true)
+      setLoading('startBackgroundLocationUpdates', true);
 
       // Check if background location is available
-      const isAvailable = await Location.isBackgroundLocationAvailableAsync()
+      const isAvailable = await Location.isBackgroundLocationAvailableAsync();
       if (!isAvailable) {
-        Alert.alert(
-          'Background Location',
-          'Background location is not available on this device'
-        )
-        return
+        Alert.alert('Background Location', 'Background location is not available on this device');
+        return;
       }
 
       // Check background permissions
-      const bgPermissions = await Location.getBackgroundPermissionsAsync()
+      const bgPermissions = await Location.getBackgroundPermissionsAsync();
       if (bgPermissions.status !== 'granted') {
         Alert.alert(
           'Permissions Required',
           'Background location permissions are required. Please grant them in settings.'
-        )
-        return
+        );
+        return;
       }
 
       await Location.startLocationUpdatesAsync('test-location-task', {
@@ -433,58 +415,52 @@ export default function LocationScreen() {
           notificationBody: 'Tracking your location in the background',
           notificationColor: '#FF0000',
         },
-      })
-      setLocationUpdatesActive(true)
-      Alert.alert('Background Location', 'Started background location updates')
+      });
+      setLocationUpdatesActive(true);
+      Alert.alert('Background Location', 'Started background location updates');
     } catch (error) {
-      console.error('Background location error:', error)
+      console.error('Background location error:', error);
       Alert.alert(
         'Error',
         `Failed to start background location updates: ${error}\n\nMake sure you have:\n1. Background location permissions\n2. Foreground service permissions\n3. App is not battery optimized`
-      )
+      );
     } finally {
-      setLoading('startBackgroundLocationUpdates', false)
+      setLoading('startBackgroundLocationUpdates', false);
     }
-  }, [])
+  }, []);
 
   const stopBackgroundLocationUpdates = useCallback(async () => {
     try {
-      setLoading('stopBackgroundLocationUpdates', true)
-      await Location.stopLocationUpdatesAsync('test-location-task')
-      setLocationUpdatesActive(false)
-      Alert.alert('Background Location', 'Stopped background location updates')
+      setLoading('stopBackgroundLocationUpdates', true);
+      await Location.stopLocationUpdatesAsync('test-location-task');
+      setLocationUpdatesActive(false);
+      Alert.alert('Background Location', 'Stopped background location updates');
     } catch (error) {
-      Alert.alert(
-        'Error',
-        `Failed to stop background location updates: ${error}`
-      )
+      Alert.alert('Error', `Failed to stop background location updates: ${error}`);
     } finally {
-      setLoading('stopBackgroundLocationUpdates', false)
+      setLoading('stopBackgroundLocationUpdates', false);
     }
-  }, [])
+  }, []);
 
   const startGeofencing = useCallback(async () => {
     try {
-      setLoading('startGeofencing', true)
+      setLoading('startGeofencing', true);
 
       // Check if background location is available
-      const isAvailable = await Location.isBackgroundLocationAvailableAsync()
+      const isAvailable = await Location.isBackgroundLocationAvailableAsync();
       if (!isAvailable) {
-        Alert.alert(
-          'Geofencing',
-          'Background location is not available on this device'
-        )
-        return
+        Alert.alert('Geofencing', 'Background location is not available on this device');
+        return;
       }
 
       // Check background permissions
-      const bgPermissions = await Location.getBackgroundPermissionsAsync()
+      const bgPermissions = await Location.getBackgroundPermissionsAsync();
       if (bgPermissions.status !== 'granted') {
         Alert.alert(
           'Permissions Required',
           'Background location permissions are required for geofencing. Please grant them in settings.'
-        )
-        return
+        );
+        return;
       }
 
       const regions: Location.LocationRegion[] = [
@@ -496,92 +472,85 @@ export default function LocationScreen() {
           notifyOnEnter: true,
           notifyOnExit: true,
         },
-      ]
-      await Location.startGeofencingAsync('test-geofencing-task', regions)
-      setGeofencingActive(true)
-      Alert.alert('Geofencing', 'Started geofencing with test region')
+      ];
+      await Location.startGeofencingAsync('test-geofencing-task', regions);
+      setGeofencingActive(true);
+      Alert.alert('Geofencing', 'Started geofencing with test region');
     } catch (error) {
-      console.error('Geofencing error:', error)
+      console.error('Geofencing error:', error);
       Alert.alert(
         'Error',
         `Failed to start geofencing: ${error}\n\nMake sure you have:\n1. Background location permissions\n2. TaskManager is properly configured\n3. App is not battery optimized`
-      )
+      );
     } finally {
-      setLoading('startGeofencing', false)
+      setLoading('startGeofencing', false);
     }
-  }, [])
+  }, []);
 
   const stopGeofencing = useCallback(async () => {
     try {
-      setLoading('stopGeofencing', true)
-      await Location.stopGeofencingAsync('test-geofencing-task')
-      setGeofencingActive(false)
-      Alert.alert('Geofencing', 'Stopped geofencing')
+      setLoading('stopGeofencing', true);
+      await Location.stopGeofencingAsync('test-geofencing-task');
+      setGeofencingActive(false);
+      Alert.alert('Geofencing', 'Stopped geofencing');
     } catch (error) {
-      Alert.alert('Error', `Failed to stop geofencing: ${error}`)
+      Alert.alert('Error', `Failed to stop geofencing: ${error}`);
     } finally {
-      setLoading('stopGeofencing', false)
+      setLoading('stopGeofencing', false);
     }
-  }, [])
+  }, []);
 
   const enableNetworkProvider = useCallback(async () => {
     if (Platform.OS === 'android') {
       try {
-        setLoading('enableNetworkProvider', true)
-        await Location.enableNetworkProviderAsync()
-        Alert.alert('Network Provider', 'Network provider enabled')
+        setLoading('enableNetworkProvider', true);
+        await Location.enableNetworkProviderAsync();
+        Alert.alert('Network Provider', 'Network provider enabled');
       } catch (error) {
-        Alert.alert('Error', `Failed to enable network provider: ${error}`)
+        Alert.alert('Error', `Failed to enable network provider: ${error}`);
       } finally {
-        setLoading('enableNetworkProvider', false)
+        setLoading('enableNetworkProvider', false);
       }
     } else {
-      Alert.alert(
-        'Network Provider',
-        'This method is only available on Android'
-      )
+      Alert.alert('Network Provider', 'This method is only available on Android');
     }
-  }, [])
+  }, []);
 
   const checkLocationUpdatesStatus = useCallback(async () => {
     try {
-      setLoading('checkLocationUpdatesStatus', true)
-      const hasStarted =
-        await Location.hasStartedLocationUpdatesAsync('test-location-task')
-      Alert.alert('Location Updates Status', `Active: ${hasStarted}`)
+      setLoading('checkLocationUpdatesStatus', true);
+      const hasStarted = await Location.hasStartedLocationUpdatesAsync('test-location-task');
+      Alert.alert('Location Updates Status', `Active: ${hasStarted}`);
     } catch (error) {
-      Alert.alert('Error', `Failed to check location updates status: ${error}`)
+      Alert.alert('Error', `Failed to check location updates status: ${error}`);
     } finally {
-      setLoading('checkLocationUpdatesStatus', false)
+      setLoading('checkLocationUpdatesStatus', false);
     }
-  }, [])
+  }, []);
 
   const checkGeofencingStatus = useCallback(async () => {
     try {
-      setLoading('checkGeofencingStatus', true)
-      const hasStarted = await Location.hasStartedGeofencingAsync(
-        'test-geofencing-task'
-      )
-      Alert.alert('Geofencing Status', `Active: ${hasStarted}`)
+      setLoading('checkGeofencingStatus', true);
+      const hasStarted = await Location.hasStartedGeofencingAsync('test-geofencing-task');
+      Alert.alert('Geofencing Status', `Active: ${hasStarted}`);
     } catch (error) {
-      Alert.alert('Error', `Failed to check geofencing status: ${error}`)
+      Alert.alert('Error', `Failed to check geofencing status: ${error}`);
     } finally {
-      setLoading('checkGeofencingStatus', false)
+      setLoading('checkGeofencingStatus', false);
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
-    checkInitialStatus()
-    setupTaskManager()
-  }, [checkInitialStatus, setupTaskManager])
+    checkInitialStatus();
+    setupTaskManager();
+  }, [checkInitialStatus, setupTaskManager]);
 
   return (
     <View style={GlobalStyles.screenContainer}>
       <StatusBar style="auto" />
       <ScrollView
         style={GlobalStyles.scrollView}
-        contentContainerStyle={GlobalStyles.scrollContent}
-      >
+        contentContainerStyle={GlobalStyles.scrollContent}>
         <Section title="Permissions">
           <TestButton
             title="Request Foreground Permissions"
@@ -594,14 +563,8 @@ export default function LocationScreen() {
             isButtonLoading={isLoading('requestBackgroundPermissions')}
           />
           <StatusText label="Services Enabled" value={servicesEnabled} />
-          <StatusText
-            label="Foreground Permissions"
-            value={permissions?.status}
-          />
-          <StatusText
-            label="Background Permissions"
-            value={backgroundPermissions?.status}
-          />
+          <StatusText label="Foreground Permissions" value={permissions?.status} />
+          <StatusText label="Background Permissions" value={backgroundPermissions?.status} />
         </Section>
 
         <Section title="Location">
@@ -638,18 +601,10 @@ export default function LocationScreen() {
           </Text>
           <Text style={GlobalStyles.dataText}>
             Timestamp:{' '}
-            {location?.timestamp
-              ? new Date(location.timestamp).toLocaleString()
-              : 'Unknown'}
+            {location?.timestamp ? new Date(location.timestamp).toLocaleString() : 'Unknown'}
           </Text>
-          <StatusText
-            label="Background Location Available"
-            value={backgroundLocationAvailable}
-          />
-          <StatusText
-            label="Location Updates Active"
-            value={locationUpdatesActive}
-          />
+          <StatusText label="Background Location Available" value={backgroundLocationAvailable} />
+          <StatusText label="Location Updates Active" value={locationUpdatesActive} />
         </Section>
 
         <Section title="Heading">
@@ -676,9 +631,7 @@ export default function LocationScreen() {
           <Text style={GlobalStyles.dataText}>
             Magnetic Heading: {heading?.magHeading || 'Unknown'}°
           </Text>
-          <Text style={GlobalStyles.dataText}>
-            Accuracy: {heading?.accuracy || 'Unknown'}
-          </Text>
+          <Text style={GlobalStyles.dataText}>Accuracy: {heading?.accuracy || 'Unknown'}</Text>
         </Section>
 
         <Section title="Geocoding">
@@ -699,27 +652,17 @@ export default function LocationScreen() {
           {geocodedAddress && geocodedAddress.length > 0 ? (
             geocodedAddress.map((address, index) => (
               <View key={index} style={GlobalStyles.infoBox}>
-                <Text style={GlobalStyles.dataText}>
-                  Name: {address.name || 'N/A'}
-                </Text>
+                <Text style={GlobalStyles.dataText}>Name: {address.name || 'N/A'}</Text>
                 <Text style={GlobalStyles.dataText}>
                   Street: {address.street || ''} {address.streetNumber || ''}
                 </Text>
-                <Text style={GlobalStyles.dataText}>
-                  City: {address.city || 'N/A'}
-                </Text>
-                <Text style={GlobalStyles.dataText}>
-                  Region: {address.region || 'N/A'}
-                </Text>
-                <Text style={GlobalStyles.dataText}>
-                  Country: {address.country || 'N/A'}
-                </Text>
+                <Text style={GlobalStyles.dataText}>City: {address.city || 'N/A'}</Text>
+                <Text style={GlobalStyles.dataText}>Region: {address.region || 'N/A'}</Text>
+                <Text style={GlobalStyles.dataText}>Country: {address.country || 'N/A'}</Text>
               </View>
             ))
           ) : (
-            <Text style={GlobalStyles.dataText}>
-              No geocoded addresses available
-            </Text>
+            <Text style={GlobalStyles.dataText}>No geocoded addresses available</Text>
           )}
         </Section>
 
@@ -728,21 +671,13 @@ export default function LocationScreen() {
           {geocodedLocation && geocodedLocation.length > 0 ? (
             geocodedLocation.map((loc, index) => (
               <View key={index} style={GlobalStyles.infoBox}>
-                <Text style={GlobalStyles.dataText}>
-                  Latitude: {loc.latitude}
-                </Text>
-                <Text style={GlobalStyles.dataText}>
-                  Longitude: {loc.longitude}
-                </Text>
-                <Text style={GlobalStyles.dataText}>
-                  Accuracy: {loc.accuracy || 'Unknown'}m
-                </Text>
+                <Text style={GlobalStyles.dataText}>Latitude: {loc.latitude}</Text>
+                <Text style={GlobalStyles.dataText}>Longitude: {loc.longitude}</Text>
+                <Text style={GlobalStyles.dataText}>Accuracy: {loc.accuracy || 'Unknown'}m</Text>
               </View>
             ))
           ) : (
-            <Text style={GlobalStyles.dataText}>
-              No geocoded locations available
-            </Text>
+            <Text style={GlobalStyles.dataText}>No geocoded locations available</Text>
           )}
         </Section>
 
@@ -794,5 +729,5 @@ export default function LocationScreen() {
         </Section>
       </ScrollView>
     </View>
-  )
+  );
 }
