@@ -1,6 +1,7 @@
-import { Alert } from 'react-native';
-import React from 'react';
 import * as Notifications from 'expo-horizon-notifications';
+import React from 'react';
+import { Alert } from 'react-native';
+
 import { Section } from '../../components/Section';
 import { TestButton } from '../../components/TestButton';
 

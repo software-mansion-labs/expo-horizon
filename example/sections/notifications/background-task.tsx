@@ -1,10 +1,11 @@
-import { Alert } from 'react-native';
-import React, { useEffect, useState } from 'react';
-import { Section } from '../../components/Section';
-import { TestButton } from '../../components/TestButton';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-horizon-notifications';
 import * as TaskManager from 'expo-task-manager';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useEffect, useState } from 'react';
+import { Alert } from 'react-native';
+
+import { Section } from '../../components/Section';
+import { TestButton } from '../../components/TestButton';
 import { TestText } from '../../components/TestText';
 
 const BACKGROUND_NOTIFICATION_TASK = 'BACKGROUND-NOTIFICATION-TASK';

@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text } from 'react-native';
+
 import { Colors } from '../constants/colors';
 
 export const TestText = ({ text }: { text: string }) => {

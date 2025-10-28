@@ -12,7 +12,7 @@ type EventObject = {
 let nextWatchId = 0;
 
 class Subscriber<
-  CallbackType extends LocationCallback | LocationHeadingCallback | LocationErrorCallback
+  CallbackType extends LocationCallback | LocationHeadingCallback | LocationErrorCallback,
 > {
   private eventName: string;
   private eventDataField: string;
