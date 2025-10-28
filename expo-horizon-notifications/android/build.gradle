@@ -1,15 +1,3 @@
-buildscript {
-  ext.kotlin_version = '2.1.0'
-  repositories {
-    google()
-    mavenCentral()
-  }
-  dependencies {
-    classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
-    classpath("org.jetbrains.kotlin:kotlin-compose-compiler-plugin-embeddable:$kotlin_version")
-  }
-}
-
 plugins {
   id 'com.android.library'
   id 'kotlin-parcelize'
