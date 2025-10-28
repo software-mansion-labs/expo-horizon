@@ -1,13 +1,12 @@
-import { Alert, SafeAreaView, ScrollView } from 'react-native'
-import React from 'react'
-import { Section } from '../components/Section'
-import { TestButton } from '../components/TestButton'
-import * as Notifications from 'expo-horizon-notifications'
-import ExpoHorizon from 'expo-horizon-core'
-import { GlobalStyles } from '../constants/styles'
-import NotificationResponseSection from '../sections/notifications/notification-response'
-import BackgroundTaskSection from '../sections/notifications/background-task'
-
+import { Alert, SafeAreaView, ScrollView } from 'react-native';
+import React from 'react';
+import { Section } from '../components/Section';
+import { TestButton } from '../components/TestButton';
+import * as Notifications from 'expo-horizon-notifications';
+import ExpoHorizon from 'expo-horizon-core';
+import { GlobalStyles } from '../constants/styles';
+import NotificationResponseSection from '../sections/notifications/notification-response';
+import BackgroundTaskSection from '../sections/notifications/background-task';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => {

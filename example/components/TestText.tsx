@@ -1,10 +1,10 @@
-import React from 'react'
-import { StyleSheet, Text } from 'react-native'
-import { Colors } from '../constants/colors'
+import React from 'react';
+import { StyleSheet, Text } from 'react-native';
+import { Colors } from '../constants/colors';
 
 export const TestText = ({ text }: { text: string }) => {
-  return <Text style={styles.text}>{text}</Text>
-}
+  return <Text style={styles.text}>{text}</Text>;
+};
 
 const styles = StyleSheet.create({
   text: {
@@ -13,4 +13,4 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 8,
   },
-})
+});

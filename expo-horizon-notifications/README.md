@@ -61,22 +61,22 @@ You might need additional features like `isHorizonDevice` or `isHorizonBuild` to
 | `getDevicePushTokenAsync`                                                        | 🛠️ Under development |                                                                                                               |
 | `getExpoPushTokenAsync`                                                          | ❌ Not supported     | Currently, support for the Expo Push Service is not planned.                                                  |
 | `addNotificationReceivedListener` <br> `addNotificationResponseReceivedListener` | ✅ Supported         |                                                                                                               |
-| `addNotificationsDroppedListener` <br> `useLastNotificationResponse`             | ✅ Supported    |                                                                                                               |
-| `setNotificationHandler`                                                         | ✅ Supported    |                                                                                                               |
-| `registerTaskAsync` <br> `unregisterTaskAsync`                                   | ✅ Supported    |                                                                                                               |
-| `getPermissionsAsync` <br> `requestPermissionsAsync`                             | ✅ Supported    |                                                                                                               |
+| `addNotificationsDroppedListener` <br> `useLastNotificationResponse`             | ✅ Supported         |                                                                                                               |
+| `setNotificationHandler`                                                         | ✅ Supported         |                                                                                                               |
+| `registerTaskAsync` <br> `unregisterTaskAsync`                                   | ✅ Supported         |                                                                                                               |
+| `getPermissionsAsync` <br> `requestPermissionsAsync`                             | ✅ Supported         |                                                                                                               |
 | `getBadgeCountAsync` <br> `setBadgeCountAsync`                                   | ❌ Not supported     | The [underlying library](https://github.com/leolin310148/ShortcutBadger) does not support this functionality. |
 | `cancelAllScheduledNotificationsAsync` <br> `cancelScheduledNotificationAsync`   | ✅ Supported         |                                                                                                               |
 | `getAllScheduledNotificationsAsync`                                              | ✅ Supported         |                                                                                                               |
 | `getNextTriggerDateAsync`                                                        | ✅ Supported         |                                                                                                               |
 | `scheduleNotificationAsync`                                                      | ✅ Supported         |                                                                                                               |
-| `dismissAllNotificationsAsync` <br> `dismissNotificationAsync`                   | ✅ Supported    |                                                                                                               |
-| `getPresentedNotificationsAsync`                                                 | ✅ Supported    |                                                                                                               |
+| `dismissAllNotificationsAsync` <br> `dismissNotificationAsync`                   | ✅ Supported         |                                                                                                               |
+| `getPresentedNotificationsAsync`                                                 | ✅ Supported         |                                                                                                               |
 | Manage notification channels                                                     | 🔍 Not tested yet    |                                                                                                               |
 | Manage notification categories (interactive notifications)                       | 🔍 Not tested yet    |                                                                                                               |
-| `clearLastNotificationResponse` <br> `clearLastNotificationResponseAsync`        | ✅ Supported    |                                                                                                               |
-| `getLastNotificationResponse` <br> `getLastNotificationResponseAsync`            | ✅ Supported    |                                                                                                               |
-| `unregisterForNotificationsAsync`                                                | 🛠️ Under development    |                                                                                                               |
+| `clearLastNotificationResponse` <br> `clearLastNotificationResponseAsync`        | ✅ Supported         |                                                                                                               |
+| `getLastNotificationResponse` <br> `getLastNotificationResponseAsync`            | ✅ Supported         |                                                                                                               |
+| `unregisterForNotificationsAsync`                                                | 🛠️ Under development |                                                                                                               |
 
 ## Version compatibility
 
