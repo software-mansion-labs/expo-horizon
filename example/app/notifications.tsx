@@ -5,6 +5,8 @@ import { TestButton } from '../components/TestButton'
 import * as Notifications from 'expo-horizon-notifications'
 import ExpoHorizon from 'expo-horizon-core'
 import { GlobalStyles } from '../constants/styles'
+import NotificationResponseSection from '../sections/notifications/notification-response'
+import BackgroundTaskSection from '../sections/notifications/background-task'
 
 Notifications.setNotificationHandler({
   handleNotification: async () => {
@@ -63,6 +65,8 @@ export default function NotificationsScreen() {
         <Section title="Local Notifications">
           <TestButton title="Send Notification" onPress={sendNotification} />
         </Section>
+        <NotificationResponseSection />
+        <BackgroundTaskSection />
         <Section title="Remote Notifications">
           <TestButton title="Get Push Token" onPress={getPushToken} />
           <TestButton

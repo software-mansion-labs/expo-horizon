@@ -17,6 +17,7 @@
     "prettier:write": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,scss,md}\""
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "2.2.0",
     "expo": "54.0.13",
     "expo-build-properties": "~1.0.9",
     "expo-constants": "~18.0.9",
