@@ -74,6 +74,14 @@ You might need additional features like `isHorizonDevice` or `isHorizonBuild` to
 | `getLastNotificationResponse` <br> `getLastNotificationResponseAsync`            | 🔍 Not tested yet    |                                                                                                               |
 | `unregisterForNotificationsAsync`                                                | 🔍 Not tested yet    |                                                                                                               |
 
+## Version compatibility
+
+Our goal is to align the version numbers of `expo-horizon-notifications` and `expo-notifications` for easier upgrades. However, since this fork is still under development, we are currently using a separate versioning scheme.
+
+| `expo-horizon-notifications` | `expo-notifications` |
+| ---------------------------- | -------------------- |
+| 0.0.7                        | 19.0.7               |
+
 ## Expo Horizon Notifications is created by Software Mansion
 
 [![swm](https://logo.swmansion.com/logo?color=white&variant=desktop&width=150&tag=expo-horizon-notifications-github "Software Mansion")](https://swmansion.com)
