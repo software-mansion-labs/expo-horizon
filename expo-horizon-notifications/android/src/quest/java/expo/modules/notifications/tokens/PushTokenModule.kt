@@ -22,7 +22,7 @@ private const val UNREGISTER_FOR_NOTIFICATIONS_FAIL_CODE = "E_UNREGISTER_FOR_NOT
 
 class PushTokenModule : Module(), FirebaseTokenListener {
   private companion object {
-    private const val APP_ID = BuildConfig.META_QUEST_APP_ID
+    private const val APP_ID = BuildConfig.META_HORIZON_APP_ID
 
     private const val TAG = "expo-quest-notifications"
   }
