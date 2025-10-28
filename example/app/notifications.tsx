@@ -6,6 +6,8 @@ import { Alert, SafeAreaView, ScrollView } from 'react-native';
 import { Section } from '../components/Section';
 import { TestButton } from '../components/TestButton';
 import { GlobalStyles } from '../constants/styles';
+import BackgroundTaskSection from '../sections/notifications/background-task';
+import NotificationResponseSection from '../sections/notifications/notification-response';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => {
@@ -60,6 +62,8 @@ export default function NotificationsScreen() {
         <Section title="Local Notifications">
           <TestButton title="Send Notification" onPress={sendNotification} />
         </Section>
+        <NotificationResponseSection />
+        <BackgroundTaskSection />
         <Section title="Remote Notifications">
           <TestButton title="Get Push Token" onPress={getPushToken} />
           <TestButton
