@@ -1,5 +1,7 @@
 # expo-horizon-notifications
 
+![expo-horizon-location](https://img.shields.io/npm/v/expo-horizon-location.svg)
+
 A fork of [`expo-notifications`](https://github.com/expo/expo/tree/main/packages/expo-notifications) that provides two implementations:
 
 - The default `expo-notifications` for Android and iOS platforms.
