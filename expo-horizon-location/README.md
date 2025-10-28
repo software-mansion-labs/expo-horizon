@@ -70,7 +70,7 @@ Our goal is to align the version numbers of `expo-horizon-location` and `expo-lo
 
 | `expo-horizon-location` | `expo-location` |
 | ----------------------- | --------------- |
-| 0.0.1                   | 18.1.17         |
+| 0.0.2                   | 18.1.17         |
 
 ## Expo Horizon Location is created by Software Mansion
 
