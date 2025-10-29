@@ -57,7 +57,7 @@ You might need additional features like `isHorizonDevice` or `isHorizonBuild` to
 
 ## Features supported on Meta Horizon OS
 
-| Function Name                                                                    | Meta Quest           | Notes                                                                                                         |
+| Function Name                                                                    | Horizon OS           | Notes                                                                                                         |
 | -------------------------------------------------------------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------- |
 | `addPushTokenListener`                                                           | 🛠️ Under development |                                                                                                               |
 | `getDevicePushTokenAsync`                                                        | 🛠️ Under development |                                                                                                               |
