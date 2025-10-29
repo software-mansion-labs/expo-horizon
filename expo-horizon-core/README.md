@@ -299,16 +299,16 @@ val horizonAppId = BuildConfig.META_HORIZON_APP_ID
 
 Now, `horizonAppId` will contain the value of your Horizon App ID as defined in your build configuration.
 
-# Resources
+## Resources
 
 - [Meta Horizon Mobile App Development](https://developers.meta.com/horizon/documentation/android-apps/mobile-overview)
 - [Panel Sizing Guidelines](https://developers.meta.com/horizon/documentation/android-apps/panel-sizing)
 - [Publishing Requirements](https://developers.meta.com/horizon/resources/publish-mobile-manifest/)
 - [Expo Config Plugins](https://docs.expo.dev/config-plugins/introduction/)
 
-# Contributing
+## Contributing
 
-Contributions are very welcome! Please refer to the guidelines described in the [contributing guide](https://github.com/expo/expo#contributing).
+Contributions are very welcome! Please refer to the guidelines described in the [contributing guide](https://github.com/software-mansion-labs/expo-horizon/blob/main/CONTRIBUTING.md).
 
 ## Expo Horizon Core is created by Software Mansion
 
