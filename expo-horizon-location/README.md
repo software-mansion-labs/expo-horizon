@@ -1,5 +1,7 @@
 # expo-horizon-location
 
+![expo-horizon-location](https://img.shields.io/npm/v/expo-horizon-location.svg)
+
 A fork of [`expo-location`](https://github.com/expo/expo/tree/main/packages/expo-location) that provides two implementations:
 
 - The default `expo-location` behavior using Google Play Services.
@@ -54,7 +56,7 @@ You might need additional features like `isHorizonDevice` or `isHorizonBuild` to
 
 ## Features supported on Meta Horizon OS
 
-| Function Name                                                                                     | Android Devices | Meta Quest       | Notes                                                                                                                                                                                                               |
+| Function Name                                                                                     | Android Devices | Horizon OS       | Notes                                                                                                                                                                                                               |
 | ------------------------------------------------------------------------------------------------- | --------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `enableNetworkProviderAsync`                                                                      | ✅ Supported    | ✅ Supported     |                                                                                                                                                                                                                     |
 | `getProviderStatusAsync`                                                                          | ✅ Supported    | ✅ Supported     |                                                                                                                                                                                                                     |
@@ -74,7 +76,7 @@ Our goal is to align the version numbers of `expo-horizon-location` and `expo-lo
 
 | `expo-horizon-location` | `expo-location` |
 | ----------------------- | --------------- |
-| 0.0.3                   | 18.1.17         |
+| 0.0.4                   | 18.1.17         |
 
 ## Expo Horizon Location is created by Software Mansion
 

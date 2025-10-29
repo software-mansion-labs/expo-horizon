@@ -1,5 +1,7 @@
 # expo-horizon-notifications
 
+![expo-horizon-location](https://img.shields.io/npm/v/expo-horizon-location.svg)
+
 A fork of [`expo-notifications`](https://github.com/expo/expo/tree/main/packages/expo-notifications) that provides two implementations:
 
 - The default `expo-notifications` for Android and iOS platforms.
@@ -55,7 +57,7 @@ You might need additional features like `isHorizonDevice` or `isHorizonBuild` to
 
 ## Features supported on Meta Horizon OS
 
-| Function Name                                                                    | Meta Quest           | Notes                                                                                                         |
+| Function Name                                                                    | Horizon OS           | Notes                                                                                                         |
 | -------------------------------------------------------------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------- |
 | `addPushTokenListener`                                                           | 🛠️ Under development |                                                                                                               |
 | `getDevicePushTokenAsync`                                                        | 🛠️ Under development |                                                                                                               |
@@ -84,7 +86,7 @@ Our goal is to align the version numbers of `expo-horizon-notifications` and `ex
 
 | `expo-horizon-notifications` | `expo-notifications` |
 | ---------------------------- | -------------------- |
-| 0.0.8                        | 19.0.7               |
+| 0.0.9                        | 19.0.7               |
 
 ## Expo Horizon Notifications is created by Software Mansion
 
