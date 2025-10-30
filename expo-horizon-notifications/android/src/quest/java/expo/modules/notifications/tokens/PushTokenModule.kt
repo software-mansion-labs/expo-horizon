@@ -24,7 +24,7 @@ class PushTokenModule : Module(), FirebaseTokenListener {
   private companion object {
     private const val APP_ID = BuildConfig.META_HORIZON_APP_ID
 
-    private const val TAG = "expo-quest-notifications"
+    private const val TAG = "ExpoHorizonNotifications"
   }
 
   /**
