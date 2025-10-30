@@ -45,7 +45,7 @@ module.exports = () => ({
       [
         '../expo-horizon-core/app.plugin.js',
         {
-          horizonAppId: 'DEMO_APP_ID',
+          horizonAppId: '24868105159473134',
           defaultHeight: '640dp',
           defaultWidth: '1024dp',
           supportedDevices: 'quest2|quest3|quest3s',
@@ -54,15 +54,6 @@ module.exports = () => ({
         },
       ],
       'expo-task-manager',
-      [
-        'expo-build-properties',
-        {
-          android: {
-            compileSdkVersion: 34,
-            targetSdkVersion: 34,
-          },
-        },
-      ],
     ],
   },
 });

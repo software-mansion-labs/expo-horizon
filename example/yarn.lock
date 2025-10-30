@@ -3645,13 +3645,13 @@ expo-font@~14.0.9:
     fontfaceobserver "^2.1.0"
 
 "expo-horizon-core@file:../expo-horizon-core":
-  version "1.0.0"
+  version "1.0.5"
 
 "expo-horizon-location@file:../expo-horizon-location":
-  version "0.0.2"
+  version "0.0.4"
 
 "expo-horizon-notifications@file:../expo-horizon-notifications":
-  version "0.0.7"
+  version "0.0.9"
   dependencies:
     "@expo/image-utils" "^0.8.7"
     "@ide/backoff" "^1.0.0"
