@@ -51,8 +51,8 @@ dependencies {
   implementation 'androidx.lifecycle:lifecycle-common-java8:2.9.3'
   implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2'
 
-  questApi("com.meta.horizon.platform.sdk:push-notification-kotlin:0.1.2")
-  questImplementation("com.facebook.kotlin.compilerplugins.dataclassgenerate:superclass-jvm:1.0.1")
+  questApi("com.meta.horizon.platform.sdk:push-notification-kotlin:0.1.3")
+  questImplementation("com.facebook.kotlin.compilerplugins.dataclassgenerate:superclass-jvm:1.1.0")
 
   // release notes in https://firebase.google.com/support/release-notes/android - cmd + f "Cloud Messaging version"
   implementation 'com.google.firebase:firebase-messaging:24.0.1'
