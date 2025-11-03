@@ -65,6 +65,13 @@ if (ExpoHorizon.isHorizonDevice) {
 }
 ```
 
+4. Migrate libraries to Meta Quest–compatible forks
+
+| Library              | Quest-Compatible Fork                                         |
+| -------------------- | ------------------------------------------------------------- |
+| `expo-location`      | [`expo-horizon-location`](../expo-horizon-location)           |
+| `expo-notifications` | [`expo-horizon-notifications`](../expo-horizon-notifications) |
+
 ## Configuration
 
 ### Config Plugin
