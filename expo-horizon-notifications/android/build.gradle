@@ -51,8 +51,7 @@ dependencies {
   implementation 'androidx.lifecycle:lifecycle-common-java8:2.9.3'
   implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2'
 
-  questApi("com.meta.horizon.platform.ovr:android-platform-sdk:77")
-  questApi files('libs/android-platform-sdk-v79.aar')
+  questApi("com.meta.horizon.platform.ovr:android-platform-sdk:77.0.1")
 
   // release notes in https://firebase.google.com/support/release-notes/android - cmd + f "Cloud Messaging version"
   implementation 'com.google.firebase:firebase-messaging:24.0.1'
@@ -63,8 +62,4 @@ dependencies {
     testImplementation project(':expo-modules-test-core')
     androidTestImplementation project(':expo-modules-test-core')
   }
-}
-
-configurations.all {
-  exclude group: "com.meta.horizon.platform.ovr", module: "android-platform-sdk"
 }
