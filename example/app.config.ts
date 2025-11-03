@@ -54,15 +54,6 @@ module.exports = () => ({
         },
       ],
       'expo-task-manager',
-      [
-        'expo-build-properties',
-        {
-          android: {
-            compileSdkVersion: 34,
-            targetSdkVersion: 34,
-          },
-        },
-      ],
     ],
   },
 });
