@@ -58,6 +58,7 @@
   "peerDependencies": {
     "expo": "*",
     "react": "*",
-    "react-native": "*"
+    "react-native": "*",
+    "expo-horizon-core": "^1.0.5"
   }
 }
