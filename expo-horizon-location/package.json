@@ -45,7 +45,6 @@
     "expo": "^54.0.11"
   },
   "peerDependencies": {
-    "expo": "*",
-    "expo-horizon-core": "^1.0.5"
+    "expo": "*"
   }
 }
