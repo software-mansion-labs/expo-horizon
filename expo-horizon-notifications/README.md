@@ -16,11 +16,16 @@ You can choose which implementation to use with the `quest` / `mobile` build var
 
 ## Usage
 
-1. Install the `expo-horizon-core` package:
+1. Install and configure the `expo-horizon-core` package:
 
 ```bash
 npx expo install expo-horizon-core
 ```
+
+For detailed setup steps and configuration options, refer to the [`expo-horizon-core` documentation](../expo-horizon-core/README.md).
+
+> [!NOTE]
+> For push notifications to work, you must set the correct `horizonAppId` in the `expo-horizon-core` configuration.
 
 2. Install the package:
 
