@@ -1,4 +1,3 @@
-import ExpoHorizon from 'expo-horizon-core';
 import * as Notifications from 'expo-horizon-notifications';
 import React from 'react';
 import { Alert, SafeAreaView, ScrollView } from 'react-native';
@@ -68,10 +67,6 @@ export default function NotificationsScreen() {
         <BackgroundTaskSection />
         <Section title="Remote Notifications">
           <TestButton title="Get Push Token" onPress={getPushToken} />
-          <TestButton
-            title="Get Device Token"
-            onPress={async () => console.log(ExpoHorizon.isHorizonDevice)}
-          />
         </Section>
       </ScrollView>
     </SafeAreaView>
