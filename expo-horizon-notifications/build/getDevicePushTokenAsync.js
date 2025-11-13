@@ -1,3 +1,4 @@
+import ExpoHorizonModule from 'expo-horizon-core';
 import { UnavailabilityError, Platform } from 'expo-modules-core';
 import PushTokenManager from './PushTokenManager';
 import { warnOfExpoGoPushUsage } from './warnOfExpoGoPushUsage';
@@ -22,6 +23,9 @@ export default async function getDevicePushTokenAsync() {
         nativeTokenPromise = PushTokenManager.getDevicePushTokenAsync();
         devicePushToken = await nativeTokenPromise;
         nativeTokenPromise = null;
+    }
+    if (ExpoHorizonModule.isHorizonDevice) {
+        return { type: 'horizon', data: devicePushToken };
     }
     // @ts-ignore: TS thinks Platform.OS could be anything and can't decide what type is it
     return { type: Platform.OS, data: devicePushToken };
