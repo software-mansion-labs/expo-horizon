@@ -12,15 +12,17 @@ You can choose which implementation to use with the `quest` / `mobile` build var
 ## Prerequisites
 
 - Expo SDK 54 or later (`expo` package version 54.0.13+)
-- `expo-horizon-core` package installed. See [expo-horizon-core](../expo-horizon-core/README.md) for more details
+- (Recommended) `expo-horizon-core` package installed. See [expo-horizon-core](../expo-horizon-core/README.md) for more details
 
 ## Usage
 
-1. Install the `expo-horizon-core` package:
+1. (Recommended) Install and configure the `expo-horizon-core` package:
 
 ```bash
 npx expo install expo-horizon-core
 ```
+
+For detailed setup steps and configuration options, refer to the [`expo-horizon-core` documentation](../expo-horizon-core/README.md).
 
 2. Install the package:
 
@@ -76,7 +78,7 @@ Our goal is to align the version numbers of `expo-horizon-location` and `expo-lo
 
 | `expo-horizon-location` | `expo-location` |
 | ----------------------- | --------------- |
-| 0.0.4                   | 18.1.17         |
+| 0.0.4-0.0.5             | 18.1.17         |
 
 ## Expo Horizon Location is created by Software Mansion
 

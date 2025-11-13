@@ -29,6 +29,10 @@ yarn add expo-horizon-core
 - Android development environment configured
 - Meta Quest developer account (for publishing)
 
+## Useful resources
+
+- [Meta Quest Developer Hub](https://developers.meta.com/horizon/documentation/android-apps/meta-quest-developer-hub) - Essential for Meta Quest development; offers features such as video casting, device storage access, and app management.
+
 ## Quick Start
 
 1. **Add the plugin to your Expo config** (`app.json` or `app.config.js`):
@@ -65,39 +69,12 @@ if (ExpoHorizon.isHorizonDevice) {
 }
 ```
 
-4. (Temporarily) downgrade the Android SDK version to 34:
+4. Migrate libraries to Meta Quest–compatible forks
 
-Until official SDK 36 support for Meta Quest is released, you’ll need to manually set the `targetSdkVersion` to 34 in your `app.config.[js|ts]` when publishing to the Meta Horizon OS Store. This ensures your app meets current Meta Horizon requirements. Once Meta Quest support is fully compatible with SDK 36, this manual configuration will no longer be necessary.
-
-```bash
-npx expo install expo-build-properties
-```
-
-```json
-{
-  "expo": {
-    "plugins": [
-      [
-        "expo-build-properties",
-        {
-          "android": {
-            "compileSdkVersion": 34,
-            "targetSdkVersion": 34
-          }
-        }
-      ]
-    ]
-  }
-}
-```
-
-> [!IMPORTANT]
-> Downgrading the SDK version may cause compatibility issues with some of your library dependencies. Therefore, you should consider the following options:
->
-> 1. **Wait until Meta releases Android SDK 36 support in the Horizon Store** (they mentioned it should happen in the coming days or weeks), and in the meantime temporarily downgrade the library dependencies — for example, as shown here: [expo-horizon-notifications patch](../expo-horizon-notifications/README.md)
-> 2. **Ignore the SDK 34 requirement for now during development.** You can remove the `targetSdkVersion` and `compileSdkVersion` fields from `expo-build-properties` (or set them to 36). Once Meta releases SDK 36 support, you’ll be able to upload the app.
->
-> For more details, refer to [the official Expo documentation](https://docs.expo.dev/versions/latest/sdk/build-properties/).
+| Library              | Quest-Compatible Fork                                         |
+| -------------------- | ------------------------------------------------------------- |
+| `expo-location`      | [`expo-horizon-location`](../expo-horizon-location)           |
+| `expo-notifications` | [`expo-horizon-notifications`](../expo-horizon-notifications) |
 
 ## Configuration
 
@@ -138,7 +115,7 @@ Add the plugin to your `app.json` or `app.config.[js|ts]`:
 
 | Option                  | Type      | Required | Default   | Description                                                                                                                                                                                                                      |
 | ----------------------- | --------- | -------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `horizonAppId`          | `string`  | No       | `""`      | Your Meta Horizon application ID. Required for publishing to the Meta Horizon Store.                                                                                                                                             |
+| `horizonAppId`          | `string`  | No       | `""`      | Your Meta Horizon application ID. Used by other libraries (like `expo-horizon-notifications`) to identify your app.                                                                                                              |
 | `defaultHeight`         | `string`  | No       | Not added | Default panel height in dp (e.g., `"640dp"`). See [Panel Sizing](https://developers.meta.com/horizon/documentation/android-apps/panel-sizing)                                                                                    |
 | `defaultWidth`          | `string`  | No       | Not added | Default panel width in dp (e.g., `"1024dp"`). See [Panel Sizing](https://developers.meta.com/horizon/documentation/android-apps/panel-sizing)                                                                                    |
 | `supportedDevices`      | `string`  | Yes      | None      | Pipe-separated list of supported Quest devices: `"quest2\|quest3\|quest3s"`. See [Mobile Manifest](https://developers.meta.com/horizon/resources/publish-mobile-manifest/)                                                       |
