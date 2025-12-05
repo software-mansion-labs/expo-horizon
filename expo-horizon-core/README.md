@@ -73,8 +73,8 @@ if (ExpoHorizon.isHorizonDevice) {
 
 | Library              | Quest-Compatible Fork                                         |
 | -------------------- | ------------------------------------------------------------- |
-| `expo-location`      | [`expo-horizon-location`](../expo-horizon-location)           |
-| `expo-notifications` | [`expo-horizon-notifications`](../expo-horizon-notifications) |
+| `expo-location`      | [`expo-horizon-location`](https://github.com/software-mansion-labs/expo-horizon/tree/main/expo-horizon-location)           |
+| `expo-notifications` | [`expo-horizon-notifications`](https://github.com/software-mansion-labs/expo-horizon/tree/main/expo-horizon-notifications) |
 
 ## Configuration
 
