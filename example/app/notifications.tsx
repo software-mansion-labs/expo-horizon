@@ -23,11 +23,14 @@ Notifications.setNotificationHandler({
 export default function NotificationsScreen() {
   const requestPermissions = async () => {
     const result = await Notifications.requestPermissionsAsync();
+    Alert.alert('Permission Request', JSON.stringify(result, null, 2));
     console.log(result);
   };
 
   const getPermissions = async () => {
     const result = await Notifications.getPermissionsAsync();
+
+    Alert.alert('Permissions', JSON.stringify(result, null, 2));
     console.log(result);
   };
 
@@ -42,6 +45,8 @@ export default function NotificationsScreen() {
         seconds: 2,
       },
     });
+
+    Alert.alert('Notification scheduled', result);
     console.log(result);
   };
 
