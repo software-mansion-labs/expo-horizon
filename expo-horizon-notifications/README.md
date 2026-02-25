@@ -91,6 +91,7 @@ Our goal is to align the version numbers of `expo-horizon-notifications` and `ex
 
 | `expo-horizon-notifications` | `expo-notifications` |
 | ---------------------------- | -------------------- |
+| 0.0.11                       | 0.32.16              |
 | 0.0.9-0.0.10                 | 19.0.7               |
 
 ## Expo Horizon Notifications is created by Software Mansion
