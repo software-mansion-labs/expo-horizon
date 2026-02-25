@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'host.exp.exponent'
-version = '19.0.7'
+version = '19.0.8'
 
 expoModule {
   canBePublished false
@@ -14,7 +14,7 @@ android {
   namespace "expo.modules.location"
   defaultConfig {
     versionCode 29
-    versionName "19.0.7"
+    versionName "19.0.8"
     consumerProguardFiles("proguard-rules.pro")
   }
 
@@ -27,6 +27,6 @@ android {
 
 dependencies {
   implementation 'androidx.core:core:1.6.0'
-  implementation "androidx.annotation:annotation:1.3.0"
+  implementation 'androidx.annotation:annotation:1.7.1'
   mobileApi 'com.google.android.gms:play-services-location:21.0.1'
 }
