@@ -4,15 +4,39 @@
 
 ### 🛠 Breaking changes
 
-- throw instead of logging when attempting to use push notifications on Android with Expo Go ([#39459](https://github.com/expo/expo/pull/39459) by [@vonovak](https://github.com/vonovak))
-
 ### 🎉 New features
 
 ### 🐛 Bug fixes
 
+- [ios] Fix `EXC_BAD_ACCESS` crash in `EXNotificationSerializer` caused by thread-unsafe static `NSDictionary` initialization during cold launch from notification tap. ([#43342](https://github.com/expo/expo/pull/43342) by [@just1and0](https://github.com/just1and0))
+
 ### 💡 Others
 
-## 0.32.12 - 2025-10-01
+## 0.32.16 — 2026-01-06
+
+### 🐛 Bug fixes
+
+- [android] avoid crash emitting new token event when module is destroyed ([#41754](https://github.com/expo/expo/pull/41754) by [@vonovak](https://github.com/vonovak))
+
+### 💡 Others
+
+- mark `NotificationImportance.UNSPECIFIED` as not suitable for use ([#41709](https://github.com/expo/expo/pull/41709) by [@vonovak](https://github.com/vonovak))
+
+## 0.32.15 — 2025-12-12
+
+### 🎉 New features
+
+- improve runtime validation for NotificationTriggerInput ([#41538](https://github.com/expo/expo/pull/41538) by [@vonovak](https://github.com/vonovak))
+
+## 0.32.14 — 2025-12-05
+
+_This version does not introduce any user-facing changes._
+
+## 0.32.13 — 2025-11-17
+
+_This version does not introduce any user-facing changes._
+
+## 0.32.12 — 2025-10-01
 
 ### 💡 Others
 
