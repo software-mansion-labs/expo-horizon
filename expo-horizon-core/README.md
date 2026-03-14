@@ -71,10 +71,10 @@ if (ExpoHorizon.isHorizonDevice) {
 
 4. Migrate libraries to Meta Quest–compatible forks
 
-| Library              | Quest-Compatible Fork                                         |
-| -------------------- | ------------------------------------------------------------- |
-| `expo-location`      | [`expo-horizon-location`](../expo-horizon-location)           |
-| `expo-notifications` | [`expo-horizon-notifications`](../expo-horizon-notifications) |
+| Library              | Quest-Compatible Fork                                                                                                      |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `expo-location`      | [`expo-horizon-location`](https://github.com/software-mansion-labs/expo-horizon/tree/main/expo-horizon-location)           |
+| `expo-notifications` | [`expo-horizon-notifications`](https://github.com/software-mansion-labs/expo-horizon/tree/main/expo-horizon-notifications) |
 
 ## Configuration
 
