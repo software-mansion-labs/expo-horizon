@@ -69,28 +69,28 @@ You might need additional features like `isHorizonDevice` or `isHorizonBuild` to
 
 ## Features supported on Meta Horizon OS
 
-| Function Name                                                                    | Horizon OS           | Notes                                                                                                         | Requirements   |
-| -------------------------------------------------------------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------- | -------------- |
-| `addPushTokenListener`                                                           | ✅ Supported         | Supported, but still in the testing phase.                                                                    | `horizonAppId` |
-| `getDevicePushTokenAsync`                                                        | ✅ Supported         | Supported, but still in the testing phase.                                                                    | `horizonAppId` |
-| `getExpoPushTokenAsync`                                                          | ❌ Not supported     | Currently, support for the Expo Push Service is not planned.                                                  |                |
-| `addNotificationReceivedListener` <br> `addNotificationResponseReceivedListener` | ✅ Supported         |                                                                                                               |                |
-| `addNotificationsDroppedListener` <br> `useLastNotificationResponse`             | ✅ Supported         |                                                                                                               |                |
-| `setNotificationHandler`                                                         | ✅ Supported         |                                                                                                               |                |
-| `registerTaskAsync` <br> `unregisterTaskAsync`                                   | ✅ Supported         |                                                                                                               |                |
-| `getPermissionsAsync` <br> `requestPermissionsAsync`                             | ✅ Supported         |                                                                                                               |                |
-| `getBadgeCountAsync` <br> `setBadgeCountAsync`                                   | ❌ Not supported     | The [underlying library](https://github.com/leolin310148/ShortcutBadger) does not support this functionality. |                |
-| `cancelAllScheduledNotificationsAsync` <br> `cancelScheduledNotificationAsync`   | ✅ Supported         |                                                                                                               |                |
-| `getAllScheduledNotificationsAsync`                                              | ✅ Supported         |                                                                                                               |                |
-| `getNextTriggerDateAsync`                                                        | ✅ Supported         |                                                                                                               |                |
-| `scheduleNotificationAsync`                                                      | ✅ Supported         |                                                                                                               |                |
-| `dismissAllNotificationsAsync` <br> `dismissNotificationAsync`                   | ✅ Supported         |                                                                                                               |                |
-| `getPresentedNotificationsAsync`                                                 | ✅ Supported         |                                                                                                               |                |
-| Manage notification channels                                                     | 🔍 Not tested yet    |                                                                                                               |                |
-| Manage notification categories (interactive notifications)                       | 🔍 Not tested yet    |                                                                                                               |                |
-| `clearLastNotificationResponse` <br> `clearLastNotificationResponseAsync`        | ✅ Supported         |                                                                                                               |                |
-| `getLastNotificationResponse` <br> `getLastNotificationResponseAsync`            | ✅ Supported         |                                                                                                               |                |
-| `unregisterForNotificationsAsync`                                                | 🛠️ Under development |                                                                                                               |                |
+| Function Name                                                                    | Horizon OS              | Notes                                                                                                         | Requirements   |
+| -------------------------------------------------------------------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------- | -------------- |
+| `addPushTokenListener`                                                           | ✅ Supported (v0.0.11+) | Supported, but still in the testing phase.                                                                    | `horizonAppId` |
+| `getDevicePushTokenAsync`                                                        | ✅ Supported (v0.0.11+) | Supported, but still in the testing phase.                                                                    | `horizonAppId` |
+| `getExpoPushTokenAsync`                                                          | ❌ Not supported        | Currently, support for the Expo Push Service is not planned.                                                  |                |
+| `addNotificationReceivedListener` <br> `addNotificationResponseReceivedListener` | ✅ Supported            |                                                                                                               |                |
+| `addNotificationsDroppedListener` <br> `useLastNotificationResponse`             | ✅ Supported            |                                                                                                               |                |
+| `setNotificationHandler`                                                         | ✅ Supported            |                                                                                                               |                |
+| `registerTaskAsync` <br> `unregisterTaskAsync`                                   | ✅ Supported            |                                                                                                               |                |
+| `getPermissionsAsync` <br> `requestPermissionsAsync`                             | ✅ Supported            |                                                                                                               |                |
+| `getBadgeCountAsync` <br> `setBadgeCountAsync`                                   | ❌ Not supported        | The [underlying library](https://github.com/leolin310148/ShortcutBadger) does not support this functionality. |                |
+| `cancelAllScheduledNotificationsAsync` <br> `cancelScheduledNotificationAsync`   | ✅ Supported            |                                                                                                               |                |
+| `getAllScheduledNotificationsAsync`                                              | ✅ Supported            |                                                                                                               |                |
+| `getNextTriggerDateAsync`                                                        | ✅ Supported            |                                                                                                               |                |
+| `scheduleNotificationAsync`                                                      | ✅ Supported            |                                                                                                               |                |
+| `dismissAllNotificationsAsync` <br> `dismissNotificationAsync`                   | ✅ Supported            |                                                                                                               |                |
+| `getPresentedNotificationsAsync`                                                 | ✅ Supported            |                                                                                                               |                |
+| Manage notification channels                                                     | 🔍 Not tested yet       |                                                                                                               |                |
+| Manage notification categories (interactive notifications)                       | 🔍 Not tested yet       |                                                                                                               |                |
+| `clearLastNotificationResponse` <br> `clearLastNotificationResponseAsync`        | ✅ Supported            |                                                                                                               |                |
+| `getLastNotificationResponse` <br> `getLastNotificationResponseAsync`            | ✅ Supported            |                                                                                                               |                |
+| `unregisterForNotificationsAsync`                                                | 🛠️ Under development    |                                                                                                               |                |
 
 ## Version compatibility
 
@@ -98,7 +98,7 @@ Our goal is to align the version numbers of `expo-horizon-notifications` and `ex
 
 | `expo-horizon-notifications` | `expo-notifications` |
 | ---------------------------- | -------------------- |
-| 0.0.9-0.0.10                 | 19.0.7               |
+| 0.0.9-0.0.11                 | 19.0.7               |
 
 ## Expo Horizon Notifications is created by Software Mansion
 
