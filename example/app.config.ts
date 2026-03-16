@@ -45,7 +45,7 @@ module.exports = () => ({
       [
         '../expo-horizon-core/app.plugin.js',
         {
-          horizonAppId: 'DEMO_APP_ID',
+          horizonAppId: '26495571020061200',
           defaultHeight: '640dp',
           defaultWidth: '1024dp',
           supportedDevices: 'quest2|quest3|quest3s',
