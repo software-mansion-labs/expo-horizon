@@ -47,6 +47,13 @@ yarn remove expo-notifications
 import * as Notifications from 'expo-horizon-notifications';
 ```
 
+### Push Notifications
+
+1. To enable push notifications, first set the `horizonAppId` in your `expo-horizon-core` configuration (see [expo-horizon-core](../expo-horizon-core/README.md) for more details).
+2. Use `getDevicePushTokenAsync` to obtain the device's push token. The returned token will have a new type, `horizon`.
+3. Send this push token to your server, which will use it to deliver push notifications to the device.
+4. For additional details, refer to the official [Horizon OS documentation](https://developers.meta.com/horizon/documentation/android-apps/ps-user-notifications/).
+
 ## Behavior
 
 - On Meta Quest devices → Uses the Meta Horizon–compatible push notification service.
