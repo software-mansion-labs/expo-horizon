@@ -29,6 +29,7 @@ module.exports = () => ({
       favicon: './assets/favicon.png',
     },
     plugins: [
+      'expo-build-properties',
       ['expo-router'],
       [
         '../expo-horizon-location/app.plugin.js',
