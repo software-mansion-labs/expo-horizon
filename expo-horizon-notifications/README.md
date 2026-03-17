@@ -90,7 +90,7 @@ You might need additional features like `isHorizonDevice` or `isHorizonBuild` to
 | Manage notification categories (interactive notifications)                       | 🔍 Not tested yet       |                                                                                                               |                |
 | `clearLastNotificationResponse` <br> `clearLastNotificationResponseAsync`        | ✅ Supported            |                                                                                                               |                |
 | `getLastNotificationResponse` <br> `getLastNotificationResponseAsync`            | ✅ Supported            |                                                                                                               |                |
-| `unregisterForNotificationsAsync`                                                | 🛠️ Under development    |                                                                                                               |                |
+| `unregisterForNotificationsAsync`                                                | ❌ Not supported        |                                                                                                               |                |
 
 ## Version compatibility
 
