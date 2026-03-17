@@ -39,10 +39,12 @@
   "jest": {
     "preset": "expo-module-scripts"
   },
+  "dependencies": {
+    "@expo/image-utils": "^0.8.12"
+  },
   "devDependencies": {
-    "expo-module-scripts": "^4.1.7",
-    "expo-modules-core": "^3.0.19",
-    "expo": "^54.0.11"
+    "expo-module-scripts": "^55.0.2",
+    "expo-modules-core": "^3.0.19"
   },
   "peerDependencies": {
     "expo": "*",

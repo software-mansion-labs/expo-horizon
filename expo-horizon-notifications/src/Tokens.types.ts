@@ -2,7 +2,7 @@ import { type Platform } from 'expo-modules-core';
 
 // @docsMissing
 export interface NativeDevicePushToken {
-  type: 'ios' | 'android' | 'horizon';
+  type: 'ios' | 'android';
   data: string;
 }
 

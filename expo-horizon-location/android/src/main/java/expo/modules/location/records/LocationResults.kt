@@ -216,15 +216,3 @@ internal class ReverseGeocodeResponse(
     }
   }
 }
-
-internal class LocationErrorEventResponse(
-  @Field var watchId: Int? = null,
-  @Field var error: String? = null
-) : Record, Serializable {
-  internal fun toBundle(): Bundle {
-    return Bundle().apply {
-      watchId?.let { putInt("watchId", it) }
-      error?.let { putString("reason", it) }
-    }
-  }
-}

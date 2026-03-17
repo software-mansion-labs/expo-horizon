@@ -36,7 +36,6 @@ import expo.modules.location.records.GeocodeResponse
 import expo.modules.location.records.GeofencingOptions
 import expo.modules.location.records.Heading
 import expo.modules.location.records.HeadingEventResponse
-import expo.modules.location.records.LocationErrorEventResponse
 import expo.modules.location.records.LocationLastKnownOptions
 import expo.modules.location.records.LocationOptions
 import expo.modules.location.records.LocationProviderStatus
