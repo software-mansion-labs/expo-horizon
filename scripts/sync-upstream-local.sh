@@ -61,8 +61,19 @@ done
 main() {
     cd "${REPO_ROOT}"
 
+    # --- 0. Preflight checks ---
     if ! command -v git-filter-repo &>/dev/null; then
         error "git-filter-repo is not installed. Install with: pip install git-filter-repo"
+        exit 1
+    fi
+
+    if [ -f "${REPO_ROOT}/.git/MERGE_HEAD" ]; then
+        error "A merge is already in progress. Resolve it or run: git merge --abort"
+        exit 1
+    fi
+
+    if ! git diff --quiet || ! git diff --cached --quiet; then
+        error "Working tree is not clean. Commit or stash your changes first."
         exit 1
     fi
 
@@ -96,9 +107,6 @@ main() {
     UPSTREAM_TREE=$(git rev-parse filtered-upstream/main^{tree})
 
     # --- 3. Update (or create) the tracking branch ---
-    #
-    # If the branch doesn't exist locally, try to fetch it from origin.
-    # This lets team members share the merge base.
     FIRST_SYNC=false
 
     if ! git rev-parse --verify "${TRACKING_BRANCH}" &>/dev/null; then
@@ -134,11 +142,20 @@ main() {
         MERGE_ARGS+=(--allow-unrelated-histories)
     fi
 
-    MERGE_OUTPUT=$(git merge "${MERGE_ARGS[@]}" "${TRACKING_BRANCH}" 2>&1) || true
+    MERGE_EXIT=0
+    MERGE_OUTPUT=$(git merge "${MERGE_ARGS[@]}" "${TRACKING_BRANCH}" 2>&1) || MERGE_EXIT=$?
+
+    echo "${MERGE_OUTPUT}"
 
     if echo "${MERGE_OUTPUT}" | grep -q "Already up to date"; then
         success "Already up to date. Nothing to do."
         exit 0
+    fi
+
+    if [ "${MERGE_EXIT}" -ne 0 ] && [ ! -f "${REPO_ROOT}/.git/MERGE_HEAD" ]; then
+        error "Merge failed:"
+        echo "${MERGE_OUTPUT}"
+        exit 1
     fi
 
     # --- 5. Report results ---
