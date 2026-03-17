@@ -3,15 +3,22 @@ package expo.modules.location
 import android.content.Context
 import android.location.Location
 import android.location.LocationManager
+import android.os.Bundle
 import android.location.LocationRequest.QUALITY_BALANCED_POWER_ACCURACY
 import android.location.LocationRequest.QUALITY_HIGH_ACCURACY
 import android.location.LocationRequest.QUALITY_LOW_POWER
 import android.os.Build
 import androidx.annotation.RequiresApi
+import expo.modules.interfaces.permissions.Permissions
 import expo.modules.kotlin.Promise
 import expo.modules.kotlin.exception.CodedException
+import expo.modules.location.records.LocationLastKnownOptions
 import expo.modules.location.records.LocationOptions
 import expo.modules.location.records.LocationResponse
+import expo.modules.location.records.PermissionRequestResponse
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 class LocationHelpers {
   companion object {
@@ -39,22 +46,13 @@ class LocationHelpers {
     internal fun prepareLocationRequest(options: LocationOptions): LocationRequest {
       val locationParams = mapOptionsToLocationParams(options)
 
-      return LocationRequest.Builder(locationParams.interval)
-        .setMinUpdateIntervalMillis(locationParams.interval)
-        .setMaxUpdateDelayMillis(locationParams.interval)
-        .setMinUpdateDistanceMeters(locationParams.distance)
-        .setPriority(mapAccuracyToPriority(options.accuracy))
-        .build()
-    }
-
-    internal fun prepareCurrentLocationRequest(options: LocationOptions): CurrentLocationRequest {
-      val locationParams = mapOptionsToLocationParams(options)
-
-      return CurrentLocationRequest.Builder().apply {
-        setGranularity(Granularity.GRANULARITY_PERMISSION_LEVEL)
-        setPriority(mapAccuracyToPriority(options.accuracy))
-        setMaxUpdateAgeMillis(locationParams.interval)
-      }.build()
+      return LocationRequest(
+        interval = locationParams.interval,
+        minUpdateIntervalMillis = locationParams.interval,
+        maxUpdateDelayMillis = locationParams.interval,
+        minUpdateDistanceMeters = locationParams.distance,
+        priority = mapAccuracyToPriority(options.accuracy)
+      )
     }
 
     fun requestSingleLocation(mLocationManager: LocationManager, locationRequest: LocationRequest, promise: Promise) {
@@ -115,17 +113,6 @@ class LocationHelpers {
             promise.reject(cause)
           }
         }
-      )
-
-    internal fun prepareLocationRequest(options: LocationOptions): LocationRequest {
-      val locationParams = mapOptionsToLocationParams(options)
-
-      return LocationRequest(
-        interval = locationParams.interval,
-        minUpdateIntervalMillis = locationParams.interval,
-        maxUpdateDelayMillis = locationParams.interval,
-        minUpdateDistanceMeters = locationParams.distance,
-        priority = mapAccuracyToPriority(options.accuracy)
       )
     }
 

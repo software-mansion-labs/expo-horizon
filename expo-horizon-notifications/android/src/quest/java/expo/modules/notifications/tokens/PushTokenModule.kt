@@ -63,10 +63,6 @@ class PushTokenModule : Module(), FirebaseTokenListener {
       }
     }
 
-    OnDestroy {
-      removeTokenListener(this@PushTokenModule)
-    }
-
     /**
      * Fetches push token from Horizon platform and resolves the promise.
      *

@@ -395,7 +395,6 @@ class LocationModule : Module(), LifecycleEventListener, ActivityEventListener {
   private fun getCurrentPositionAsync(options: LocationOptions, promise: Promise) {
     // Read options
     val locationRequest = LocationHelpers.prepareLocationRequest(options)
-    val currentLocationRequest = LocationHelpers.prepareCurrentLocationRequest(options)
     val showUserSettingsDialog = options.mayShowUserSettingsDialog
 
     // Check for permissions
@@ -404,14 +403,14 @@ class LocationModule : Module(), LifecycleEventListener, ActivityEventListener {
       return
     }
     if (LocationHelpers.hasNetworkProviderEnabled(mContext) || !showUserSettingsDialog) {
-      LocationHelpers.requestSingleLocation(currentLocationRequest, promise)
+      LocationHelpers.requestSingleLocation(mLocationManager, locationRequest, promise)
     } else {
       addPendingLocationRequest(
         locationRequest,
         object : LocationActivityResultListener {
           override fun onResult(resultCode: Int) {
             if (resultCode == Activity.RESULT_OK) {
-              LocationHelpers.requestSingleLocation(currentLocationRequest, promise)
+              LocationHelpers.requestSingleLocation(mLocationManager, locationRequest, promise)
             } else {
               promise.reject(LocationSettingsUnsatisfiedException())
             }
