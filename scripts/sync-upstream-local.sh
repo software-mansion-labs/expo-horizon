@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 #
 # Sync upstream expo-location & expo-notifications into this repo using a
-# real git merge. Produces proper conflict markers when both sides changed
-# the same file. Nothing is committed — you resolve and commit manually.
+# real git merge with proper conflict detection.
+#
+# Maintains a local tracking branch (upstream-filtered) so that git has a
+# merge base on subsequent syncs. Only files changed on BOTH sides conflict.
 #
 # Requirements: git-filter-repo (pip install git-filter-repo)
 #
@@ -11,6 +13,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 UPSTREAM_REPO="https://github.com/expo/expo.git"
+TRACKING_BRANCH="upstream-filtered"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -38,7 +41,7 @@ usage() {
     echo
     echo "Options:"
     echo "  --ref <ref>   Upstream git ref to sync from (default: main)"
-    echo "  --dry-run     Run the merge then abort — shows conflicts without changing anything"
+    echo "  --dry-run     Run the merge then abort — shows what would happen"
     echo "  -h, --help    Show this help"
     exit 0
 }
@@ -63,15 +66,14 @@ main() {
         exit 1
     fi
 
-    # --- 1. Clone upstream into a temp directory ---
+    # --- 1. Clone upstream and filter ---
     TEMP_DIR=$(mktemp -d)
-    log "Cloning upstream at ref '${UPSTREAM_REF}' into temp dir..."
+    log "Cloning upstream at ref '${UPSTREAM_REF}'..."
 
     git clone --branch "${UPSTREAM_REF}" "${UPSTREAM_REPO}" "${TEMP_DIR}/upstream" 2>&1 \
         | while IFS= read -r line; do echo "  ${line}"; done
 
-    # --- 2. Filter to only the packages we track, rename to local paths ---
-    log "Filtering upstream to expo-location + expo-notifications..."
+    log "Filtering to expo-location + expo-notifications..."
 
     cd "${TEMP_DIR}/upstream"
     git-filter-repo \
@@ -84,24 +86,62 @@ main() {
     UPSTREAM_SHA=$(git rev-parse --short HEAD)
     log "Filtered upstream HEAD: ${UPSTREAM_SHA}"
 
-    # --- 3. Add filtered repo as a remote and fetch ---
+    # --- 2. Fetch filtered objects into local repo ---
     cd "${REPO_ROOT}"
 
     git remote remove filtered-upstream 2>/dev/null || true
     git remote add filtered-upstream "${TEMP_DIR}/upstream"
     git fetch filtered-upstream 2>/dev/null
 
-    # --- 4. Merge with --no-commit so nothing is auto-committed ---
-    log "Merging filtered upstream into current branch..."
+    UPSTREAM_TREE=$(git rev-parse filtered-upstream/main^{tree})
 
-    MERGE_EXIT=0
-    MERGE_OUTPUT=$(git merge --no-commit --no-ff --allow-unrelated-histories filtered-upstream/main 2>&1) || MERGE_EXIT=$?
+    # --- 3. Update (or create) the tracking branch ---
+    #
+    # If the branch doesn't exist locally, try to fetch it from origin.
+    # This lets team members share the merge base.
+    FIRST_SYNC=false
+
+    if ! git rev-parse --verify "${TRACKING_BRANCH}" &>/dev/null; then
+        if git fetch origin "${TRACKING_BRANCH}" 2>/dev/null; then
+            git branch "${TRACKING_BRANCH}" "origin/${TRACKING_BRANCH}"
+            log "Fetched tracking branch '${TRACKING_BRANCH}' from origin."
+        fi
+    fi
+
+    if git rev-parse --verify "${TRACKING_BRANCH}" &>/dev/null; then
+        PREV_TREE=$(git rev-parse "${TRACKING_BRANCH}^{tree}")
+        if [ "${PREV_TREE}" = "${UPSTREAM_TREE}" ]; then
+            success "Already up to date with upstream (${UPSTREAM_SHA}). Nothing to do."
+            exit 0
+        fi
+
+        log "Updating tracking branch '${TRACKING_BRANCH}'..."
+        PARENT=$(git rev-parse "${TRACKING_BRANCH}")
+        NEW_COMMIT=$(git commit-tree "${UPSTREAM_TREE}" -p "${PARENT}" -m "upstream snapshot ${UPSTREAM_SHA}")
+        git branch -f "${TRACKING_BRANCH}" "${NEW_COMMIT}"
+    else
+        log "First sync — creating tracking branch '${TRACKING_BRANCH}'..."
+        NEW_COMMIT=$(git commit-tree "${UPSTREAM_TREE}" -m "initial upstream snapshot ${UPSTREAM_SHA}")
+        git branch "${TRACKING_BRANCH}" "${NEW_COMMIT}"
+        FIRST_SYNC=true
+    fi
+
+    # --- 4. Merge tracking branch into current branch ---
+    log "Merging upstream changes..."
+
+    MERGE_ARGS=(--no-commit --no-ff)
+    if [ "${FIRST_SYNC}" = true ]; then
+        MERGE_ARGS+=(--allow-unrelated-histories)
+    fi
+
+    MERGE_OUTPUT=$(git merge "${MERGE_ARGS[@]}" "${TRACKING_BRANCH}" 2>&1) || true
 
     if echo "${MERGE_OUTPUT}" | grep -q "Already up to date"; then
-        success "Already up to date with upstream. Nothing to do."
+        success "Already up to date. Nothing to do."
         exit 0
     fi
 
+    # --- 5. Report results ---
     echo
     log "Merge result (upstream ${UPSTREAM_SHA}):"
     echo
@@ -135,23 +175,28 @@ main() {
         echo
     fi
 
-    # --- 5. Dry run: abort the merge ---
+    # --- 6. Dry run: abort ---
     if [ "${DRY_RUN}" = true ]; then
         git merge --abort 2>/dev/null || git reset --merge 2>/dev/null || true
         success "Dry run complete. Merge aborted, working tree restored."
         exit 0
     fi
 
-    # --- 6. Print next steps ---
     git diff --cached --stat 2>/dev/null
     echo
+
+    if [ "${FIRST_SYNC}" = true ]; then
+        warning "First sync — all files show as new/conflicted (no previous merge base)."
+        echo "  This is expected. Accept upstream versions for files you haven't modified."
+        echo
+    fi
 
     if [ -n "${CONFLICTED}" ]; then
         warning "You are in a merge state with conflicts."
         echo
         echo "Resolve conflicts, then:"
         echo "  git add <resolved-file>"
-        echo "  git commit -m 'chore: sync upstream ${UPSTREAM_SHA}'"
+        echo "  git commit"
         echo
         echo "To abort:"
         echo "  git merge --abort"
@@ -165,6 +210,10 @@ main() {
         echo "To abort:"
         echo "  git merge --abort"
     fi
+
+    echo
+    echo "After committing, push the tracking branch so others share the merge base:"
+    echo "  git push origin ${TRACKING_BRANCH}"
 }
 
 main
