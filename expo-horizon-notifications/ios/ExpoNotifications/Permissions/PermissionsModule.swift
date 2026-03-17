@@ -37,14 +37,7 @@ public class PermissionsModule: Module {
       // forwarded to the OS, even if notifications were previously granted.
       // iOS safely handles repeated calls to `requestAuthorization(options:)`.
       // Expo Go notifications permissions are not scoped
-      let resolver: EXPromiseResolveBlock = { result in
-        if let permission = result as? [AnyHashable: Any] {
-          promise.resolver(EXPermissionsService.parsePermission(fromRequester: permission))
-        } else {
-          promise.legacyRejecter("ERR_PERMISSIONS_REQUEST_NOTIFICATIONS", "Unexpected permission result type", nil)
-        }
-      }
-      requester.requestAuthorizationOptions(options, resolver: resolver, rejecter: promise.legacyRejecter)
+      requester.requestAuthorizationOptions(options, resolver: promise.resolver, rejecter: promise.legacyRejecter)
     }
   }
 }

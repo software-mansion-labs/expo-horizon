@@ -43,6 +43,7 @@ module.exports = () => ({
           locationWhenInUsePermission: 'Allow $(PRODUCT_NAME) to access your location',
         },
       ],
+      '../expo-horizon-notifications/app.plugin.js',
       [
         '../expo-horizon-core/app.plugin.js',
         {
