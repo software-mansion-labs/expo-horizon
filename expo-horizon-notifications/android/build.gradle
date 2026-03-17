@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'host.exp.exponent'
-version = '0.32.11'
+version = '55.0.10'
 
 expoModule {
   canBePublished false
@@ -17,7 +17,7 @@ android {
   namespace "expo.modules.notifications"
   defaultConfig {
     versionCode 21
-    versionName '0.32.11'
+    versionName '55.0.10'
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     buildConfigField "String", "META_HORIZON_APP_ID", horizonAppIdConfigField
   }
@@ -54,7 +54,7 @@ dependencies {
   questApi("com.meta.horizon.platform.sdk:push-notification-kotlin:0.1.3")
 
   // release notes in https://firebase.google.com/support/release-notes/android - cmd + f "Cloud Messaging version"
-  implementation 'com.google.firebase:firebase-messaging:24.0.1'
+  implementation 'com.google.firebase:firebase-messaging:25.0.1'
 
   implementation 'me.leolin:ShortcutBadger:1.1.22@aar'
 
