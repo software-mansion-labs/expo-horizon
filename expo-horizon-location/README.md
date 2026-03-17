@@ -76,9 +76,10 @@ You might need additional features like `isHorizonDevice` or `isHorizonBuild` to
 
 Our goal is to align the version numbers of `expo-horizon-location` and `expo-location` for easier upgrades. However, since this fork is still under development, we are currently using a separate versioning scheme.
 
-| `expo-horizon-location` | `expo-location` |
-| ----------------------- | --------------- |
-| 0.0.4-0.0.5             | 18.1.17         |
+| `expo-horizon-location` | `expo-location` | Expo SDK Version |
+| ----------------------- | --------------- | ---------------- |
+| 0.1.0                   | 55.1.2          | 55               |
+| 0.0.4-0.0.5             | 18.1.17         | 54               |
 
 ## Expo Horizon Location is created by Software Mansion
 

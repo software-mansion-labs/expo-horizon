@@ -276,6 +276,13 @@ val horizonAppId = BuildConfig.META_HORIZON_APP_ID
 
 Now, `horizonAppId` will contain the value of your Horizon App ID as defined in your build configuration.
 
+## Version compatibility
+
+| `expo-horizon-core` | Expo SDK Version |
+| ------------------- | ---------------- |
+| 1.1.0               | 55               |
+| 1.0.7               | 54               |
+
 ## Resources
 
 - [Meta Horizon Mobile App Development](https://developers.meta.com/horizon/documentation/android-apps/mobile-overview)
