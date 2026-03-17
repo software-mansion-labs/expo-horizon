@@ -43,8 +43,7 @@
     "@expo/image-utils": "^0.8.12"
   },
   "devDependencies": {
-    "expo-module-scripts": "^55.0.2",
-    "expo-modules-core": "^3.0.19"
+    "expo-module-scripts": "^55.0.2"
   },
   "peerDependencies": {
     "expo": "*",
