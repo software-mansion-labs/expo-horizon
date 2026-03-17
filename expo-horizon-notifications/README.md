@@ -90,7 +90,7 @@ You might need additional features like `isHorizonDevice` or `isHorizonBuild` to
 | Manage notification categories (interactive notifications)                       | 🔍 Not tested yet       |                                                                                                               |                |
 | `clearLastNotificationResponse` <br> `clearLastNotificationResponseAsync`        | ✅ Supported            |                                                                                                               |                |
 | `getLastNotificationResponse` <br> `getLastNotificationResponseAsync`            | ✅ Supported            |                                                                                                               |                |
-| `unregisterForNotificationsAsync`                                                | ❌ Not supported    |                                                                                                               |                |
+| `unregisterForNotificationsAsync`                                                | ❌ Not supported        |                                                                                                               |                |
 
 ## Version compatibility
 
@@ -99,7 +99,6 @@ Our goal is to align the version numbers of `expo-horizon-notifications` and `ex
 | `expo-horizon-notifications` | `expo-notifications` |
 | ---------------------------- | -------------------- |
 | 0.0.9-0.0.11                 | 19.0.7               |
-
 
 ## Expo Horizon Notifications is created by Software Mansion
 
