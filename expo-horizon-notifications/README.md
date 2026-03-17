@@ -71,8 +71,8 @@ You might need additional features like `isHorizonDevice` or `isHorizonBuild` to
 
 | Function Name                                                                    | Horizon OS              | Notes                                                                                                         | Requirements   |
 | -------------------------------------------------------------------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------- | -------------- |
-| `addPushTokenListener`                                                           | ✅ Supported (v0.0.11+) | Supported, but still in the testing phase.                                                                    | `horizonAppId` |
-| `getDevicePushTokenAsync`                                                        | ✅ Supported (v0.0.11+) | Supported, but still in the testing phase.                                                                    | `horizonAppId` |
+| `addPushTokenListener`                                                           | ✅ Supported (v0.1.0+) | Supported, but still in the testing phase.                                                                    | `horizonAppId` |
+| `getDevicePushTokenAsync`                                                        | ✅ Supported (v0.1.0+) | Supported, but still in the testing phase.                                                                    | `horizonAppId` |
 | `getExpoPushTokenAsync`                                                          | ❌ Not supported        | Currently, support for the Expo Push Service is not planned.                                                  |                |
 | `addNotificationReceivedListener` <br> `addNotificationResponseReceivedListener` | ✅ Supported            |                                                                                                               |                |
 | `addNotificationsDroppedListener` <br> `useLastNotificationResponse`             | ✅ Supported            |                                                                                                               |                |
@@ -90,7 +90,7 @@ You might need additional features like `isHorizonDevice` or `isHorizonBuild` to
 | Manage notification categories (interactive notifications)                       | 🔍 Not tested yet       |                                                                                                               |                |
 | `clearLastNotificationResponse` <br> `clearLastNotificationResponseAsync`        | ✅ Supported            |                                                                                                               |                |
 | `getLastNotificationResponse` <br> `getLastNotificationResponseAsync`            | ✅ Supported            |                                                                                                               |                |
-| `unregisterForNotificationsAsync`                                                | 🛠️ Under development    |                                                                                                               |                |
+| `unregisterForNotificationsAsync`                                                | ❌ Not supported    |                                                                                                               |                |
 
 ## Version compatibility
 
@@ -99,6 +99,7 @@ Our goal is to align the version numbers of `expo-horizon-notifications` and `ex
 | `expo-horizon-notifications` | `expo-notifications` |
 | ---------------------------- | -------------------- |
 | 0.0.9-0.0.11                 | 19.0.7               |
+
 
 ## Expo Horizon Notifications is created by Software Mansion
 
