@@ -1,14 +1,10 @@
 #!/usr/bin/env bash
 #
-# Pull upstream expo-location & expo-notifications changes into the working tree.
+# Sync upstream expo-location & expo-notifications into this repo using a
+# real git merge. Produces proper conflict markers when both sides changed
+# the same file. Nothing is committed — you resolve and commit manually.
 #
-# What it does:
-#   1. Shallow-clones the two upstream packages into a temp dir
-#   2. Copies them over the local expo-horizon-{location,notifications} dirs
-#   3. Stages everything so you can review with `git diff --cached`
-#
-# Conflicts / renames / deletions show up as normal staged changes.
-# Nothing is committed — you decide what to keep.
+# Requirements: git-filter-repo (pip install git-filter-repo)
 #
 set -euo pipefail
 
@@ -29,6 +25,8 @@ error()   { echo -e "${RED}[sync] ✗${NC} $1"; }
 
 TEMP_DIR=""
 cleanup() {
+    cd "${REPO_ROOT}" 2>/dev/null || true
+    git remote remove filtered-upstream 2>/dev/null || true
     if [ -n "${TEMP_DIR}" ] && [ -d "${TEMP_DIR}" ]; then
         rm -rf "${TEMP_DIR}"
     fi
@@ -39,8 +37,8 @@ usage() {
     echo "Usage: $0 [--ref <git-ref>] [--dry-run]"
     echo
     echo "Options:"
-    echo "  --ref <ref>   Upstream ref to sync from (default: main)"
-    echo "  --dry-run     Show what would change without modifying files"
+    echo "  --ref <ref>   Upstream git ref to sync from (default: main)"
+    echo "  --dry-run     Run the merge then abort — shows conflicts without changing anything"
     echo "  -h, --help    Show this help"
     exit 0
 }
@@ -57,109 +55,116 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-UPSTREAM_PATHS=(
-    "packages/expo-location"
-    "packages/expo-notifications"
-)
-LOCAL_PATHS=(
-    "expo-horizon-location"
-    "expo-horizon-notifications"
-)
-
 main() {
     cd "${REPO_ROOT}"
 
-    TEMP_DIR=$(mktemp -d)
-    log "Cloning upstream (shallow, sparse) at ref '${UPSTREAM_REF}'..."
+    if ! command -v git-filter-repo &>/dev/null; then
+        error "git-filter-repo is not installed. Install with: pip install git-filter-repo"
+        exit 1
+    fi
 
-    git clone \
-        --depth 1 \
-        --branch "${UPSTREAM_REF}" \
-        --filter=blob:none \
-        --sparse \
-        "${UPSTREAM_REPO}" \
-        "${TEMP_DIR}/upstream" 2>&1 | tail -1
+    # --- 1. Clone upstream into a temp directory ---
+    TEMP_DIR=$(mktemp -d)
+    log "Cloning upstream at ref '${UPSTREAM_REF}' into temp dir..."
+
+    git clone --branch "${UPSTREAM_REF}" "${UPSTREAM_REPO}" "${TEMP_DIR}/upstream" 2>&1 \
+        | while IFS= read -r line; do echo "  ${line}"; done
+
+    # --- 2. Filter to only the packages we track, rename to local paths ---
+    log "Filtering upstream to expo-location + expo-notifications..."
 
     cd "${TEMP_DIR}/upstream"
-    git sparse-checkout set "${UPSTREAM_PATHS[@]}"
-    git checkout 2>/dev/null
+    git-filter-repo \
+        --force \
+        --path packages/expo-location \
+        --path packages/expo-notifications \
+        --path-rename packages/expo-location:expo-horizon-location \
+        --path-rename packages/expo-notifications:expo-horizon-notifications
 
     UPSTREAM_SHA=$(git rev-parse --short HEAD)
-    log "Upstream HEAD: ${UPSTREAM_SHA}"
+    log "Filtered upstream HEAD: ${UPSTREAM_SHA}"
 
+    # --- 3. Add filtered repo as a remote and fetch ---
     cd "${REPO_ROOT}"
 
-    for i in "${!UPSTREAM_PATHS[@]}"; do
-        upstream_path="${UPSTREAM_PATHS[$i]}"
-        local_path="${LOCAL_PATHS[$i]}"
-        src="${TEMP_DIR}/upstream/${upstream_path}"
-        dst="${REPO_ROOT}/${local_path}"
+    git remote remove filtered-upstream 2>/dev/null || true
+    git remote add filtered-upstream "${TEMP_DIR}/upstream"
+    git fetch filtered-upstream 2>/dev/null
 
-        if [ ! -d "${src}" ]; then
-            warning "Upstream path '${upstream_path}' not found — skipping"
-            continue
-        fi
+    # --- 4. Merge with --no-commit so nothing is auto-committed ---
+    log "Merging filtered upstream into current branch..."
 
-        log "Syncing ${upstream_path} → ${local_path}"
+    MERGE_EXIT=0
+    MERGE_OUTPUT=$(git merge --no-commit --no-ff --allow-unrelated-histories filtered-upstream/main 2>&1) || MERGE_EXIT=$?
 
-        if [ "${DRY_RUN}" = true ]; then
-            rsync -rcn --delete --itemize-changes \
-                --exclude='build/' \
-                --exclude='plugin/build/' \
-                "${src}/" "${dst}/" | head -40
-            echo "  ... (use without --dry-run to apply)"
-        else
-            rsync -rc --delete \
-                --exclude='build/' \
-                --exclude='plugin/build/' \
-                "${src}/" "${dst}/"
-        fi
-    done
-
-    if [ "${DRY_RUN}" = true ]; then
-        success "Dry run complete. No files were modified."
+    if echo "${MERGE_OUTPUT}" | grep -q "Already up to date"; then
+        success "Already up to date with upstream. Nothing to do."
         exit 0
     fi
 
-    for local_path in "${LOCAL_PATHS[@]}"; do
-        git add -A "${local_path}"
-    done
-
     echo
-    log "Upstream changes staged. Summary:"
+    log "Merge result (upstream ${UPSTREAM_SHA}):"
     echo
 
-    STAT=$(git diff --cached --stat -- "${LOCAL_PATHS[@]}")
-    if [ -z "${STAT}" ]; then
-        success "No differences from upstream."
-        git reset HEAD -- "${LOCAL_PATHS[@]}" >/dev/null 2>&1
-        exit 0
-    fi
+    CONFLICTED=$(git diff --name-only --diff-filter=U 2>/dev/null || true)
+    MODIFIED=$(git diff --cached --name-only --diff-filter=M 2>/dev/null || true)
+    ADDED=$(git diff --cached --name-only --diff-filter=A 2>/dev/null || true)
+    DELETED=$(git diff --cached --name-only --diff-filter=D 2>/dev/null || true)
 
-    echo "${STAT}"
-    echo
-
-    DELETED=$(git diff --cached --name-only --diff-filter=D -- "${LOCAL_PATHS[@]}")
-    if [ -n "${DELETED}" ]; then
-        warning "Files deleted upstream:"
-        echo "${DELETED}" | sed 's/^/  /'
-        echo
-    fi
-
-    ADDED=$(git diff --cached --name-only --diff-filter=A -- "${LOCAL_PATHS[@]}")
     if [ -n "${ADDED}" ]; then
         log "New files from upstream:"
         echo "${ADDED}" | sed 's/^/  /'
         echo
     fi
 
-    success "All changes staged (not committed)."
+    if [ -n "${MODIFIED}" ]; then
+        log "Modified (auto-merged):"
+        echo "${MODIFIED}" | sed 's/^/  /'
+        echo
+    fi
+
+    if [ -n "${DELETED}" ]; then
+        warning "Deleted upstream:"
+        echo "${DELETED}" | sed 's/^/  /'
+        echo
+    fi
+
+    if [ -n "${CONFLICTED}" ]; then
+        warning "CONFLICTS — resolve manually:"
+        echo "${CONFLICTED}" | sed 's/^/  /'
+        echo
+    fi
+
+    # --- 5. Dry run: abort the merge ---
+    if [ "${DRY_RUN}" = true ]; then
+        git merge --abort 2>/dev/null || git reset --merge 2>/dev/null || true
+        success "Dry run complete. Merge aborted, working tree restored."
+        exit 0
+    fi
+
+    # --- 6. Print next steps ---
+    git diff --cached --stat 2>/dev/null
     echo
-    echo "Next steps:"
-    echo "  Review:   git diff --cached"
-    echo "  Unstage:  git reset HEAD <file>     (to keep your version)"
-    echo "  Commit:   git commit -m 'chore: sync upstream ${UPSTREAM_SHA}'"
-    echo "  Undo all: git reset HEAD -- ${LOCAL_PATHS[*]}"
+
+    if [ -n "${CONFLICTED}" ]; then
+        warning "You are in a merge state with conflicts."
+        echo
+        echo "Resolve conflicts, then:"
+        echo "  git add <resolved-file>"
+        echo "  git commit -m 'chore: sync upstream ${UPSTREAM_SHA}'"
+        echo
+        echo "To abort:"
+        echo "  git merge --abort"
+    else
+        success "All changes merged cleanly (not committed)."
+        echo
+        echo "Review and commit:"
+        echo "  git diff --cached"
+        echo "  git commit -m 'chore: sync upstream ${UPSTREAM_SHA}'"
+        echo
+        echo "To abort:"
+        echo "  git merge --abort"
+    fi
 }
 
 main

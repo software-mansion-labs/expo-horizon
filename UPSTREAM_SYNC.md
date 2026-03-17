@@ -13,60 +13,52 @@ This repo tracks two packages from [expo/expo](https://github.com/expo/expo):
 ./scripts/sync-upstream-local.sh
 ```
 
-This shallow-clones the upstream packages, copies them over the local dirs via `rsync`, and stages everything. Nothing is committed — you review and decide what to keep.
+The script clones upstream, filters it down to the two packages (renaming them to match local paths), and runs `git merge --no-commit` on your current branch. This gives you a real 3-way merge — files changed only upstream merge cleanly, files changed on both sides get conflict markers.
 
 ## Options
 
 ```bash
-./scripts/sync-upstream-local.sh --dry-run        # preview changes, don't touch files
+./scripts/sync-upstream-local.sh --dry-run        # run the merge, show results, then abort
 ./scripts/sync-upstream-local.sh --ref sdk-52      # sync from a specific tag/branch
 ```
 
 ## After running the script
 
-All upstream changes are staged. Use standard git to review:
+You're left in a **merge state** (not committed). The script prints a summary of what happened.
+
+### No conflicts
+
+Review and commit:
 
 ```bash
-git diff --cached                    # full diff of staged changes
-git diff --cached --stat             # file-level summary
-git diff --cached -- <file>          # inspect a specific file
-```
-
-### Handling changes
-
-| Situation | What to do |
-|---|---|
-| Accept upstream change | Leave it staged, commit normally |
-| Keep your version | `git reset HEAD <file>` then `git checkout -- <file>` |
-| Partially accept | `git reset HEAD <file>`, manually edit, `git add <file>` |
-| File deleted upstream | Shows as a staged deletion — unstage to keep it |
-| New file from upstream | Shows as a staged addition — unstage + delete to skip it |
-
-### Commit
-
-```bash
+git diff --cached                    # inspect merged changes
 git commit -m "chore: sync upstream <sha>"
 ```
 
-The script prints the upstream SHA for reference.
+### With conflicts
 
-### Undo everything
-
-```bash
-git reset HEAD -- expo-horizon-location expo-horizon-notifications
-git checkout -- expo-horizon-location expo-horizon-notifications
-```
-
-## What the script skips
-
-`build/` and `plugin/build/` directories are excluded since those are generated artifacts. Rebuild after syncing:
+Files with conflicts have standard `<<<<<<<` / `=======` / `>>>>>>>` markers. Resolve them, then:
 
 ```bash
-cd expo-horizon-location && yarn build && yarn build plugin
-cd expo-horizon-notifications && yarn build && yarn build plugin
+git add <resolved-file>
+git commit -m "chore: sync upstream <sha>"
 ```
+
+### Undo the merge
+
+```bash
+git merge --abort
+```
+
+## How it works
+
+1. Clones `expo/expo` into a temp directory
+2. Runs `git-filter-repo` to keep only `packages/expo-location` and `packages/expo-notifications`, renaming them to `expo-horizon-location` and `expo-horizon-notifications`
+3. Adds the filtered repo as a temporary remote (`filtered-upstream`)
+4. Merges with `--no-commit --no-ff --allow-unrelated-histories`
+5. Cleans up the remote and temp directory on exit
 
 ## Requirements
 
-- `rsync` (pre-installed on macOS)
-- `git` with sparse-checkout support (2.25+)
+- `git-filter-repo` — `pip install git-filter-repo`
+- `git` 2.25+
