@@ -57,16 +57,18 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# Map: upstream path -> local path
-declare -A PACKAGE_MAP=(
-    ["packages/expo-location"]="expo-horizon-location"
-    ["packages/expo-notifications"]="expo-horizon-notifications"
+UPSTREAM_PATHS=(
+    "packages/expo-location"
+    "packages/expo-notifications"
+)
+LOCAL_PATHS=(
+    "expo-horizon-location"
+    "expo-horizon-notifications"
 )
 
 main() {
     cd "${REPO_ROOT}"
 
-    # --- Shallow clone with only the dirs we need ---
     TEMP_DIR=$(mktemp -d)
     log "Cloning upstream (shallow, sparse) at ref '${UPSTREAM_REF}'..."
 
@@ -79,8 +81,7 @@ main() {
         "${TEMP_DIR}/upstream" 2>&1 | tail -1
 
     cd "${TEMP_DIR}/upstream"
-    git sparse-checkout set "${!PACKAGE_MAP[@]}"
-    # Materialize blobs for the sparse paths
+    git sparse-checkout set "${UPSTREAM_PATHS[@]}"
     git checkout 2>/dev/null
 
     UPSTREAM_SHA=$(git rev-parse --short HEAD)
@@ -88,9 +89,9 @@ main() {
 
     cd "${REPO_ROOT}"
 
-    # --- Sync each package ---
-    for upstream_path in "${!PACKAGE_MAP[@]}"; do
-        local_path="${PACKAGE_MAP[$upstream_path]}"
+    for i in "${!UPSTREAM_PATHS[@]}"; do
+        upstream_path="${UPSTREAM_PATHS[$i]}"
+        local_path="${LOCAL_PATHS[$i]}"
         src="${TEMP_DIR}/upstream/${upstream_path}"
         dst="${REPO_ROOT}/${local_path}"
 
@@ -102,7 +103,6 @@ main() {
         log "Syncing ${upstream_path} → ${local_path}"
 
         if [ "${DRY_RUN}" = true ]; then
-            # Show what rsync would do
             rsync -rcn --delete --itemize-changes \
                 --exclude='build/' \
                 --exclude='plugin/build/' \
@@ -121,8 +121,7 @@ main() {
         exit 0
     fi
 
-    # --- Stage everything so `git diff --cached` shows the full picture ---
-    for local_path in "${PACKAGE_MAP[@]}"; do
+    for local_path in "${LOCAL_PATHS[@]}"; do
         git add -A "${local_path}"
     done
 
@@ -130,27 +129,24 @@ main() {
     log "Upstream changes staged. Summary:"
     echo
 
-    # Show a compact stat of what changed
-    STAT=$(git diff --cached --stat -- "${PACKAGE_MAP[@]}")
+    STAT=$(git diff --cached --stat -- "${LOCAL_PATHS[@]}")
     if [ -z "${STAT}" ]; then
         success "No differences from upstream."
-        git reset HEAD -- "${PACKAGE_MAP[@]}" >/dev/null 2>&1
+        git reset HEAD -- "${LOCAL_PATHS[@]}" >/dev/null 2>&1
         exit 0
     fi
 
     echo "${STAT}"
     echo
 
-    # Highlight deleted files (upstream removed them)
-    DELETED=$(git diff --cached --name-only --diff-filter=D -- "${PACKAGE_MAP[@]}")
+    DELETED=$(git diff --cached --name-only --diff-filter=D -- "${LOCAL_PATHS[@]}")
     if [ -n "${DELETED}" ]; then
         warning "Files deleted upstream:"
         echo "${DELETED}" | sed 's/^/  /'
         echo
     fi
 
-    # Highlight new files (upstream added them)
-    ADDED=$(git diff --cached --name-only --diff-filter=A -- "${PACKAGE_MAP[@]}")
+    ADDED=$(git diff --cached --name-only --diff-filter=A -- "${LOCAL_PATHS[@]}")
     if [ -n "${ADDED}" ]; then
         log "New files from upstream:"
         echo "${ADDED}" | sed 's/^/  /'
@@ -163,7 +159,7 @@ main() {
     echo "  Review:   git diff --cached"
     echo "  Unstage:  git reset HEAD <file>     (to keep your version)"
     echo "  Commit:   git commit -m 'chore: sync upstream ${UPSTREAM_SHA}'"
-    echo "  Undo all: git reset HEAD -- ${PACKAGE_MAP[*]}"
+    echo "  Undo all: git reset HEAD -- ${LOCAL_PATHS[*]}"
 }
 
 main
