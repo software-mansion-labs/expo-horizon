@@ -3,63 +3,46 @@ package expo.modules.location
 import android.content.Context
 import android.location.Location
 import android.location.LocationManager
+import android.os.Bundle
 import com.google.android.gms.location.CurrentLocationRequest
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.Granularity
 import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import expo.modules.interfaces.permissions.Permissions
 import expo.modules.kotlin.Promise
 import expo.modules.kotlin.exception.CodedException
+import expo.modules.location.records.LocationLastKnownOptions
 import expo.modules.location.records.LocationOptions
 import expo.modules.location.records.LocationResponse
+import expo.modules.location.records.PermissionRequestResponse
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
-class LocationHelpers(context: Context) {
-  private val mLocationProvider: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
-
-  fun requestSingleLocation(locationProvider: FusedLocationProviderClient, locationRequest: CurrentLocationRequest, promise: Promise) {
-    try {
-      locationProvider.getCurrentLocation(locationRequest, null)
-        .addOnSuccessListener { location: Location? ->
-          if (location == null) {
-            promise.reject(CurrentLocationIsUnavailableException())
-            return@addOnSuccessListener
-          }
-
-          promise.resolve(LocationResponse(location))
-        }
-        .addOnFailureListener {
-          promise.reject(LocationRequestRejectedException(it))
-        }
-        .addOnCanceledListener {
-          promise.reject(LocationRequestCancelledException())
-        }
-    } catch (e: SecurityException) {
-      promise.reject(LocationRequestRejectedException(e))
-    }
-  }
-
-  fun requestContinuousUpdates(locationModule: LocationModule, locationRequest: LocationRequest, watchId: Int, promise: Promise) {
-    locationModule.requestLocationUpdates(
-      locationRequest,
-      watchId,
-      object : LocationRequestCallbacks {
-        override fun onLocationChanged(location: Location) {
-          locationModule.sendLocationResponse(watchId, LocationResponse(location))
-        }
-
-        override fun onRequestSuccess() {
-          promise.resolve(null)
-        }
-
-        override fun onRequestFailed(cause: CodedException) {
-          promise.reject(cause)
-        }
-      }
-    )
-  }
-
+class LocationHelpers {
   companion object {
+    /**
+     * Checks whether given location didn't exceed given `maxAge` and fits in the required accuracy.
+     */
+    internal fun isLocationValid(location: Location?, options: LocationLastKnownOptions): Boolean {
+      if (location == null) {
+        return false
+      }
+      val maxAge = options.maxAge ?: Double.MAX_VALUE
+      val requiredAccuracy = options.requiredAccuracy ?: Double.MAX_VALUE
+      val timeDiff = (System.currentTimeMillis() - location.time).toDouble()
+      return timeDiff <= maxAge && location.accuracy <= requiredAccuracy
+    }
+
+    fun hasNetworkProviderEnabled(context: Context?): Boolean {
+      if (context == null) {
+        return false
+      }
+      val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as? LocationManager
+      return locationManager != null && locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+    }
+
     internal fun prepareLocationRequest(options: LocationOptions): LocationRequest {
       val locationParams = mapOptionsToLocationParams(options)
 
@@ -79,6 +62,48 @@ class LocationHelpers(context: Context) {
         setPriority(mapAccuracyToPriority(options.accuracy))
         setMaxUpdateAgeMillis(locationParams.interval)
       }.build()
+    }
+
+    fun requestSingleLocation(locationProvider: FusedLocationProviderClient, locationRequest: CurrentLocationRequest, promise: Promise) {
+      try {
+        locationProvider.getCurrentLocation(locationRequest, null)
+          .addOnSuccessListener { location: Location? ->
+            if (location == null) {
+              promise.reject(CurrentLocationIsUnavailableException())
+              return@addOnSuccessListener
+            }
+
+            promise.resolve(LocationResponse(location))
+          }
+          .addOnFailureListener {
+            promise.reject(LocationRequestRejectedException(it))
+          }
+          .addOnCanceledListener {
+            promise.reject(LocationRequestCancelledException())
+          }
+      } catch (e: SecurityException) {
+        promise.reject(LocationRequestRejectedException(e))
+      }
+    }
+
+    fun requestContinuousUpdates(locationModule: LocationModule, locationRequest: LocationRequest, watchId: Int, promise: Promise) {
+      locationModule.requestLocationUpdates(
+        locationRequest,
+        watchId,
+        object : LocationRequestCallbacks {
+          override fun onLocationChanged(location: Location) {
+            locationModule.sendLocationResponse(watchId, LocationResponse(location))
+          }
+
+          override fun onRequestSuccess() {
+            promise.resolve(null)
+          }
+
+          override fun onRequestFailed(cause: CodedException) {
+            promise.reject(cause)
+          }
+        }
+      )
     }
 
     private fun mapOptionsToLocationParams(options: LocationOptions): LocationParams {
@@ -120,6 +145,49 @@ class LocationHelpers(context: Context) {
       val locationManager = context?.getSystemService(Context.LOCATION_SERVICE) as? LocationManager
         ?: return false
       return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+    }
+
+    // Decorator for Permissions.getPermissionsWithPermissionsManager, for use in Kotlin coroutines
+    internal suspend fun getPermissionsWithPermissionsManager(contextPermissions: Permissions, vararg permissionStrings: String): PermissionRequestResponse {
+      return suspendCoroutine { continuation ->
+        Permissions.getPermissionsWithPermissionsManager(
+          contextPermissions,
+          object : Promise {
+            override fun resolve(value: Any?) {
+              val result = value as? Bundle
+                ?: throw ConversionException(Any::class.java, Bundle::class.java, "value returned by the permission promise is not a Bundle")
+              continuation.resume(PermissionRequestResponse(result))
+            }
+
+            override fun reject(code: String?, message: String?, cause: Throwable?) {
+              continuation.resumeWithException(CodedException(code, message, cause))
+            }
+          },
+          *permissionStrings
+        )
+      }
+    }
+
+    // Decorator for Permissions.getPermissionsWithPermissionsManager, for use in Kotlin coroutines
+    internal suspend fun askForPermissionsWithPermissionsManager(contextPermissions: Permissions, vararg permissionStrings: String): Bundle {
+      return suspendCoroutine {
+        Permissions.askForPermissionsWithPermissionsManager(
+          contextPermissions,
+          object : Promise {
+            override fun resolve(value: Any?) {
+              it.resume(
+                value as? Bundle
+                  ?: throw ConversionException(Any::class.java, Bundle::class.java, "value returned by the permission promise is not a Bundle")
+              )
+            }
+
+            override fun reject(code: String?, message: String?, cause: Throwable?) {
+              it.resumeWithException(CodedException(code, message, cause))
+            }
+          },
+          *permissionStrings
+        )
+      }
     }
   }
 }
