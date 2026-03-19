@@ -98,7 +98,7 @@ Our goal is to align the version numbers of `expo-horizon-notifications` and `ex
 
 | `expo-horizon-notifications` | `expo-notifications` | Expo SDK Version |
 | ---------------------------- | -------------------- | ---------------- |
-| 0.1.0                        | 55.0.12              | 55               |
+| 55.0.0                       | 55.0.10              | 55               |
 | 0.0.9-0.0.11                 | 19.0.7               | 54               |
 
 ## Expo Horizon Notifications is created by Software Mansion

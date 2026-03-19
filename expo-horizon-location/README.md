@@ -78,7 +78,7 @@ Our goal is to align the version numbers of `expo-horizon-location` and `expo-lo
 
 | `expo-horizon-location` | `expo-location` | Expo SDK Version |
 | ----------------------- | --------------- | ---------------- |
-| 0.1.0                   | 55.1.2          | 55               |
+| 55.0.0                  | 55.1.2          | 55               |
 | 0.0.4-0.0.5             | 18.1.17         | 54               |
 
 ## Expo Horizon Location is created by Software Mansion

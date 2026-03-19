@@ -280,7 +280,7 @@ Now, `horizonAppId` will contain the value of your Horizon App ID as defined in 
 
 | `expo-horizon-core` | Expo SDK Version |
 | ------------------- | ---------------- |
-| 1.1.0               | 55               |
+| 55.0.0              | 55               |
 | 1.0.7               | 54               |
 
 ## Resources
