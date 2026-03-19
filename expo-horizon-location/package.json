@@ -47,6 +47,6 @@
   },
   "peerDependencies": {
     "expo": "*",
-    "expo-horizon-core": "^1.0.7"
+    "expo-horizon-core": "^55.0.0"
   }
 }
