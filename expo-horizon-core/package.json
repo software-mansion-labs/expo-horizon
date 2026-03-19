@@ -1,6 +1,6 @@
 {
   "name": "expo-horizon-core",
-  "version": "1.0.7",
+  "version": "1.1.0-next.0",
   "description": "ExpoHorizon common features.",
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -32,9 +32,9 @@
   "dependencies": {},
   "devDependencies": {
     "@types/react": "~19.1.0",
-    "expo-module-scripts": "^5.0.7",
-    "expo": "^54.0.10",
-    "react-native": "0.81.4"
+    "expo-module-scripts": "^55.0.2",
+    "expo": "^55.0.0",
+    "react-native": "0.83.2"
   },
   "peerDependencies": {
     "expo": "*",

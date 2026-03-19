@@ -96,9 +96,10 @@ You might need additional features like `isHorizonDevice` or `isHorizonBuild` to
 
 Our goal is to align the version numbers of `expo-horizon-notifications` and `expo-notifications` for easier upgrades. However, since this fork is still under development, we are currently using a separate versioning scheme.
 
-| `expo-horizon-notifications` | `expo-notifications` |
-| ---------------------------- | -------------------- |
-| 0.0.9-0.0.11                 | 19.0.7               |
+| `expo-horizon-notifications` | `expo-notifications` | Expo SDK Version |
+| ---------------------------- | -------------------- | ---------------- |
+| 0.1.0                        | 55.0.12              | 55               |
+| 0.0.9-0.0.11                 | 19.0.7               | 54               |
 
 ## Expo Horizon Notifications is created by Software Mansion
 

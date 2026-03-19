@@ -52,7 +52,6 @@ import expo.modules.location.records.PermissionDetailsLocationAndroid
 import expo.modules.location.records.PermissionRequestResponse
 import expo.modules.location.records.ReverseGeocodeLocation
 import expo.modules.location.records.ReverseGeocodeResponse
-import expo.modules.location.SharedHelpers
 import expo.modules.location.taskConsumers.GeofencingTaskConsumer
 import expo.modules.location.taskConsumers.LocationTaskConsumer
 import java.util.Locale
@@ -70,7 +69,6 @@ class LocationModule : Module(), LifecycleEventListener, SensorEventListener, Ac
   private lateinit var mSensorManager: SensorManager
   private lateinit var mUIManager: UIManager
   private lateinit var mLocationProvider: FusedLocationProviderClient
-  private lateinit var locationHelpers: LocationHelpers
 
   private var mGravity: FloatArray = FloatArray(9)
   private var mGeomagnetic: FloatArray = FloatArray(9)
@@ -94,7 +92,6 @@ class LocationModule : Module(), LifecycleEventListener, SensorEventListener, Ac
       mLocationProvider = LocationServices.getFusedLocationProviderClient(mContext)
       mSensorManager = mContext.getSystemService(Context.SENSOR_SERVICE) as? SensorManager
         ?: throw SensorManagerUnavailable()
-      locationHelpers = LocationHelpers(mContext)
     }
 
     Constant("isHorizon") {
@@ -108,14 +105,14 @@ class LocationModule : Module(), LifecycleEventListener, SensorEventListener, Ac
       val permissionsManager = appContext.permissions ?: throw NoPermissionsModuleException()
 
       return@Coroutine if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
-        PermissionHelpers.askForPermissionsWithPermissionsManager(
+        LocationHelpers.askForPermissionsWithPermissionsManager(
           permissionsManager,
           Manifest.permission.ACCESS_FINE_LOCATION,
           Manifest.permission.ACCESS_COARSE_LOCATION,
           Manifest.permission.ACCESS_BACKGROUND_LOCATION
         )
       } else {
-        PermissionHelpers.askForPermissionsWithPermissionsManager(permissionsManager, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
+        LocationHelpers.askForPermissionsWithPermissionsManager(permissionsManager, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
       }
     }
 
@@ -124,7 +121,7 @@ class LocationModule : Module(), LifecycleEventListener, SensorEventListener, Ac
       val permissionsManager = appContext.permissions ?: throw NoPermissionsModuleException()
 
       return@Coroutine if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
-        PermissionHelpers.getPermissionsWithPermissionsManager(
+        LocationHelpers.getPermissionsWithPermissionsManager(
           permissionsManager,
           Manifest.permission.ACCESS_FINE_LOCATION,
           Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -138,7 +135,7 @@ class LocationModule : Module(), LifecycleEventListener, SensorEventListener, Ac
     AsyncFunction("requestForegroundPermissionsAsync") Coroutine { ->
       val permissionsManager = appContext.permissions ?: throw NoPermissionsModuleException()
 
-      PermissionHelpers.askForPermissionsWithPermissionsManager(permissionsManager, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
+      LocationHelpers.askForPermissionsWithPermissionsManager(permissionsManager, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
       // We aren't using the values returned above, because we need to check if the user has provided fine location permissions
       return@Coroutine getForegroundPermissionsAsync()
     }
@@ -182,8 +179,8 @@ class LocationModule : Module(), LifecycleEventListener, SensorEventListener, Ac
       val locationRequest = LocationHelpers.prepareLocationRequest(options)
       val showUserSettingsDialog = options.mayShowUserSettingsDialog
 
-      if (SharedHelpers.hasNetworkProviderEnabled(mContext) || !showUserSettingsDialog) {
-        locationHelpers.requestContinuousUpdates(this@LocationModule, locationRequest, watchId, promise)
+      if (LocationHelpers.hasNetworkProviderEnabled(mContext) || !showUserSettingsDialog) {
+        LocationHelpers.requestContinuousUpdates(this@LocationModule, locationRequest, watchId, promise)
       } else {
         // Pending requests can ask the user to turn on improved accuracy mode in user's settings.
         addPendingLocationRequest(
@@ -191,7 +188,7 @@ class LocationModule : Module(), LifecycleEventListener, SensorEventListener, Ac
           object : LocationActivityResultListener {
             override fun onResult(resultCode: Int) {
               if (resultCode == Activity.RESULT_OK) {
-                locationHelpers.requestContinuousUpdates(this@LocationModule, locationRequest, watchId, promise)
+                LocationHelpers.requestContinuousUpdates(this@LocationModule, locationRequest, watchId, promise)
               } else {
                 promise.reject(LocationSettingsUnsatisfiedException())
               }
@@ -223,7 +220,7 @@ class LocationModule : Module(), LifecycleEventListener, SensorEventListener, Ac
     }
 
     AsyncFunction("enableNetworkProviderAsync") Coroutine { ->
-      if (SharedHelpers.hasNetworkProviderEnabled(mContext)) {
+      if (LocationHelpers.hasNetworkProviderEnabled(mContext)) {
         return@Coroutine null
       }
 
@@ -319,8 +316,8 @@ class LocationModule : Module(), LifecycleEventListener, SensorEventListener, Ac
 
   private suspend fun getForegroundPermissionsAsync(): PermissionRequestResponse {
     appContext.permissions?.let {
-      val locationPermission = PermissionHelpers.getPermissionsWithPermissionsManager(it, Manifest.permission.ACCESS_COARSE_LOCATION)
-      val fineLocationPermission = PermissionHelpers.getPermissionsWithPermissionsManager(it, Manifest.permission.ACCESS_FINE_LOCATION)
+      val locationPermission = LocationHelpers.getPermissionsWithPermissionsManager(it, Manifest.permission.ACCESS_COARSE_LOCATION)
+      val fineLocationPermission = LocationHelpers.getPermissionsWithPermissionsManager(it, Manifest.permission.ACCESS_FINE_LOCATION)
 
       var accuracy = "none"
       if (locationPermission.granted) {
@@ -363,7 +360,7 @@ class LocationModule : Module(), LifecycleEventListener, SensorEventListener, Ac
       return getForegroundPermissionsAsync()
     }
     return appContext.permissions?.let {
-      val permissionResponseBundle = PermissionHelpers.askForPermissionsWithPermissionsManager(it, Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+      val permissionResponseBundle = LocationHelpers.askForPermissionsWithPermissionsManager(it, Manifest.permission.ACCESS_BACKGROUND_LOCATION)
       PermissionRequestResponse(permissionResponseBundle)
     } ?: throw NoPermissionsModuleException()
   }
@@ -376,7 +373,7 @@ class LocationModule : Module(), LifecycleEventListener, SensorEventListener, Ac
       return getForegroundPermissionsAsync()
     }
     appContext.permissions?.let {
-      return PermissionHelpers.getPermissionsWithPermissionsManager(it, Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+      return LocationHelpers.getPermissionsWithPermissionsManager(it, Manifest.permission.ACCESS_BACKGROUND_LOCATION)
     } ?: throw NoPermissionsModuleException()
   }
 
@@ -390,7 +387,7 @@ class LocationModule : Module(), LifecycleEventListener, SensorEventListener, Ac
     }
     val lastKnownLocation = getLastKnownLocation() ?: return null
 
-    if (SharedHelpers.isLocationValid(lastKnownLocation, options)) {
+    if (LocationHelpers.isLocationValid(lastKnownLocation, options)) {
       return LocationResponse(lastKnownLocation)
     }
     return null
@@ -411,15 +408,15 @@ class LocationModule : Module(), LifecycleEventListener, SensorEventListener, Ac
       promise.reject(LocationUnauthorizedException())
       return
     }
-    if (SharedHelpers.hasNetworkProviderEnabled(mContext) || !showUserSettingsDialog) {
-      locationHelpers.requestSingleLocation(mLocationProvider, currentLocationRequest, promise)
+    if (LocationHelpers.hasNetworkProviderEnabled(mContext) || !showUserSettingsDialog) {
+      LocationHelpers.requestSingleLocation(mLocationProvider, currentLocationRequest, promise)
     } else {
       addPendingLocationRequest(
         locationRequest,
         object : LocationActivityResultListener {
           override fun onResult(resultCode: Int) {
             if (resultCode == Activity.RESULT_OK) {
-              locationHelpers.requestSingleLocation(mLocationProvider, currentLocationRequest, promise)
+              LocationHelpers.requestSingleLocation(mLocationProvider, currentLocationRequest, promise)
             } else {
               promise.reject(LocationSettingsUnsatisfiedException())
             }

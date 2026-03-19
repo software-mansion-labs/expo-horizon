@@ -29,6 +29,7 @@ module.exports = () => ({
       favicon: './assets/favicon.png',
     },
     plugins: [
+      'expo-build-properties',
       ['expo-router'],
       [
         '../expo-horizon-location/app.plugin.js',
@@ -42,6 +43,7 @@ module.exports = () => ({
           locationWhenInUsePermission: 'Allow $(PRODUCT_NAME) to access your location',
         },
       ],
+      '../expo-horizon-notifications/app.plugin.js',
       [
         '../expo-horizon-core/app.plugin.js',
         {

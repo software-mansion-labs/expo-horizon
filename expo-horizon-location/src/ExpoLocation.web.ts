@@ -124,9 +124,7 @@ async function getPermissionsAsync(shouldAsk = false): Promise<PermissionRespons
 let lastKnownPosition: LocationObject | null = null;
 
 export default {
-  async getProviderStatusAsync(): Promise<{
-    locationServicesEnabled: boolean;
-  }> {
+  async getProviderStatusAsync(): Promise<{ locationServicesEnabled: boolean }> {
     return {
       locationServicesEnabled: 'geolocation' in navigator,
     };
