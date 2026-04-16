@@ -8,10 +8,51 @@
 
 ### 🐛 Bug fixes
 
-- [ios] fix unhandled promise rejection in `getRegistrationInfoAsync`, relax keychain accessibility to allow access after device unlocked. ([#43829](https://github.com/expo/expo/pull/43829) by [@jmalmo](https://github.com/jmalmo))
-- [ios] Fixed `requestPermissionsAsync` returning raw permission result without several documented fields ([#43555](https://github.com/expo/expo/pull/43555) by [@vonovak](https://github.com/vonovak))
-
 ### 💡 Others
+
+## 55.0.19 — 2026-04-13
+
+_This version does not introduce any user-facing changes._
+
+## 55.0.18 — 2026-04-09
+
+_This version does not introduce any user-facing changes._
+
+## 55.0.17 — 2026-04-07
+
+_This version does not introduce any user-facing changes._
+
+## 55.0.16 — 2026-04-02
+
+_This version does not introduce any user-facing changes._
+
+## 55.0.15 — 2026-04-02
+
+_This version does not introduce any user-facing changes._
+
+## 55.0.14 — 2026-03-27
+
+_This version does not introduce any user-facing changes._
+
+## 55.0.13 — 2026-03-17
+
+### 🐛 Bug fixes
+
+- [web] fix `getDevicePushTokenAsync` export ([#44413](https://github.com/expo/expo/pull/44413) by [@vonovak](https://github.com/vonovak))
+- [ios] fix unhandled promise rejection in `getRegistrationInfoAsync`, relax keychain accessibility to allow access after device unlocked. ([#43829](https://github.com/expo/expo/pull/43829) by [@jmalmo](https://github.com/jmalmo))
+
+## 55.0.12 — 2026-03-11
+
+### 🐛 Bug fixes
+
+- [ios] Fixed build issue with Expo Go in `PermissionsModule.swift` ([#43690](https://github.com/expo/expo/pull/43690) by [@vonovak](https://github.com/vonovak))
+
+## 55.0.11 — 2026-03-05
+
+### 🐛 Bug fixes
+
+- [ios] Fixed `requestPermissionsAsync` returning raw permission result without several documented fields ([#43555](https://github.com/expo/expo/pull/43555) by [@vonovak](https://github.com/vonovak))
+- [iOS] Added explicit `import React` for xcframework compatibility. ([#44248](https://github.com/expo/expo/pull/44248) by [@chrfalch](https://github.com/chrfalch))
 
 ## 55.0.10 — 2026-02-25
 
