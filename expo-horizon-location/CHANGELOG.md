@@ -10,9 +10,31 @@
 
 ### 💡 Others
 
-### ⚠️ Notices
+## 55.1.8 — 2026-04-09
 
-- Added support for React Native 0.84.x. ([#43018](https://github.com/expo/expo/pull/43018) by [@chrfalch](https://github.com/chrfalch))
+_This version does not introduce any user-facing changes._
+
+## 55.1.7 — 2026-04-07
+
+_This version does not introduce any user-facing changes._
+
+## 55.1.6 — 2026-04-02
+
+_This version does not introduce any user-facing changes._
+
+## 55.1.5 — 2026-04-02
+
+_This version does not introduce any user-facing changes._
+
+## 55.1.4 — 2026-03-18
+
+### 🐛 Bug fixes
+
+- [iOS] Ignore [`locationUnknown`](https://developer.apple.com/documentation/corelocation/clerror-swift.struct/locationunknown) errors in `watchPositionAsync`. ([#44027](https://github.com/expo/expo/pull/44027) by [@tsapeta](https://github.com/tsapeta))
+
+## 55.1.3 — 2026-03-17
+
+_This version does not introduce any user-facing changes._
 
 ## 55.1.2 — 2026-02-25
 

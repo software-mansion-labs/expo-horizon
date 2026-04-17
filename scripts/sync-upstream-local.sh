@@ -81,7 +81,7 @@ main() {
     TEMP_DIR=$(mktemp -d)
     log "Cloning upstream at ref '${UPSTREAM_REF}'..."
 
-    git clone --branch "${UPSTREAM_REF}" "${UPSTREAM_REPO}" "${TEMP_DIR}/upstream" 2>&1 \
+    git clone --branch "${UPSTREAM_REF}" --single-branch "${UPSTREAM_REPO}" "${TEMP_DIR}/upstream" 2>&1 \
         | while IFS= read -r line; do echo "  ${line}"; done
 
     log "Filtering to expo-location + expo-notifications..."
@@ -104,7 +104,7 @@ main() {
     git remote add filtered-upstream "${TEMP_DIR}/upstream"
     git fetch filtered-upstream 2>/dev/null
 
-    UPSTREAM_TREE=$(git rev-parse filtered-upstream/main^{tree})
+    UPSTREAM_TREE=$(git rev-parse "filtered-upstream/${UPSTREAM_REF}^{tree}")
 
     # --- 3. Update (or create) the tracking branch ---
     FIRST_SYNC=false
