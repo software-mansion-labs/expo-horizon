@@ -46,7 +46,6 @@ jobs:
           package-name: 'expo-horizon-core'
           package-json-path: 'expo-horizon-core/package.json'
           install-dependencies-command: 'yarn install --immutable'
-          build-command: 'yarn workspace expo-horizon-core build'
           release-type: ${{ inputs.release-type }}
           version: ${{ inputs.version }}
           dry-run: ${{ inputs.dry-run }}
