@@ -57,6 +57,10 @@ Publishing is handled via the **Publish Package to NPM** GitHub Actions workflow
 | `rc` | `next` |
 | `stable` | `latest` (when the version is newer than the current `latest`) |
 
+### Git release tags
+
+Only the `expo-horizon-core` job creates and pushes a `vX.Y.Z` git tag for the release. The `expo-horizon-location` and `expo-horizon-notifications` jobs skip git operations (`perform-git-operations: false`) so that publishing all three packages concurrently does not collide on the same tag — all three packages share a release version, and the `npm-package-publish` action does not currently support per-package tag prefixes. Treat the `expo-horizon-core` tag as the canonical marker for a given release across all three packages.
+
 ## Naming Conventions
 
 Name your PRs using the format: `[package] type: <description>`
