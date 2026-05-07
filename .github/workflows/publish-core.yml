@@ -1,15 +1,54 @@
 name: Publish expo-horizon-core to NPM
+
 on:
   workflow_dispatch:
     inputs:
       release-type:
         type: choice
         options: [stable, nightly, rc]
+        default: nightly
+      version:
+        description: 'Explicit version in x.y.z format (leave empty to infer).'
+        type: string
+        required: false
+        default: ''
       dry-run:
+        description: 'Dry run — no actual publish or git push.'
         type: boolean
         default: true
+
 jobs:
   publish:
+    name: Publish expo-horizon-core
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      id-token: write
+
+    concurrency:
+      group: publish-${{ github.ref }}
+      cancel-in-progress: false
+
     steps:
-      - run: echo "Workflow registered on main!"
+      - name: 🏗 Check out
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.9.0
+          registry-url: 'https://registry.npmjs.org/'
+
+      - name: 🚀 Publish manual release
+        uses: software-mansion/npm-package-publish@22b6e632b4310c5c061a047bccc99d0cea88d2bb
+        with:
+          package-name: 'expo-horizon-core'
+          package-json-path: 'expo-horizon-core/package.json'
+          install-dependencies-command: 'yarn install --immutable'
+          build-command: 'yarn workspace expo-horizon-core build'
+          release-type: ${{ inputs.release-type }}
+          version: ${{ inputs.version }}
+          dry-run: ${{ inputs.dry-run }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
