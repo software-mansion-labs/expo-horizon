@@ -63,6 +63,7 @@ jobs:
           package-name: ${{ inputs.package }}
           package-json-path: '${{ inputs.package }}/package.json'
           install-dependencies-command: 'yarn install --immutable'
+          perform-git-operations: ${{ inputs.package == 'expo-horizon-core' }}
           release-type: ${{ inputs.release-type }}
           version: ${{ inputs.version }}
           dry-run: ${{ inputs.dry-run }}
