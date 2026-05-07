@@ -50,6 +50,7 @@
     "expo-constants": "~55.0.14"
   },
   "devDependencies": {
+    "expo-horizon-core": "*",
     "expo-module-scripts": "^55.0.2",
     "memfs": "^3.2.0"
   },

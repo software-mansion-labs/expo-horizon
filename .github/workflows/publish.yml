@@ -49,6 +49,14 @@ jobs:
           node-version-file: '.nvmrc'
           registry-url: 'https://registry.npmjs.org/'
 
+      - name: 📦 Install dependencies
+        if: ${{ inputs.package == 'expo-horizon-notifications' }}
+        run: yarn install --immutable
+
+      - name: 🔨 Build expo-horizon-core
+        if: ${{ inputs.package == 'expo-horizon-notifications' }}
+        run: yarn workspace expo-horizon-core build
+
       - name: 🚀 Publish ${{ inputs.package }}
         uses: software-mansion/npm-package-publish@22b6e632b4310c5c061a047bccc99d0cea88d2bb
         with:
