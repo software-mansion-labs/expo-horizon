@@ -1,8 +1,17 @@
-name: Publish expo-horizon-core to NPM
+name: Publish Package to NPM
 
 on:
   workflow_dispatch:
     inputs:
+      package:
+        description: 'Package to publish'
+        type: choice
+        options: 
+          - expo-horizon-core
+          - expo-horizon-location
+          - expo-horizon-notifications
+        required: true
+        default: expo-horizon-core
       release-type:
         type: choice
         options: [stable, nightly, rc]
@@ -19,7 +28,7 @@ on:
 
 jobs:
   publish:
-    name: Publish expo-horizon-core
+    name: Publish ${{ inputs.package }}
     runs-on: ubuntu-latest
 
     permissions:
@@ -27,7 +36,7 @@ jobs:
       id-token: write
 
     concurrency:
-      group: publish-${{ github.ref }}
+      group: publish-${{ inputs.package }}-${{ github.ref }}
       cancel-in-progress: false
 
     steps:
@@ -40,11 +49,11 @@ jobs:
           node-version-file: '.nvmrc'
           registry-url: 'https://registry.npmjs.org/'
 
-      - name: 🚀 Publish manual release
+      - name: 🚀 Publish ${{ inputs.package }}
         uses: software-mansion/npm-package-publish@22b6e632b4310c5c061a047bccc99d0cea88d2bb
         with:
-          package-name: 'expo-horizon-core'
-          package-json-path: 'expo-horizon-core/package.json'
+          package-name: ${{ inputs.package }}
+          package-json-path: '${{ inputs.package }}/package.json'
           install-dependencies-command: 'yarn install --immutable'
           release-type: ${{ inputs.release-type }}
           version: ${{ inputs.version }}
