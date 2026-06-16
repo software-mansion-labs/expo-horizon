@@ -25,6 +25,7 @@ export async function getDevicePushTokenAsync() {
         nativeTokenPromise = null;
     }
     if (ExpoHorizonCore.isHorizonDevice) {
+        // @ts-ignore: 'horizon' is a Horizon-specific device push token type
         return { type: 'horizon', data: devicePushToken };
     }
     // @ts-ignore: TS thinks Platform.OS could be anything and can't decide what type is it

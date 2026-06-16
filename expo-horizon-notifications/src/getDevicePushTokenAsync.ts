@@ -2,7 +2,7 @@ import ExpoHorizonCore from 'expo-horizon-core';
 import { UnavailabilityError, Platform } from 'expo-modules-core';
 
 import PushTokenManager from './PushTokenManager';
-import { DevicePushToken } from './Tokens.types';
+import type { DevicePushToken } from './Tokens.types';
 import { warnOfExpoGoPushUsage } from './warnOfExpoGoPushUsage';
 
 let nativeTokenPromise: Promise<string> | null = null;
@@ -30,6 +30,7 @@ export async function getDevicePushTokenAsync(): Promise<DevicePushToken> {
   }
 
   if (ExpoHorizonCore.isHorizonDevice) {
+    // @ts-ignore: 'horizon' is a Horizon-specific device push token type
     return { type: 'horizon', data: devicePushToken };
   }
 

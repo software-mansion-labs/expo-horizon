@@ -1,1 +1,1 @@
-{"root":["./src/withhorizon.ts","./src/withlocation.ts"],"version":"5.9.3"}
+{"root":["./src/index.ts","./src/withhorizon.ts","./src/withlocation.ts"],"version":"5.9.3"}

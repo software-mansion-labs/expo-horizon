@@ -19,25 +19,25 @@
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",
-    "expo": "^55.0.0",
-    "expo-build-properties": "~55.0.9",
-    "expo-constants": "~55.0.7",
+    "expo": "^56.0.0",
+    "expo-build-properties": "~56.0.19",
+    "expo-constants": "~56.0.18",
     "expo-horizon-core": "file:../expo-horizon-core",
     "expo-horizon-location": "file:../expo-horizon-location",
     "expo-horizon-notifications": "file:../expo-horizon-notifications",
-    "expo-linking": "~55.0.7",
-    "expo-router": "~55.0.5",
-    "expo-status-bar": "~55.0.4",
-    "expo-task-manager": "~55.0.9",
-    "react": "19.2.0",
-    "react-dom": "19.2.0",
-    "react-native": "0.83.2",
-    "react-native-safe-area-context": "~5.6.2",
-    "react-native-screens": "~4.23.0",
+    "expo-linking": "~56.0.14",
+    "expo-router": "~56.2.11",
+    "expo-status-bar": "~56.0.4",
+    "expo-task-manager": "~56.0.19",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-native": "0.85.3",
+    "react-native-safe-area-context": "~5.7.0",
+    "react-native-screens": "4.25.2",
     "react-native-web": "^0.21.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.25.2",
+    "@babel/core": "^7.29.0",
     "@react-native/eslint-config": "^0.82.0",
     "@types/react": "~19.2.10",
     "eslint": "^8",
@@ -48,7 +48,7 @@
     "postinstall-postinstall": "^2.1.0",
     "prettier": "^3.6.2",
     "tsx": "^4.20.6",
-    "typescript": "~5.9.2"
+    "typescript": "~6.0.3"
   },
   "private": true
 }

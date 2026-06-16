@@ -56,6 +56,7 @@ module.exports = () => ({
         },
       ],
       'expo-task-manager',
+      "expo-status-bar"
     ],
   },
 });

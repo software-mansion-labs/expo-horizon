@@ -10,6 +10,17 @@
 
 ### 💡 Others
 
+## 56.0.0 — 2026-06-16
+
+### 🎉 New features
+
+- Synced with upstream `expo-location@56.0.18` (Expo SDK 56). The `mobile` build variant and iOS are now 1:1 with upstream.
+- Added motion activity APIs: `getMotionActivityAsync`, `watchMotionActivityAsync`, and permission helpers (`useMotionActivityPermissions`). Supported on the `mobile` variant (Google Play Services activity recognition) and iOS. On Horizon OS (`quest` variant) these reject with `QuestFeatureUnavailableException`, since Google Play Services is unavailable.
+
+### 💡 Others
+
+- Permission hooks and permission type imports are now imported from `expo` instead of `expo-modules-core`, matching upstream.
+
 ## 55.1.8 — 2026-04-09
 
 _This version does not introduce any user-facing changes._

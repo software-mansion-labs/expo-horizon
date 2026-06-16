@@ -11,7 +11,7 @@ You can choose which implementation to use with the `quest` / `mobile` build var
 
 ## Prerequisites
 
-- Expo SDK 55 or later (`expo` package version 55.0.0+)
+- Expo SDK 56 or later (`expo` package version 56.0.0+)
 - (Recommended) `expo-horizon-core` package installed. See [expo-horizon-core](../expo-horizon-core/README.md) for more details
 
 ## Usage
@@ -69,6 +69,7 @@ You might need additional features like `isHorizonDevice` or `isHorizonBuild` to
 | `getLastKnownPositionAsync`                                                                       | ✅ Supported    | ✅ Supported     |                                                                                                                                                                                                                     |
 | `watchHeadingAsync` <br> `getHeadingAsync`                                                        | ✅ Supported    | ❌ Not supported | Magnetic and accelerometer sensors are not available on Quest.                                                                                                                                                      |
 | `geocodeAsync` <br> `reverseGeocodeAsync`                                                         | ✅ Supported    | ❌ Not supported | The [`Geocoder`](https://developer.android.com/reference/android/location/Geocoder) is not present on Quest.                                                                                                        |
+| `getMotionActivityAsync` <br> `watchMotionActivityAsync`                                          | ✅ Supported    | ❌ Not supported | Activity recognition relies on Google Play Services, which is not available on Quest. Calls reject with `QuestFeatureUnavailableException`.                                                                         |
 | `startGeofencingAsync` <br> `stopGeofencingAsync` <br> `hasStartedGeofencingAsync`                | ✅ Supported    | ❌ Not supported | Meta Horizon Store doesn't support `ACCESS_BACKGROUND_LOCATION` Android permission.                                                                                                                                 |
 | `startLocationUpdatesAsync` <br> `stopLocationUpdatesAsync` <br> `hasStartedLocationUpdatesAsync` | ✅ Supported    | ❌ Not supported | Meta Horizon Store doesn't support `ACCESS_BACKGROUND_LOCATION` Android permission.                                                                                                                                 |
 
@@ -78,6 +79,7 @@ Our goal is to align the version numbers of `expo-horizon-location` and `expo-lo
 
 | `expo-horizon-location` | `expo-location` | Expo SDK Version |
 | ----------------------- | --------------- | ---------------- |
+| 56.0.0                  | 56.0.18         | 56               |
 | 55.0.1                  | 55.1.8          | 55               |
 | 55.0.0                  | 55.1.2          | 55               |
 | 0.0.4-0.0.5             | 18.1.17         | 54               |

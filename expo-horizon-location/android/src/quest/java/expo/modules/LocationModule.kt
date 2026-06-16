@@ -89,7 +89,7 @@ class LocationModule : Module(), LifecycleEventListener, ActivityEventListener {
       Utilities.isHorizonDevice()
     }
 
-    Events(HEADING_EVENT_NAME, LOCATION_EVENT_NAME, LOCATION_ERROR_EVENT_NAME)
+    Events(HEADING_EVENT_NAME, LOCATION_EVENT_NAME, LOCATION_ERROR_EVENT_NAME, MOTION_ACTIVITY_EVENT_NAME)
 
     // Deprecated
     AsyncFunction("requestPermissionsAsync") Coroutine { ->
@@ -156,6 +156,35 @@ class LocationModule : Module(), LifecycleEventListener, ActivityEventListener {
     }
 
     AsyncFunction("watchDeviceHeading") { _: Int, promise: Promise ->
+      if (Utilities.isHorizonDevice()) {
+        promise.reject(QuestFeatureUnavailableException())
+        return@AsyncFunction
+      }
+      promise.reject(QuestBuildVariantException())
+      return@AsyncFunction
+    }
+
+    // Motion activity relies on Google Play Services activity recognition, which is
+    // unavailable on Horizon OS. Reject with the same pattern used for heading.
+    AsyncFunction("watchMotionActivityImplAsync") { _: Int, promise: Promise ->
+      if (Utilities.isHorizonDevice()) {
+        promise.reject(QuestFeatureUnavailableException())
+        return@AsyncFunction
+      }
+      promise.reject(QuestBuildVariantException())
+      return@AsyncFunction
+    }
+
+    AsyncFunction("getMotionActivityPermissionsAsync") { promise: Promise ->
+      if (Utilities.isHorizonDevice()) {
+        promise.reject(QuestFeatureUnavailableException())
+        return@AsyncFunction
+      }
+      promise.reject(QuestBuildVariantException())
+      return@AsyncFunction
+    }
+
+    AsyncFunction("requestMotionActivityPermissionsAsync") { promise: Promise ->
       if (Utilities.isHorizonDevice()) {
         promise.reject(QuestFeatureUnavailableException())
         return@AsyncFunction
@@ -673,6 +702,8 @@ class LocationModule : Module(), LifecycleEventListener, ActivityEventListener {
     private const val LOCATION_EVENT_NAME = "Expo.locationChanged"
     private const val HEADING_EVENT_NAME = "Expo.headingChanged"
     private const val LOCATION_ERROR_EVENT_NAME = "Expo.locationError"
+    // Declared so the shared JS can subscribe; Horizon never emits this event.
+    private const val MOTION_ACTIVITY_EVENT_NAME = "Expo.motionActivityChanged"
     private const val CHECK_SETTINGS_REQUEST_CODE = 42
 
     const val ACCURACY_LOWEST = 1
