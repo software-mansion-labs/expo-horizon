@@ -146,8 +146,11 @@ const withLocation = (config, { locationAlwaysAndWhenInUsePermission, locationAl
             'android.permission.ACCESS_BACKGROUND_LOCATION',
         enableAndroidForegroundService && 'android.permission.FOREGROUND_SERVICE',
         enableAndroidForegroundService && 'android.permission.FOREGROUND_SERVICE_LOCATION',
-        isAndroidMotionActivityEnabled && 'android.permission.ACTIVITY_RECOGNITION',
-        isAndroidMotionActivityEnabled && 'com.google.android.gms.permission.ACTIVITY_RECOGNITION',
+        // ACTIVITY_RECOGNITION is prohibited on the Meta Horizon Store, so never add it on Horizon.
+        !useHorizon && isAndroidMotionActivityEnabled && 'android.permission.ACTIVITY_RECOGNITION',
+        !useHorizon &&
+            isAndroidMotionActivityEnabled &&
+            'com.google.android.gms.permission.ACTIVITY_RECOGNITION',
     ].filter(Boolean));
 };
 exports.default = (0, config_plugins_1.createRunOncePlugin)(withLocation, pkg.name, pkg.version);

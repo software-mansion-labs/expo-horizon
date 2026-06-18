@@ -1,6 +1,6 @@
 # expo-horizon-notifications
 
-![expo-horizon-location](https://img.shields.io/npm/v/expo-horizon-location.svg)
+![expo-horizon-notifications](https://img.shields.io/npm/v/expo-horizon-notifications.svg)
 
 A fork of [`expo-notifications`](https://github.com/expo/expo/tree/main/packages/expo-notifications) that provides two implementations:
 

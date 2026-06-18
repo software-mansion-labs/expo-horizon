@@ -53,7 +53,7 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 import kotlin.math.abs
 
-class LocationModule : Module(), LifecycleEventListener, ActivityEventListener {
+class LocationModule : Module(), LifecycleEventListener, ActivityEventListener, SensorEventListener {
   private var mGeofield: GeomagneticField? = null
   private val mLocationCallbacks = HashMap<Int, LocationListener>()
   private val mLocationRequests = HashMap<Int, LocationRequest>()
@@ -61,6 +61,10 @@ class LocationModule : Module(), LifecycleEventListener, ActivityEventListener {
   private lateinit var mContext: Context
   private lateinit var mUIManager: UIManager
   private lateinit var mLocationManager: LocationManager
+
+  private var mSensorManager: SensorManager? = null
+  // true when heading falls back to the rotation-vector sensor (no magnetometer present)
+  private var mUsesRotationVector = false
 
   private var mGravity: FloatArray = FloatArray(9)
   private var mGeomagnetic: FloatArray = FloatArray(9)
@@ -83,6 +87,7 @@ class LocationModule : Module(), LifecycleEventListener, ActivityEventListener {
       mUIManager = appContext.legacyModule<UIManager>() ?: throw MissingUIManagerException()
       mLocationManager = mContext.getSystemService(Context.LOCATION_SERVICE) as? LocationManager
         ?: throw LocationManagerUnavailable()
+      mSensorManager = mContext.getSystemService(Context.SENSOR_SERVICE) as? SensorManager
     }
 
     Constant("isHorizon") {
@@ -155,17 +160,13 @@ class LocationModule : Module(), LifecycleEventListener, ActivityEventListener {
       return@AsyncFunction getProviderStatus()
     }
 
-    AsyncFunction("watchDeviceHeading") { _: Int, promise: Promise ->
-      if (Utilities.isHorizonDevice()) {
-        promise.reject(QuestFeatureUnavailableException())
-        return@AsyncFunction
-      }
-      promise.reject(QuestBuildVariantException())
-      return@AsyncFunction
+    // Heading uses orientation sensors (no Android permission required).
+    AsyncFunction("watchDeviceHeading") { watchId: Int ->
+      return@AsyncFunction startHeadingUpdate(watchId)
     }
 
-    // Motion activity relies on Google Play Services activity recognition, which is
-    // unavailable on Horizon OS. Reject with the same pattern used for heading.
+    // ACTIVITY_RECOGNITION is prohibited on the Meta Horizon Store and has no Play Services
+    // backing on Horizon, so motion activity is permanently stubbed.
     AsyncFunction("watchMotionActivityImplAsync") { _: Int, promise: Promise ->
       if (Utilities.isHorizonDevice()) {
         promise.reject(QuestFeatureUnavailableException())
@@ -175,22 +176,13 @@ class LocationModule : Module(), LifecycleEventListener, ActivityEventListener {
       return@AsyncFunction
     }
 
-    AsyncFunction("getMotionActivityPermissionsAsync") { promise: Promise ->
-      if (Utilities.isHorizonDevice()) {
-        promise.reject(QuestFeatureUnavailableException())
-        return@AsyncFunction
-      }
-      promise.reject(QuestBuildVariantException())
-      return@AsyncFunction
+    // Resolve as denied instead of throwing so the JS permission hooks degrade gracefully.
+    AsyncFunction("getMotionActivityPermissionsAsync") {
+      return@AsyncFunction motionActivityUnavailablePermissions()
     }
 
-    AsyncFunction("requestMotionActivityPermissionsAsync") { promise: Promise ->
-      if (Utilities.isHorizonDevice()) {
-        promise.reject(QuestFeatureUnavailableException())
-        return@AsyncFunction
-      }
-      promise.reject(QuestBuildVariantException())
-      return@AsyncFunction
+    AsyncFunction("requestMotionActivityPermissionsAsync") {
+      return@AsyncFunction motionActivityUnavailablePermissions()
     }
 
     AsyncFunction("watchPositionImplAsync") { watchId: Int, options: LocationOptions, promise: Promise ->
@@ -228,8 +220,8 @@ class LocationModule : Module(), LifecycleEventListener, ActivityEventListener {
       }
 
       // Check if we want to stop watching location or compass
-      if (watchId == mHeadingId) {
-        throw QuestFeatureUnavailableException()
+      if (mHeadingId != 0 && watchId == mHeadingId) {
+        destroyHeadingWatch()
       } else {
         removeLocationUpdatesForRequest(watchId)
       }
@@ -635,6 +627,150 @@ class LocationModule : Module(), LifecycleEventListener, ActivityEventListener {
     throw QuestBuildVariantException()
   }
 
+  //region heading
+  /**
+   * Prefers magnetometer + accelerometer (magnetic and, with a location fix, true north); falls back
+   * to the fused rotation-vector sensor when there is no magnetometer (common on Quest); throws
+   * [QuestFeatureUnavailableException] when neither is available.
+   */
+  private fun startHeadingUpdate(watchId: Int) {
+    val sensorManager = mSensorManager ?: throw QuestFeatureUnavailableException()
+    mHeadingId = watchId
+
+    // Best-effort true-north correction; magnetic heading still works without a location fix.
+    updateGeomagneticField()
+
+    val magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
+    val accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+    if (magnetometer != null && accelerometer != null) {
+      mUsesRotationVector = false
+      sensorManager.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_NORMAL)
+      sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL)
+      return
+    }
+
+    val rotationVector = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)
+      ?: sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR)
+    if (rotationVector != null) {
+      mUsesRotationVector = true
+      sensorManager.registerListener(this, rotationVector, SensorManager.SENSOR_DELAY_NORMAL)
+      return
+    }
+
+    mHeadingId = 0
+    throw QuestFeatureUnavailableException()
+  }
+
+  /**
+   * Refreshes the [GeomagneticField] used to convert magnetic heading to true north. Requires a
+   * foreground location permission and a last-known location; otherwise true heading stays -1.
+   */
+  private fun updateGeomagneticField() {
+    if (isMissingForegroundPermissions()) {
+      return
+    }
+    try {
+      val lastLocation = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+        ?: mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+      if (lastLocation != null) {
+        mGeofield = GeomagneticField(
+          lastLocation.latitude.toFloat(),
+          lastLocation.longitude.toFloat(),
+          lastLocation.altitude.toFloat(),
+          System.currentTimeMillis()
+        )
+      }
+    } catch (e: SecurityException) {
+      // Permission was revoked between the check and the read; leave true heading at -1.
+    }
+  }
+
+  override fun onSensorChanged(event: SensorEvent?) {
+    event ?: return
+
+    if (mUsesRotationVector) {
+      if (event.sensor.type == Sensor.TYPE_ROTATION_VECTOR || event.sensor.type == Sensor.TYPE_GAME_ROTATION_VECTOR) {
+        val rotationMatrix = FloatArray(9)
+        SensorManager.getRotationMatrixFromVector(rotationMatrix, event.values)
+        val orientation = FloatArray(3)
+        SensorManager.getOrientation(rotationMatrix, orientation)
+        sendHeadingUpdate(orientation[0])
+      }
+      return
+    }
+
+    when (event.sensor.type) {
+      Sensor.TYPE_ACCELEROMETER -> mGravity = event.values
+      Sensor.TYPE_MAGNETIC_FIELD -> mGeomagnetic = event.values
+    }
+    val rotationMatrix = FloatArray(9)
+    val inclinationMatrix = FloatArray(9)
+    if (SensorManager.getRotationMatrix(rotationMatrix, inclinationMatrix, mGravity, mGeomagnetic)) {
+      val orientation = FloatArray(3)
+      SensorManager.getOrientation(rotationMatrix, orientation)
+      sendHeadingUpdate(orientation[0])
+    }
+  }
+
+  override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+    mAccuracy = accuracy
+  }
+
+  /** Emits a throttled heading event. [azimuth] is in radians. */
+  private fun sendHeadingUpdate(azimuth: Float) {
+    if (abs(azimuth - mLastAzimuth) > DEGREE_DELTA && System.currentTimeMillis() - mLastUpdate > TIME_DELTA) {
+      mLastAzimuth = azimuth
+      mLastUpdate = System.currentTimeMillis()
+      val magneticNorth = calcMagNorth(azimuth)
+      val trueNorth = calcTrueNorth(magneticNorth)
+
+      val response = HeadingEventResponse(
+        watchId = mHeadingId,
+        heading = Heading(
+          trueHeading = trueNorth,
+          magHeading = magneticNorth,
+          accuracy = mAccuracy
+        )
+      )
+      sendEvent(HEADING_EVENT_NAME, response.toBundle())
+    }
+  }
+
+  private fun calcMagNorth(azimuth: Float): Float {
+    val azimuthDeg = Math.toDegrees(azimuth.toDouble()).toFloat()
+    return (azimuthDeg + 360) % 360
+  }
+
+  private fun calcTrueNorth(magNorth: Float): Float {
+    // Needs a geomagnetic field (and therefore a location fix) to derive declination.
+    val geofield = mGeofield.takeIf { !isMissingForegroundPermissions() } ?: return -1f
+    return (magNorth + geofield.declination) % 360
+  }
+
+  private fun stopHeadingWatch() {
+    mSensorManager?.unregisterListener(this)
+  }
+
+  private fun destroyHeadingWatch() {
+    stopHeadingWatch()
+    mGravity = FloatArray(9)
+    mGeomagnetic = FloatArray(9)
+    mGeofield = null
+    mHeadingId = 0
+    mLastAzimuth = 0f
+    mAccuracy = 0
+    mUsesRotationVector = false
+  }
+  //endregion
+
+  private fun motionActivityUnavailablePermissions() = PermissionRequestResponse(
+    canAskAgain = false,
+    expires = "never",
+    granted = false,
+    status = "denied",
+    android = null
+  )
+
   //region private methods
   /**
    * Checks whether all required permissions have been granted by the user.
@@ -715,18 +851,30 @@ class LocationModule : Module(), LifecycleEventListener, ActivityEventListener {
 
     const val GEOFENCING_EVENT_ENTER = 1
     const val GEOFENCING_EVENT_EXIT = 2
+
+    const val DEGREE_DELTA = 0.0355 // in radians, about 2 degrees
+    const val TIME_DELTA = 50f // in milliseconds
   }
 
   override fun onHostResume() {
     startWatching()
+    if (mHeadingId != 0) {
+      try {
+        startHeadingUpdate(mHeadingId)
+      } catch (e: QuestFeatureUnavailableException) {
+        // Sensor no longer available.
+      }
+    }
   }
 
   override fun onHostPause() {
     stopWatching()
+    stopHeadingWatch()
   }
 
   override fun onHostDestroy() {
     stopWatching()
+    stopHeadingWatch()
   }
 
   override fun onActivityResult(activity: Activity?, requestCode: Int, resultCode: Int, data: Intent?) {

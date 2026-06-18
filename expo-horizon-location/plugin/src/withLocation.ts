@@ -195,6 +195,7 @@ export type Props = {
   /**
    * Whether to enable the `ACTIVITY_RECOGNITION` and `com.google.android.gms.permission.ACTIVITY_RECOGNITION`
    * permissions required for motion activity tracking via `getMotionActivityAsync` and `watchMotionActivityAsync`.
+   * Ignored on Horizon (Meta Quest) builds — `ACTIVITY_RECOGNITION` is prohibited on the Meta Horizon Store.
    * @default false
    * @platform android
    */
@@ -265,8 +266,11 @@ const withLocation: ConfigPlugin<Props | void> = (
         'android.permission.ACCESS_BACKGROUND_LOCATION',
       enableAndroidForegroundService && 'android.permission.FOREGROUND_SERVICE',
       enableAndroidForegroundService && 'android.permission.FOREGROUND_SERVICE_LOCATION',
-      isAndroidMotionActivityEnabled && 'android.permission.ACTIVITY_RECOGNITION',
-      isAndroidMotionActivityEnabled && 'com.google.android.gms.permission.ACTIVITY_RECOGNITION',
+      // ACTIVITY_RECOGNITION is prohibited on the Meta Horizon Store, so never add it on Horizon.
+      !useHorizon && isAndroidMotionActivityEnabled && 'android.permission.ACTIVITY_RECOGNITION',
+      !useHorizon &&
+        isAndroidMotionActivityEnabled &&
+        'com.google.android.gms.permission.ACTIVITY_RECOGNITION',
     ].filter(Boolean) as string[]
   );
 };

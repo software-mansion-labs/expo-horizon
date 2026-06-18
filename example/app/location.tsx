@@ -76,6 +76,12 @@ export default function LocationScreen() {
     useState<Location.LocationSubscription | null>(null);
   const [headingSubscription, setHeadingSubscription] =
     useState<Location.LocationSubscription | null>(null);
+  const [motionActivity, setMotionActivity] = useState<Location.MotionActivityObject | null>(null);
+  const [motionPermissions, setMotionPermissions] = useState<Awaited<
+    ReturnType<typeof Location.getMotionActivityPermissionsAsync>
+  > | null>(null);
+  const [motionSubscription, setMotionSubscription] =
+    useState<Location.LocationSubscription | null>(null);
 
   // Loading states for async operations
   const [loadingStates, setLoadingStates] = useState<{
@@ -347,6 +353,75 @@ export default function LocationScreen() {
       Alert.alert('Heading Watching', 'Stopped watching heading updates');
     }
   }, [headingSubscription]);
+
+  // Motion activity (new in SDK 56). On Quest the permission resolves denied and the watch rejects.
+  const getMotionPermissions = useCallback(async () => {
+    try {
+      setLoading('getMotionPermissions', true);
+      const result = await Location.getMotionActivityPermissionsAsync();
+      setMotionPermissions(result);
+      Alert.alert('Motion Activity Permissions', `Status: ${result.status}`);
+    } catch (error) {
+      Alert.alert('Error', `Failed to get motion activity permissions: ${error}`);
+    } finally {
+      setLoading('getMotionPermissions', false);
+    }
+  }, []);
+
+  const requestMotionPermissions = useCallback(async () => {
+    try {
+      setLoading('requestMotionPermissions', true);
+      const result = await Location.requestMotionActivityPermissionsAsync();
+      setMotionPermissions(result);
+      Alert.alert('Motion Activity Permissions', `Status: ${result.status}`);
+    } catch (error) {
+      Alert.alert('Error', `Failed to request motion activity permissions: ${error}`);
+    } finally {
+      setLoading('requestMotionPermissions', false);
+    }
+  }, []);
+
+  const getMotionActivity = useCallback(async () => {
+    try {
+      setLoading('getMotionActivity', true);
+      const activity = await Location.getMotionActivityAsync();
+      setMotionActivity(activity);
+      Alert.alert('Motion Activity', JSON.stringify(activity.activities, null, 2));
+    } catch (error) {
+      Alert.alert('Error', `Failed to get motion activity: ${error}`);
+    } finally {
+      setLoading('getMotionActivity', false);
+    }
+  }, []);
+
+  const startMotionActivityWatching = useCallback(async () => {
+    try {
+      setLoading('startMotionActivityWatching', true);
+      const subscription = await Location.watchMotionActivityAsync(
+        (newActivity: Location.MotionActivityObject) => {
+          setMotionActivity(newActivity);
+          console.log('Motion activity update:', newActivity);
+        },
+        (error: string) => {
+          console.error('Motion activity watch error:', error);
+        }
+      );
+      setMotionSubscription(subscription);
+      Alert.alert('Motion Activity Watching', 'Started watching motion activity updates');
+    } catch (error) {
+      Alert.alert('Error', `Failed to start motion activity watching: ${error}`);
+    } finally {
+      setLoading('startMotionActivityWatching', false);
+    }
+  }, []);
+
+  const stopMotionActivityWatching = useCallback(() => {
+    if (motionSubscription) {
+      motionSubscription.remove();
+      setMotionSubscription(null);
+      Alert.alert('Motion Activity Watching', 'Stopped watching motion activity updates');
+    }
+  }, [motionSubscription]);
 
   const geocodeAddress = useCallback(async () => {
     try {
@@ -632,6 +707,46 @@ export default function LocationScreen() {
             Magnetic Heading: {heading?.magHeading || 'Unknown'}°
           </Text>
           <Text style={GlobalStyles.dataText}>Accuracy: {heading?.accuracy || 'Unknown'}</Text>
+        </Section>
+
+        <Section title="Motion Activity">
+          <TestButton
+            title="Get Motion Permissions"
+            onPress={getMotionPermissions}
+            isButtonLoading={isLoading('getMotionPermissions')}
+          />
+          <TestButton
+            title="Request Motion Permissions"
+            onPress={requestMotionPermissions}
+            isButtonLoading={isLoading('requestMotionPermissions')}
+          />
+          <TestButton
+            title="Get Motion Activity"
+            onPress={getMotionActivity}
+            isButtonLoading={isLoading('getMotionActivity')}
+          />
+          <TestButton
+            title="Start Motion Activity Watching"
+            onPress={startMotionActivityWatching}
+            isButtonLoading={isLoading('startMotionActivityWatching')}
+          />
+          <TestButton
+            title="Stop Motion Activity Watching"
+            onPress={stopMotionActivityWatching}
+            color="#FF3B30"
+            isButtonLoading={isLoading('stopMotionActivityWatching')}
+          />
+          <SectionTitle title="Current Motion Activity" />
+          <StatusText label="Motion Permissions" value={motionPermissions?.status} />
+          <Text style={GlobalStyles.dataText}>
+            Activities: {motionActivity ? JSON.stringify(motionActivity.activities) : 'Unknown'}
+          </Text>
+          <Text style={GlobalStyles.dataText}>
+            Timestamp:{' '}
+            {motionActivity?.timestamp
+              ? new Date(motionActivity.timestamp).toLocaleString()
+              : 'Unknown'}
+          </Text>
         </Section>
 
         <Section title="Geocoding">

@@ -36,6 +36,7 @@ module.exports = () => ({
         {
           isAndroidBackgroundLocationEnabled: true,
           isAndroidForegroundServiceEnabled: true,
+          // isAndroidMotionActivityEnabled omitted: ACTIVITY_RECOGNITION is prohibited on the Horizon Store.
           locationAlwaysAndWhenInUsePermission:
             'Allow $(PRODUCT_NAME) to access your location for background tracking',
           locationAlwaysPermission:
@@ -56,7 +57,7 @@ module.exports = () => ({
         },
       ],
       'expo-task-manager',
-      "expo-status-bar"
+      'expo-status-bar',
     ],
   },
 });

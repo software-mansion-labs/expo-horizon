@@ -67,6 +67,7 @@ export type Props = {
     /**
      * Whether to enable the `ACTIVITY_RECOGNITION` and `com.google.android.gms.permission.ACTIVITY_RECOGNITION`
      * permissions required for motion activity tracking via `getMotionActivityAsync` and `watchMotionActivityAsync`.
+     * Ignored on Horizon (Meta Quest) builds — `ACTIVITY_RECOGNITION` is prohibited on the Meta Horizon Store.
      * @default false
      * @platform android
      */
