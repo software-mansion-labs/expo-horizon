@@ -4,13 +4,6 @@ import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.hardware.GeomagneticField
-import android.hardware.Sensor
-import android.hardware.SensorEvent
-import android.hardware.SensorEventListener
-import android.hardware.SensorManager
-import android.location.Geocoder
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
@@ -20,7 +13,6 @@ import android.os.Bundle
 import android.os.Looper
 import android.util.Log
 import androidx.annotation.ChecksSdkIntAtLeast
-import androidx.core.app.ActivityCompat
 import androidx.core.location.LocationManagerCompat
 import androidx.core.os.bundleOf
 import expo.modules.core.interfaces.ActivityEventListener
@@ -34,8 +26,6 @@ import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 import expo.modules.location.records.GeocodeResponse
 import expo.modules.location.records.GeofencingOptions
-import expo.modules.location.records.Heading
-import expo.modules.location.records.HeadingEventResponse
 import expo.modules.location.records.LocationLastKnownOptions
 import expo.modules.location.records.LocationOptions
 import expo.modules.location.records.LocationProviderStatus
@@ -47,32 +37,17 @@ import expo.modules.location.records.ReverseGeocodeLocation
 import expo.modules.location.records.ReverseGeocodeResponse
 import expo.modules.location.taskConsumers.GeofencingTaskConsumer
 import expo.modules.location.taskConsumers.LocationTaskConsumer
-import java.util.Locale
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
-import kotlin.math.abs
 
-class LocationModule : Module(), LifecycleEventListener, ActivityEventListener, SensorEventListener {
-  private var mGeofield: GeomagneticField? = null
+class LocationModule : Module(), LifecycleEventListener, ActivityEventListener {
   private val mLocationCallbacks = HashMap<Int, LocationListener>()
   private val mLocationRequests = HashMap<Int, LocationRequest>()
   private var mPendingLocationRequests = ArrayList<LocationActivityResultListener>()
   private lateinit var mContext: Context
   private lateinit var mUIManager: UIManager
   private lateinit var mLocationManager: LocationManager
-
-  private var mSensorManager: SensorManager? = null
-  // true when heading falls back to the rotation-vector sensor (no magnetometer present)
-  private var mUsesRotationVector = false
-
-  private var mGravity: FloatArray = FloatArray(9)
-  private var mGeomagnetic: FloatArray = FloatArray(9)
-  private var mHeadingId = 0
-  private var mLastAzimuth = 0f
-  private var mAccuracy = 0
-  private var mLastUpdate: Long = 0
-  private var mGeocoderPaused = false
 
   private val mTaskManager: TaskManagerInterface by lazy {
     return@lazy appContext.legacyModule<TaskManagerInterface>()
@@ -87,7 +62,6 @@ class LocationModule : Module(), LifecycleEventListener, ActivityEventListener, 
       mUIManager = appContext.legacyModule<UIManager>() ?: throw MissingUIManagerException()
       mLocationManager = mContext.getSystemService(Context.LOCATION_SERVICE) as? LocationManager
         ?: throw LocationManagerUnavailable()
-      mSensorManager = mContext.getSystemService(Context.SENSOR_SERVICE) as? SensorManager
     }
 
     Constant("isHorizon") {
@@ -160,9 +134,14 @@ class LocationModule : Module(), LifecycleEventListener, ActivityEventListener, 
       return@AsyncFunction getProviderStatus()
     }
 
-    // Heading uses orientation sensors (no Android permission required).
-    AsyncFunction("watchDeviceHeading") { watchId: Int ->
-      return@AsyncFunction startHeadingUpdate(watchId)
+    // Heading needs orientation sensors via Android's SensorManager, which Horizon OS does not
+    // expose to 2D panel apps (raw IMU/pose is only available through Meta's XR SDK). Stubbed.
+    AsyncFunction("watchDeviceHeading") { _: Int, promise: Promise ->
+      if (Utilities.isHorizonDevice()) {
+        promise.reject(QuestFeatureUnavailableException())
+        return@AsyncFunction
+      }
+      promise.reject(QuestBuildVariantException())
     }
 
     // ACTIVITY_RECOGNITION is prohibited on the Meta Horizon Store and has no Play Services
@@ -219,12 +198,7 @@ class LocationModule : Module(), LifecycleEventListener, ActivityEventListener, 
         throw LocationUnauthorizedException()
       }
 
-      // Check if we want to stop watching location or compass
-      if (mHeadingId != 0 && watchId == mHeadingId) {
-        destroyHeadingWatch()
-      } else {
-        removeLocationUpdatesForRequest(watchId)
-      }
+      removeLocationUpdatesForRequest(watchId)
     }
 
     AsyncFunction("geocodeAsync") Coroutine { address: String ->
@@ -627,142 +601,6 @@ class LocationModule : Module(), LifecycleEventListener, ActivityEventListener, 
     throw QuestBuildVariantException()
   }
 
-  //region heading
-  /**
-   * Prefers magnetometer + accelerometer (magnetic and, with a location fix, true north); falls back
-   * to the fused rotation-vector sensor when there is no magnetometer (common on Quest); throws
-   * [QuestFeatureUnavailableException] when neither is available.
-   */
-  private fun startHeadingUpdate(watchId: Int) {
-    val sensorManager = mSensorManager ?: throw QuestFeatureUnavailableException()
-    mHeadingId = watchId
-
-    // Best-effort true-north correction; magnetic heading still works without a location fix.
-    updateGeomagneticField()
-
-    val magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
-    val accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
-    if (magnetometer != null && accelerometer != null) {
-      mUsesRotationVector = false
-      sensorManager.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_NORMAL)
-      sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL)
-      return
-    }
-
-    val rotationVector = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)
-      ?: sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR)
-    if (rotationVector != null) {
-      mUsesRotationVector = true
-      sensorManager.registerListener(this, rotationVector, SensorManager.SENSOR_DELAY_NORMAL)
-      return
-    }
-
-    mHeadingId = 0
-    throw QuestFeatureUnavailableException()
-  }
-
-  /**
-   * Refreshes the [GeomagneticField] used to convert magnetic heading to true north. Requires a
-   * foreground location permission and a last-known location; otherwise true heading stays -1.
-   */
-  private fun updateGeomagneticField() {
-    if (isMissingForegroundPermissions()) {
-      return
-    }
-    try {
-      val lastLocation = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
-        ?: mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-      if (lastLocation != null) {
-        mGeofield = GeomagneticField(
-          lastLocation.latitude.toFloat(),
-          lastLocation.longitude.toFloat(),
-          lastLocation.altitude.toFloat(),
-          System.currentTimeMillis()
-        )
-      }
-    } catch (e: SecurityException) {
-      // Permission was revoked between the check and the read; leave true heading at -1.
-    }
-  }
-
-  override fun onSensorChanged(event: SensorEvent?) {
-    event ?: return
-
-    if (mUsesRotationVector) {
-      if (event.sensor.type == Sensor.TYPE_ROTATION_VECTOR || event.sensor.type == Sensor.TYPE_GAME_ROTATION_VECTOR) {
-        val rotationMatrix = FloatArray(9)
-        SensorManager.getRotationMatrixFromVector(rotationMatrix, event.values)
-        val orientation = FloatArray(3)
-        SensorManager.getOrientation(rotationMatrix, orientation)
-        sendHeadingUpdate(orientation[0])
-      }
-      return
-    }
-
-    when (event.sensor.type) {
-      Sensor.TYPE_ACCELEROMETER -> mGravity = event.values
-      Sensor.TYPE_MAGNETIC_FIELD -> mGeomagnetic = event.values
-    }
-    val rotationMatrix = FloatArray(9)
-    val inclinationMatrix = FloatArray(9)
-    if (SensorManager.getRotationMatrix(rotationMatrix, inclinationMatrix, mGravity, mGeomagnetic)) {
-      val orientation = FloatArray(3)
-      SensorManager.getOrientation(rotationMatrix, orientation)
-      sendHeadingUpdate(orientation[0])
-    }
-  }
-
-  override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-    mAccuracy = accuracy
-  }
-
-  /** Emits a throttled heading event. [azimuth] is in radians. */
-  private fun sendHeadingUpdate(azimuth: Float) {
-    if (abs(azimuth - mLastAzimuth) > DEGREE_DELTA && System.currentTimeMillis() - mLastUpdate > TIME_DELTA) {
-      mLastAzimuth = azimuth
-      mLastUpdate = System.currentTimeMillis()
-      val magneticNorth = calcMagNorth(azimuth)
-      val trueNorth = calcTrueNorth(magneticNorth)
-
-      val response = HeadingEventResponse(
-        watchId = mHeadingId,
-        heading = Heading(
-          trueHeading = trueNorth,
-          magHeading = magneticNorth,
-          accuracy = mAccuracy
-        )
-      )
-      sendEvent(HEADING_EVENT_NAME, response.toBundle())
-    }
-  }
-
-  private fun calcMagNorth(azimuth: Float): Float {
-    val azimuthDeg = Math.toDegrees(azimuth.toDouble()).toFloat()
-    return (azimuthDeg + 360) % 360
-  }
-
-  private fun calcTrueNorth(magNorth: Float): Float {
-    // Needs a geomagnetic field (and therefore a location fix) to derive declination.
-    val geofield = mGeofield.takeIf { !isMissingForegroundPermissions() } ?: return -1f
-    return (magNorth + geofield.declination) % 360
-  }
-
-  private fun stopHeadingWatch() {
-    mSensorManager?.unregisterListener(this)
-  }
-
-  private fun destroyHeadingWatch() {
-    stopHeadingWatch()
-    mGravity = FloatArray(9)
-    mGeomagnetic = FloatArray(9)
-    mGeofield = null
-    mHeadingId = 0
-    mLastAzimuth = 0f
-    mAccuracy = 0
-    mUsesRotationVector = false
-  }
-  //endregion
-
   private fun motionActivityUnavailablePermissions() = PermissionRequestResponse(
     canAskAgain = false,
     expires = "never",
@@ -851,30 +689,18 @@ class LocationModule : Module(), LifecycleEventListener, ActivityEventListener, 
 
     const val GEOFENCING_EVENT_ENTER = 1
     const val GEOFENCING_EVENT_EXIT = 2
-
-    const val DEGREE_DELTA = 0.0355 // in radians, about 2 degrees
-    const val TIME_DELTA = 50f // in milliseconds
   }
 
   override fun onHostResume() {
     startWatching()
-    if (mHeadingId != 0) {
-      try {
-        startHeadingUpdate(mHeadingId)
-      } catch (e: QuestFeatureUnavailableException) {
-        // Sensor no longer available.
-      }
-    }
   }
 
   override fun onHostPause() {
     stopWatching()
-    stopHeadingWatch()
   }
 
   override fun onHostDestroy() {
     stopWatching()
-    stopHeadingWatch()
   }
 
   override fun onActivityResult(activity: Activity?, requestCode: Int, resultCode: Int, data: Intent?) {

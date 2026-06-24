@@ -46,18 +46,28 @@ TaskManager.defineTask<Notifications.NotificationTaskPayload>(
 const registerBackgroundTask = async () => {
   try {
     await Notifications.registerTaskAsync(BACKGROUND_NOTIFICATION_TASK);
-    console.log('Background notification task registered');
+    Alert.alert('Background Task', 'Background notification task registered.');
   } catch (error) {
     console.error('Failed to register background task:', error);
+    const message = error instanceof Error ? error.message : String(error);
+    Alert.alert('Could not register background task', message);
   }
 };
 
 const unregisterBackgroundTask = async () => {
   try {
+    // unregisterTaskAsync throws if the task was never registered, so check first.
+    const isRegistered = await TaskManager.isTaskRegisteredAsync(BACKGROUND_NOTIFICATION_TASK);
+    if (!isRegistered) {
+      Alert.alert('Background Task', 'The background notification task is not registered yet.');
+      return;
+    }
     await Notifications.unregisterTaskAsync(BACKGROUND_NOTIFICATION_TASK);
-    console.log('Background notification task unregistered');
+    Alert.alert('Background Task', 'Background notification task unregistered.');
   } catch (error) {
     console.error('Failed to unregister background task:', error);
+    const message = error instanceof Error ? error.message : String(error);
+    Alert.alert('Could not unregister background task', message);
   }
 };
 
@@ -85,7 +95,8 @@ export default function BackgroundTaskSection() {
       Alert.alert('Success', 'Counter has been reset to 0');
     } catch (error) {
       console.error('Error resetting counter:', error);
-      Alert.alert('Error', 'Failed to reset counter');
+      const message = error instanceof Error ? error.message : String(error);
+      Alert.alert('Could not reset counter', message);
     }
   };
   return (

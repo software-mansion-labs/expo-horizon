@@ -52,6 +52,17 @@ const StatusText = ({ label, value }: { label: string; value: any }) => (
     <Text style={GlobalStyles.statusValue}>{String(value)}</Text>
   </Text>
 );
+
+// Surfaces failures consistently. Meta Quest feature limitations are shown as a friendly notice
+// rather than an error, since they are expected platform behavior and not a crash.
+function notifyFailure(action: string, error: unknown) {
+  const message = error instanceof Error ? error.message : String(error);
+  if (/Meta Quest|Quest build variant/i.test(message)) {
+    Alert.alert('Not available on Meta Quest', message);
+    return;
+  }
+  Alert.alert(`Could not ${action}`, message);
+}
 export default function LocationScreen() {
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
   const [, setLastKnownLocation] = useState<Location.LocationObject | null>(null);
@@ -157,7 +168,7 @@ export default function LocationScreen() {
       setPermissions(result);
       Alert.alert('Foreground Permissions', `Status: ${result.status}`);
     } catch (error) {
-      Alert.alert('Error', `Failed to request foreground permissions: ${error}`);
+      notifyFailure('request foreground permissions', error);
     } finally {
       setLoading('requestForegroundPermissions', false);
     }
@@ -170,7 +181,7 @@ export default function LocationScreen() {
       setBackgroundPermissions(result);
       Alert.alert('Background Permissions', `Status: ${result.status}`);
     } catch (error) {
-      Alert.alert('Error', `Failed to request background permissions: ${error}`);
+      notifyFailure('request background permissions', error);
     } finally {
       setLoading('requestBackgroundPermissions', false);
     }
@@ -211,10 +222,7 @@ export default function LocationScreen() {
       );
     } catch (error) {
       console.error('Get current position error:', error);
-      Alert.alert(
-        'Error',
-        `Failed to get current position: ${error}\n\nFor Android emulator:\n1. Enable location in emulator settings\n2. Set a route in Extended Controls\n3. Start route playback`
-      );
+      notifyFailure('get current position', error);
     } finally {
       setLoading('getCurrentPosition', false);
     }
@@ -237,7 +245,7 @@ export default function LocationScreen() {
         Alert.alert('Last Known Position', 'No last known position available');
       }
     } catch (error) {
-      Alert.alert('Error', `Failed to get last known position: ${error}`);
+      notifyFailure('get last known position', error);
     } finally {
       setLoading('getLastKnownPosition', false);
     }
@@ -280,7 +288,7 @@ export default function LocationScreen() {
         },
         (error: string) => {
           console.error('Location watch error:', error);
-          Alert.alert('Location Error', `Location watch error: ${error}`);
+          notifyFailure('watch location', error);
         }
       );
       setLocationSubscription(subscription);
@@ -291,10 +299,7 @@ export default function LocationScreen() {
       );
     } catch (error) {
       console.error('Location watching error:', error);
-      Alert.alert(
-        'Error',
-        `Failed to start location watching: ${error}\n\nFor Android emulator:\n1. Enable location in emulator settings\n2. Set a route in Extended Controls\n3. Start route playback`
-      );
+      notifyFailure('start location watching', error);
     } finally {
       setLoading('startLocationWatching', false);
     }
@@ -319,7 +324,7 @@ export default function LocationScreen() {
         `True: ${headingData.trueHeading}°, Magnetic: ${headingData.magHeading}°`
       );
     } catch (error) {
-      Alert.alert('Error', `Failed to get heading: ${error}`);
+      notifyFailure('get heading', error);
     } finally {
       setLoading('getHeading', false);
     }
@@ -340,7 +345,7 @@ export default function LocationScreen() {
       setHeadingSubscription(subscription);
       Alert.alert('Heading Watching', 'Started watching heading updates');
     } catch (error) {
-      Alert.alert('Error', `Failed to start heading watching: ${error}`);
+      notifyFailure('start heading watching', error);
     } finally {
       setLoading('startHeadingWatching', false);
     }
@@ -362,7 +367,7 @@ export default function LocationScreen() {
       setMotionPermissions(result);
       Alert.alert('Motion Activity Permissions', `Status: ${result.status}`);
     } catch (error) {
-      Alert.alert('Error', `Failed to get motion activity permissions: ${error}`);
+      notifyFailure('get motion activity permissions', error);
     } finally {
       setLoading('getMotionPermissions', false);
     }
@@ -375,7 +380,7 @@ export default function LocationScreen() {
       setMotionPermissions(result);
       Alert.alert('Motion Activity Permissions', `Status: ${result.status}`);
     } catch (error) {
-      Alert.alert('Error', `Failed to request motion activity permissions: ${error}`);
+      notifyFailure('request motion activity permissions', error);
     } finally {
       setLoading('requestMotionPermissions', false);
     }
@@ -388,7 +393,7 @@ export default function LocationScreen() {
       setMotionActivity(activity);
       Alert.alert('Motion Activity', JSON.stringify(activity.activities, null, 2));
     } catch (error) {
-      Alert.alert('Error', `Failed to get motion activity: ${error}`);
+      notifyFailure('get motion activity', error);
     } finally {
       setLoading('getMotionActivity', false);
     }
@@ -409,7 +414,7 @@ export default function LocationScreen() {
       setMotionSubscription(subscription);
       Alert.alert('Motion Activity Watching', 'Started watching motion activity updates');
     } catch (error) {
-      Alert.alert('Error', `Failed to start motion activity watching: ${error}`);
+      notifyFailure('start motion activity watching', error);
     } finally {
       setLoading('startMotionActivityWatching', false);
     }
@@ -434,7 +439,7 @@ export default function LocationScreen() {
         Alert.alert('Geocoding Result', 'No locations found');
       }
     } catch (error) {
-      Alert.alert('Error', `Failed to geocode address: ${error}`);
+      notifyFailure('geocode address', error);
     } finally {
       setLoading('geocodeAddress', false);
     }
@@ -454,7 +459,7 @@ export default function LocationScreen() {
         Alert.alert('Reverse Geocoding Result', 'No addresses found');
       }
     } catch (error) {
-      Alert.alert('Error', `Failed to reverse geocode location: ${error}`);
+      notifyFailure('reverse geocode location', error);
     } finally {
       setLoading('reverseGeocodeLocation', false);
     }
@@ -464,20 +469,12 @@ export default function LocationScreen() {
     try {
       setLoading('startBackgroundLocationUpdates', true);
 
-      // Check if background location is available
-      const isAvailable = await Location.isBackgroundLocationAvailableAsync();
-      if (!isAvailable) {
-        Alert.alert('Background Location', 'Background location is not available on this device');
-        return;
-      }
-
-      // Check background permissions
-      const bgPermissions = await Location.getBackgroundPermissionsAsync();
-      if (bgPermissions.status !== 'granted') {
-        Alert.alert(
-          'Permissions Required',
-          'Background location permissions are required. Please grant them in settings.'
-        );
+      // A foreground-service task only needs foreground location permission (not background), so it
+      // registers on Android without "Allow all the time" and on Horizon where background location
+      // is prohibited.
+      const { status } = await Location.getForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permissions Required', 'Foreground location permission is required.');
         return;
       }
 
@@ -495,10 +492,7 @@ export default function LocationScreen() {
       Alert.alert('Background Location', 'Started background location updates');
     } catch (error) {
       console.error('Background location error:', error);
-      Alert.alert(
-        'Error',
-        `Failed to start background location updates: ${error}\n\nMake sure you have:\n1. Background location permissions\n2. Foreground service permissions\n3. App is not battery optimized`
-      );
+      notifyFailure('start background location updates', error);
     } finally {
       setLoading('startBackgroundLocationUpdates', false);
     }
@@ -511,7 +505,7 @@ export default function LocationScreen() {
       setLocationUpdatesActive(false);
       Alert.alert('Background Location', 'Stopped background location updates');
     } catch (error) {
-      Alert.alert('Error', `Failed to stop background location updates: ${error}`);
+      notifyFailure('stop background location updates', error);
     } finally {
       setLoading('stopBackgroundLocationUpdates', false);
     }
@@ -521,19 +515,18 @@ export default function LocationScreen() {
     try {
       setLoading('startGeofencing', true);
 
-      // Check if background location is available
-      const isAvailable = await Location.isBackgroundLocationAvailableAsync();
-      if (!isAvailable) {
-        Alert.alert('Geofencing', 'Background location is not available on this device');
+      // Geofencing requires the background location permission, which the Meta Horizon Store
+      // prohibits, so it cannot run on Quest.
+      if (ExpoHorizon.isHorizonDevice) {
+        Alert.alert('Geofencing', 'Geofencing is not supported on Meta Horizon devices.');
         return;
       }
 
-      // Check background permissions
       const bgPermissions = await Location.getBackgroundPermissionsAsync();
       if (bgPermissions.status !== 'granted') {
         Alert.alert(
           'Permissions Required',
-          'Background location permissions are required for geofencing. Please grant them in settings.'
+          'Background location permission ("Allow all the time") is required for geofencing.'
         );
         return;
       }
@@ -553,10 +546,7 @@ export default function LocationScreen() {
       Alert.alert('Geofencing', 'Started geofencing with test region');
     } catch (error) {
       console.error('Geofencing error:', error);
-      Alert.alert(
-        'Error',
-        `Failed to start geofencing: ${error}\n\nMake sure you have:\n1. Background location permissions\n2. TaskManager is properly configured\n3. App is not battery optimized`
-      );
+      notifyFailure('start geofencing', error);
     } finally {
       setLoading('startGeofencing', false);
     }
@@ -569,7 +559,7 @@ export default function LocationScreen() {
       setGeofencingActive(false);
       Alert.alert('Geofencing', 'Stopped geofencing');
     } catch (error) {
-      Alert.alert('Error', `Failed to stop geofencing: ${error}`);
+      notifyFailure('stop geofencing', error);
     } finally {
       setLoading('stopGeofencing', false);
     }
@@ -582,7 +572,7 @@ export default function LocationScreen() {
         await Location.enableNetworkProviderAsync();
         Alert.alert('Network Provider', 'Network provider enabled');
       } catch (error) {
-        Alert.alert('Error', `Failed to enable network provider: ${error}`);
+        notifyFailure('enable network provider', error);
       } finally {
         setLoading('enableNetworkProvider', false);
       }
@@ -597,7 +587,7 @@ export default function LocationScreen() {
       const hasStarted = await Location.hasStartedLocationUpdatesAsync('test-location-task');
       Alert.alert('Location Updates Status', `Active: ${hasStarted}`);
     } catch (error) {
-      Alert.alert('Error', `Failed to check location updates status: ${error}`);
+      notifyFailure('check location updates status', error);
     } finally {
       setLoading('checkLocationUpdatesStatus', false);
     }
@@ -609,7 +599,7 @@ export default function LocationScreen() {
       const hasStarted = await Location.hasStartedGeofencingAsync('test-geofencing-task');
       Alert.alert('Geofencing Status', `Active: ${hasStarted}`);
     } catch (error) {
-      Alert.alert('Error', `Failed to check geofencing status: ${error}`);
+      notifyFailure('check geofencing status', error);
     } finally {
       setLoading('checkGeofencingStatus', false);
     }

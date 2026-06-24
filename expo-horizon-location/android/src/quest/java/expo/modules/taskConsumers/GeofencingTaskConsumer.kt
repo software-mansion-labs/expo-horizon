@@ -11,7 +11,6 @@ import android.util.Log
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
-import android.location.LocationProvider
 import android.os.Looper
 import expo.modules.interfaces.taskManager.TaskConsumer
 import expo.modules.interfaces.taskManager.TaskConsumerInterface

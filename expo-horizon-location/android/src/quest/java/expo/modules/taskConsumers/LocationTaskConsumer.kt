@@ -16,7 +16,6 @@ import android.os.Looper
 import android.os.PersistableBundle
 import android.util.Log
 import android.location.LocationListener
-import android.location.LocationProvider
 import expo.modules.core.arguments.MapArguments
 import expo.modules.core.arguments.ReadableArguments
 import expo.modules.core.interfaces.LifecycleEventListener
@@ -27,7 +26,6 @@ import expo.modules.interfaces.taskManager.TaskInterface
 import expo.modules.interfaces.taskManager.TaskManagerUtilsInterface
 import expo.modules.location.AppForegroundedSingleton
 import expo.modules.location.LocationHelpers
-import expo.modules.location.LocationModule
 import expo.modules.location.LocationRequest
 import expo.modules.location.records.LocationOptions
 import expo.modules.location.records.LocationResponse
