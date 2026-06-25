@@ -58,7 +58,7 @@ jobs:
         run: yarn workspace expo-horizon-core build
 
       - name: 🚀 Publish ${{ inputs.package }}
-        uses: software-mansion/npm-package-publish@22b6e632b4310c5c061a047bccc99d0cea88d2bb
+        uses: software-mansion/npm-package-publish@d347fc2b353b9ffc6e80ac7a149a49171274d1a4
         with:
           package-name: ${{ inputs.package }}
           package-json-path: '${{ inputs.package }}/package.json'
