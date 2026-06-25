@@ -10,6 +10,17 @@
 
 ### 💡 Others
 
+## 56.0.0 — 2026-06-16
+
+### 🎉 New features
+
+- Synced with upstream `expo-notifications@56.0.18` (Expo SDK 56). The `mobile` build variant and iOS are now 1:1 with upstream.
+
+### 💡 Others
+
+- Permission hooks and permission type imports are now imported from `expo` instead of `expo-modules-core`, matching upstream.
+- [android] Apply bundled `proguard-rules.pro` via `consumerProguardFiles`, matching upstream.
+
 ## 55.0.19 — 2026-04-13
 
 _This version does not introduce any user-facing changes._

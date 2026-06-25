@@ -45,10 +45,15 @@ export default function NotificationsScreen() {
   };
 
   const getPushToken = async () => {
-    const result = await Notifications.getDevicePushTokenAsync();
-    const stringifiedResult = JSON.stringify(result, null, 2);
-    Alert.alert('Push Token', stringifiedResult);
-    console.log(stringifiedResult);
+    try {
+      const result = await Notifications.getDevicePushTokenAsync();
+      const stringifiedResult = JSON.stringify(result, null, 2);
+      Alert.alert('Push Token', stringifiedResult);
+      console.log(stringifiedResult);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      Alert.alert('Could not get push token', message);
+    }
   };
 
   return (

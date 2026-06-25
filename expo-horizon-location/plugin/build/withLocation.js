@@ -12,6 +12,8 @@ const path_1 = require("path");
 const withHorizon_1 = __importDefault(require("./withHorizon"));
 const pkg = require('../../package.json');
 const LOCATION_USAGE = 'Allow $(PRODUCT_NAME) to access your location';
+const MOTION_USAGE = 'Allow $(PRODUCT_NAME) to detect your current motion activity';
+// Horizon (Meta Quest) support is opt-in via the EXPO_HORIZON env flag.
 const useHorizon = !!process.env.EXPO_HORIZON;
 exports.ANDROID_RES_PATH = 'android/app/src/main/res/';
 exports.dpiValues = {
@@ -106,23 +108,25 @@ function removeForegroundServiceIconImageFiles(projectRoot) {
         }
     });
 }
-const withLocation = (config, { locationAlwaysAndWhenInUsePermission, locationAlwaysPermission, locationWhenInUsePermission, isIosBackgroundLocationEnabled, isAndroidBackgroundLocationEnabled, isAndroidForegroundServiceEnabled, androidForegroundServiceIcon, } = {}) => {
-    if (isIosBackgroundLocationEnabled) {
-        config = withBackgroundLocation(config);
-    }
+const withLocation = (config, { locationAlwaysAndWhenInUsePermission, locationAlwaysPermission, locationWhenInUsePermission, motionUsagePermission, isIosBackgroundLocationEnabled, isAndroidBackgroundLocationEnabled, isAndroidForegroundServiceEnabled, isAndroidMotionActivityEnabled, androidForegroundServiceIcon, } = {}) => {
     // Add Horizon support
     if (useHorizon) {
         config = (0, withHorizon_1.default)(config);
+    }
+    if (isIosBackgroundLocationEnabled) {
+        config = withBackgroundLocation(config);
     }
     config = (0, exports.withForegroundServiceIcon)(config, { icon: androidForegroundServiceIcon ?? null });
     config_plugins_1.IOSConfig.Permissions.createPermissionsPlugin({
         NSLocationAlwaysAndWhenInUseUsageDescription: LOCATION_USAGE,
         NSLocationAlwaysUsageDescription: LOCATION_USAGE,
         NSLocationWhenInUseUsageDescription: LOCATION_USAGE,
+        NSMotionUsageDescription: MOTION_USAGE,
     })(config, {
         NSLocationAlwaysAndWhenInUseUsageDescription: locationAlwaysAndWhenInUsePermission,
         NSLocationAlwaysUsageDescription: locationAlwaysPermission,
         NSLocationWhenInUseUsageDescription: locationWhenInUsePermission,
+        NSMotionUsageDescription: motionUsagePermission,
     });
     // If the user has not specified a value for isAndroidForegroundServiceEnabled,
     // we default to the value of isAndroidBackgroundLocationEnabled because we want
@@ -136,11 +140,17 @@ const withLocation = (config, { locationAlwaysAndWhenInUsePermission, locationAl
         'android.permission.ACCESS_COARSE_LOCATION',
         'android.permission.ACCESS_FINE_LOCATION',
         // These permissions are optional, and not listed in the library AndroidManifest.xml
-        !useHorizon && // ACCESS_BACKGROUND_LOCATION is not supported on Meta Quest devices
+        // ACCESS_BACKGROUND_LOCATION is not supported on Meta Quest devices.
+        !useHorizon &&
             isAndroidBackgroundLocationEnabled &&
             'android.permission.ACCESS_BACKGROUND_LOCATION',
         enableAndroidForegroundService && 'android.permission.FOREGROUND_SERVICE',
         enableAndroidForegroundService && 'android.permission.FOREGROUND_SERVICE_LOCATION',
+        // ACTIVITY_RECOGNITION is prohibited on the Meta Horizon Store, so never add it on Horizon.
+        !useHorizon && isAndroidMotionActivityEnabled && 'android.permission.ACTIVITY_RECOGNITION',
+        !useHorizon &&
+            isAndroidMotionActivityEnabled &&
+            'com.google.android.gms.permission.ACTIVITY_RECOGNITION',
     ].filter(Boolean));
 };
 exports.default = (0, config_plugins_1.createRunOncePlugin)(withLocation, pkg.name, pkg.version);

@@ -16,7 +16,6 @@ import android.os.Looper
 import android.os.PersistableBundle
 import android.util.Log
 import android.location.LocationListener
-import android.location.LocationProvider
 import expo.modules.core.arguments.MapArguments
 import expo.modules.core.arguments.ReadableArguments
 import expo.modules.core.interfaces.LifecycleEventListener
@@ -27,7 +26,6 @@ import expo.modules.interfaces.taskManager.TaskInterface
 import expo.modules.interfaces.taskManager.TaskManagerUtilsInterface
 import expo.modules.location.AppForegroundedSingleton
 import expo.modules.location.LocationHelpers
-import expo.modules.location.LocationModule
 import expo.modules.location.LocationRequest
 import expo.modules.location.records.LocationOptions
 import expo.modules.location.records.LocationResponse
@@ -40,6 +38,7 @@ class LocationTaskConsumer(context: Context, taskManagerUtils: TaskManagerUtilsI
   private var mPendingIntent: PendingIntent? = null
   private var mService: LocationTaskService? = null
   private var mLocationRequest: LocationRequest? = null
+  private var mLocationListener: LocationListener? = null
   private var mLastReportedLocation: Location? = null
   private var mDeferredDistance = 0.0
   private val mDeferredLocations: MutableList<Location> = ArrayList()
@@ -148,28 +147,30 @@ class LocationTaskConsumer(context: Context, taskManagerUtils: TaskManagerUtilsI
       val provider = LocationHelpers.mapPriorityToProvider(locationRequest.priority)
 
       if (mLocationManager.isProviderEnabled(provider)) {
+        val listener = object : LocationListener {
+          override fun onLocationChanged(location: Location) {
+            deferLocations(listOf(location))
+            maybeReportDeferredLocations()
+          }
+
+          override fun onProviderEnabled(provider: String) {
+            // Provider enabled
+          }
+
+          override fun onProviderDisabled(provider: String) {
+            // Provider disabled
+          }
+
+          override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {
+            // Status changed
+          }
+        }
+        mLocationListener = listener
         mLocationManager.requestLocationUpdates(
           provider,
           locationRequest.minUpdateIntervalMillis,
           locationRequest.minUpdateDistanceMeters,
-          object : LocationListener {
-            override fun onLocationChanged(location: Location) {
-              deferLocations(listOf(location))
-              maybeReportDeferredLocations()
-            }
-
-            override fun onProviderEnabled(provider: String) {
-              // Provider enabled
-            }
-
-            override fun onProviderDisabled(provider: String) {
-              // Provider disabled
-            }
-
-            override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {
-              // Status changed
-            }
-          },
+          listener,
           Looper.getMainLooper()
         )
       }
@@ -179,9 +180,9 @@ class LocationTaskConsumer(context: Context, taskManagerUtils: TaskManagerUtilsI
   }
 
   private fun stopLocationUpdates() {
-    // For LocationManager, we need to remove all location listeners
-    // Since we're using anonymous LocationListener objects, we can't easily remove them
-    // The system will handle cleanup when the service is destroyed
+    // Remove the listener so updates stop and we don't leak one per restart/setOptions.
+    mLocationListener?.let { mLocationManager.removeUpdates(it) }
+    mLocationListener = null
     mPendingIntent?.let {
       it.cancel()
     }

@@ -4,13 +4,6 @@ import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.hardware.GeomagneticField
-import android.hardware.Sensor
-import android.hardware.SensorEvent
-import android.hardware.SensorEventListener
-import android.hardware.SensorManager
-import android.location.Geocoder
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
@@ -20,7 +13,6 @@ import android.os.Bundle
 import android.os.Looper
 import android.util.Log
 import androidx.annotation.ChecksSdkIntAtLeast
-import androidx.core.app.ActivityCompat
 import androidx.core.location.LocationManagerCompat
 import androidx.core.os.bundleOf
 import expo.modules.core.interfaces.ActivityEventListener
@@ -34,8 +26,6 @@ import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 import expo.modules.location.records.GeocodeResponse
 import expo.modules.location.records.GeofencingOptions
-import expo.modules.location.records.Heading
-import expo.modules.location.records.HeadingEventResponse
 import expo.modules.location.records.LocationLastKnownOptions
 import expo.modules.location.records.LocationOptions
 import expo.modules.location.records.LocationProviderStatus
@@ -47,28 +37,17 @@ import expo.modules.location.records.ReverseGeocodeLocation
 import expo.modules.location.records.ReverseGeocodeResponse
 import expo.modules.location.taskConsumers.GeofencingTaskConsumer
 import expo.modules.location.taskConsumers.LocationTaskConsumer
-import java.util.Locale
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
-import kotlin.math.abs
 
 class LocationModule : Module(), LifecycleEventListener, ActivityEventListener {
-  private var mGeofield: GeomagneticField? = null
   private val mLocationCallbacks = HashMap<Int, LocationListener>()
   private val mLocationRequests = HashMap<Int, LocationRequest>()
   private var mPendingLocationRequests = ArrayList<LocationActivityResultListener>()
   private lateinit var mContext: Context
   private lateinit var mUIManager: UIManager
   private lateinit var mLocationManager: LocationManager
-
-  private var mGravity: FloatArray = FloatArray(9)
-  private var mGeomagnetic: FloatArray = FloatArray(9)
-  private var mHeadingId = 0
-  private var mLastAzimuth = 0f
-  private var mAccuracy = 0
-  private var mLastUpdate: Long = 0
-  private var mGeocoderPaused = false
 
   private val mTaskManager: TaskManagerInterface by lazy {
     return@lazy appContext.legacyModule<TaskManagerInterface>()
@@ -89,7 +68,7 @@ class LocationModule : Module(), LifecycleEventListener, ActivityEventListener {
       Utilities.isHorizonDevice()
     }
 
-    Events(HEADING_EVENT_NAME, LOCATION_EVENT_NAME, LOCATION_ERROR_EVENT_NAME)
+    Events(HEADING_EVENT_NAME, LOCATION_EVENT_NAME, LOCATION_ERROR_EVENT_NAME, MOTION_ACTIVITY_EVENT_NAME)
 
     // Deprecated
     AsyncFunction("requestPermissionsAsync") Coroutine { ->
@@ -155,13 +134,34 @@ class LocationModule : Module(), LifecycleEventListener, ActivityEventListener {
       return@AsyncFunction getProviderStatus()
     }
 
+    // Heading needs orientation sensors via Android's SensorManager, which Horizon OS does not
+    // expose to 2D panel apps (raw IMU/pose is only available through Meta's XR SDK). Stubbed.
     AsyncFunction("watchDeviceHeading") { _: Int, promise: Promise ->
       if (Utilities.isHorizonDevice()) {
         promise.reject(QuestFeatureUnavailableException())
         return@AsyncFunction
       }
       promise.reject(QuestBuildVariantException())
+    }
+
+    // ACTIVITY_RECOGNITION is prohibited on the Meta Horizon Store and has no Play Services
+    // backing on Horizon, so motion activity is permanently stubbed.
+    AsyncFunction("watchMotionActivityImplAsync") { _: Int, promise: Promise ->
+      if (Utilities.isHorizonDevice()) {
+        promise.reject(QuestFeatureUnavailableException())
+        return@AsyncFunction
+      }
+      promise.reject(QuestBuildVariantException())
       return@AsyncFunction
+    }
+
+    // Resolve as denied instead of throwing so the JS permission hooks degrade gracefully.
+    AsyncFunction("getMotionActivityPermissionsAsync") {
+      return@AsyncFunction motionActivityUnavailablePermissions()
+    }
+
+    AsyncFunction("requestMotionActivityPermissionsAsync") {
+      return@AsyncFunction motionActivityUnavailablePermissions()
     }
 
     AsyncFunction("watchPositionImplAsync") { watchId: Int, options: LocationOptions, promise: Promise ->
@@ -198,12 +198,7 @@ class LocationModule : Module(), LifecycleEventListener, ActivityEventListener {
         throw LocationUnauthorizedException()
       }
 
-      // Check if we want to stop watching location or compass
-      if (watchId == mHeadingId) {
-        throw QuestFeatureUnavailableException()
-      } else {
-        removeLocationUpdatesForRequest(watchId)
-      }
+      removeLocationUpdatesForRequest(watchId)
     }
 
     AsyncFunction("geocodeAsync") Coroutine { address: String ->
@@ -606,6 +601,14 @@ class LocationModule : Module(), LifecycleEventListener, ActivityEventListener {
     throw QuestBuildVariantException()
   }
 
+  private fun motionActivityUnavailablePermissions() = PermissionRequestResponse(
+    canAskAgain = false,
+    expires = "never",
+    granted = false,
+    status = "denied",
+    android = null
+  )
+
   //region private methods
   /**
    * Checks whether all required permissions have been granted by the user.
@@ -673,6 +676,8 @@ class LocationModule : Module(), LifecycleEventListener, ActivityEventListener {
     private const val LOCATION_EVENT_NAME = "Expo.locationChanged"
     private const val HEADING_EVENT_NAME = "Expo.headingChanged"
     private const val LOCATION_ERROR_EVENT_NAME = "Expo.locationError"
+    // Declared so the shared JS can subscribe; Horizon never emits this event.
+    private const val MOTION_ACTIVITY_EVENT_NAME = "Expo.motionActivityChanged"
     private const val CHECK_SETTINGS_REQUEST_CODE = 42
 
     const val ACCURACY_LOWEST = 1

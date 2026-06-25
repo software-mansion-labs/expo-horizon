@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'host.exp.exponent'
-version = '55.1.8'
+version = '56.0.0'
 
 expoModule {
   canBePublished false
@@ -14,7 +14,7 @@ android {
   namespace "expo.modules.location"
   defaultConfig {
     versionCode 29
-    versionName "55.1.8"
+    versionName "56.0.0"
     consumerProguardFiles("proguard-rules.pro")
   }
 
