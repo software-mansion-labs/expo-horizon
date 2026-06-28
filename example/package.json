@@ -4,7 +4,6 @@
   "main": "expo-router/entry",
   "scripts": {
     "start": "expo start",
-    "prebuild": "expo prebuild",
     "android": "expo run:android --variant mobileDebug",
     "quest": "expo run:android --variant questDebug",
     "quest-release": "expo run:android --variant questRelease",
@@ -16,7 +15,7 @@
     "ts:check": "tsc -p . --noEmit",
     "prettier:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,css,scss,md}\"",
     "prettier:write": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,scss,md}\"",
-    "prepare": "echo 'noop'"
+    "build": "echo 'noop'"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",

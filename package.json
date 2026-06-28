@@ -13,7 +13,8 @@
     "clean": "yarn workspaces run clean",
     "lint": "eslint '**/*.{js,jsx,ts,tsx}' --max-warnings 0",
     "prettier:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,css,scss,md}\"",
-    "prettier:write": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,scss,md}\""
+    "prettier:write": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,scss,md}\"",
+    "postinstall": "EXPO_NONINTERACTIVE=true yarn workspaces run build && EXPO_NONINTERACTIVE=true yarn workspaces run build plugin"
   },
   "dependencies": {
     "eslint": "^8.57.1",
