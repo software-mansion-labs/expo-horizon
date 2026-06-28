@@ -1,0 +1,36 @@
+{
+  "name": "expo-horizon-demo",
+  "slug": "expo-horizon-demo",
+  "version": "1.0.0",
+  "orientation": "default",
+  "icon": "./assets/icon.png",
+  "userInterfaceStyle": "light",
+  "newArchEnabled": true,
+  "splash": {
+    "image": "./assets/splash-icon.png",
+    "resizeMode": "contain",
+    "backgroundColor": "#ffffff"
+  },
+  "ios": {
+    "supportsTablet": true,
+    "bundleIdentifier": "com.anonymous.app"
+  },
+  "android": {
+    "versionCode": 4,
+    "adaptiveIcon": {
+      "foregroundImage": "./assets/adaptive-icon.png",
+      "backgroundColor": "#ffffff"
+    },
+    "edgeToEdgeEnabled": true,
+    "package": "com.swmansion.horizon.demo"
+  },
+  "web": {
+    "favicon": "./assets/favicon.png"
+  },
+  "plugins": [
+    "expo-build-properties",
+    "expo-router",
+    "expo-task-manager",
+    "expo-status-bar"
+  ]
+}
