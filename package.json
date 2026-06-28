@@ -2,6 +2,7 @@
   "name": "expo-horizon-sdk",
   "private": true,
   "workspaces": [
+    "example",
     "expo-horizon-core",
     "expo-horizon-location",
     "expo-horizon-notifications"
