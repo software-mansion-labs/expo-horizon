@@ -1,63 +1,34 @@
+import type { ConfigContext, ExpoConfig } from 'expo/config';
 import horizonCorePlugin from 'expo-horizon-core/plugin';
 
-export default () => ({
-  expo: {
-    name: 'expo-horizon-demo',
-    slug: 'expo-horizon-demo',
-    version: '1.0.0',
-    orientation: 'default',
-    icon: './assets/icon.png',
-    userInterfaceStyle: 'light',
-    newArchEnabled: true,
-    splash: {
-      image: './assets/splash-icon.png',
-      resizeMode: 'contain',
-      backgroundColor: '#ffffff',
-    },
-    ios: {
-      supportsTablet: true,
-      bundleIdentifier: 'com.anonymous.app',
-    },
-    android: {
-      versionCode: 4,
-      adaptiveIcon: {
-        foregroundImage: './assets/adaptive-icon.png',
-        backgroundColor: '#ffffff',
+export default ({ config }: ConfigContext): ExpoConfig => ({
+  ...config,
+  name: config.name!,
+  slug: config.slug!,
+  plugins: [
+    ...(config.plugins ?? []),
+    [
+      '../expo-horizon-location/app.plugin.js',
+      {
+        isAndroidBackgroundLocationEnabled: true,
+        isAndroidForegroundServiceEnabled: true,
+        // isAndroidMotionActivityEnabled omitted: ACTIVITY_RECOGNITION is prohibited on the Horizon Store.
+        isAndroidMotionActivityEnabled: true,
+        locationAlwaysAndWhenInUsePermission:
+          'Allow $(PRODUCT_NAME) to access your location for background tracking',
+        locationAlwaysPermission:
+          'Allow $(PRODUCT_NAME) to access your location for background tracking',
+        locationWhenInUsePermission: 'Allow $(PRODUCT_NAME) to access your location',
       },
-      edgeToEdgeEnabled: true,
-      package: 'com.swmansion.horizon.demo',
-    },
-    web: {
-      favicon: './assets/favicon.png',
-    },
-    plugins: [
-      'expo-build-properties',
-      ['expo-router'],
-      [
-        '../expo-horizon-location/app.plugin.js',
-        {
-          isAndroidBackgroundLocationEnabled: true,
-          isAndroidForegroundServiceEnabled: true,
-          // isAndroidMotionActivityEnabled omitted: ACTIVITY_RECOGNITION is prohibited on the Horizon Store.
-          isAndroidMotionActivityEnabled: true,
-          locationAlwaysAndWhenInUsePermission:
-            'Allow $(PRODUCT_NAME) to access your location for background tracking',
-          locationAlwaysPermission:
-            'Allow $(PRODUCT_NAME) to access your location for background tracking',
-          locationWhenInUsePermission: 'Allow $(PRODUCT_NAME) to access your location',
-        },
-      ],
-      '../expo-horizon-notifications/app.plugin.js',
-      horizonCorePlugin({
-        horizonAppId: 'DEMO_APP_ID',
-        defaultHeight: '640dp',
-        defaultWidth: '1024dp',
-        supportedDevices: 'quest2|quest3|quest3s',
-        disableVrHeadtracking: false,
-        allowBackup: false,
-      }),
-      'expo-task-manager',
-      'expo-status-bar',
     ],
-  },
+    '../expo-horizon-notifications/app.plugin.js',
+    horizonCorePlugin({
+      horizonAppId: 'DEMO_APP_ID',
+      defaultHeight: '640dp',
+      defaultWidth: '1024dp',
+      supportedDevices: 'quest2|quest3|quest3s',
+      disableVrHeadtracking: false,
+      allowBackup: false,
+    }),
+  ],
 });
