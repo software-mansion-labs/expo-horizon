@@ -4,7 +4,6 @@
   "main": "expo-router/entry",
   "scripts": {
     "start": "expo start",
-    "prebuild": "expo prebuild",
     "android": "expo run:android --variant mobileDebug",
     "quest": "expo run:android --variant questDebug",
     "quest-release": "expo run:android --variant questRelease",
@@ -15,16 +14,18 @@
     "lint": "eslint '**/*.{js,jsx,ts,tsx}' --max-warnings 0",
     "ts:check": "tsc -p . --noEmit",
     "prettier:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,css,scss,md}\"",
-    "prettier:write": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,scss,md}\""
+    "prettier:write": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,scss,md}\"",
+    "build": "echo 'noop'",
+    "prepare": "echo 'noop'"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",
     "expo": "^56.0.0",
     "expo-build-properties": "~56.0.19",
     "expo-constants": "~56.0.18",
-    "expo-horizon-core": "file:../expo-horizon-core",
-    "expo-horizon-location": "file:../expo-horizon-location",
-    "expo-horizon-notifications": "file:../expo-horizon-notifications",
+    "expo-horizon-core": "*",
+    "expo-horizon-location": "*",
+    "expo-horizon-notifications": "*",
     "expo-linking": "~56.0.14",
     "expo-router": "~56.2.11",
     "expo-status-bar": "~56.0.4",
