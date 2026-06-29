@@ -1,4 +1,5 @@
 import type { ConfigContext, ExpoConfig } from 'expo/config';
+import horizonCorePlugin from 'expo-horizon-core/plugin';
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
@@ -21,16 +22,13 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       },
     ],
     '../expo-horizon-notifications/app.plugin.js',
-    [
-      '../expo-horizon-core/app.plugin.js',
-      {
-        horizonAppId: 'DEMO_APP_ID',
-        defaultHeight: '640dp',
-        defaultWidth: '1024dp',
-        supportedDevices: 'quest2|quest3|quest3s',
-        disableVrHeadtracking: false,
-        allowBackup: false,
-      },
-    ],
+    horizonCorePlugin({
+      horizonAppId: 'DEMO_APP_ID',
+      defaultHeight: '640dp',
+      defaultWidth: '1024dp',
+      supportedDevices: 'quest2|quest3|quest3s',
+      disableVrHeadtracking: false,
+      allowBackup: false,
+    }),
   ],
 });
