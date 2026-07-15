@@ -46,8 +46,7 @@ export type ImplicitlySupportedDevicePushToken = {
  * which you can then use to send notifications via Firebase Cloud Messaging (Android) or APNs (iOS).
  */
 export type DevicePushToken =
-  | ExplicitlySupportedDevicePushToken
-  | ImplicitlySupportedDevicePushToken;
+  ExplicitlySupportedDevicePushToken | ImplicitlySupportedDevicePushToken;
 
 /**
  * Object which contains the Expo push token in the `data` field. Use the value from `data` to send notifications via Expo Notifications service.

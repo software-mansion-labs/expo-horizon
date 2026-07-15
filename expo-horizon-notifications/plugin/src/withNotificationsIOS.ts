@@ -33,12 +33,10 @@ const withBackgroundRemoteNotifications: ConfigPlugin<boolean | undefined> = (
   config,
   enableBackgroundRemoteNotifications
 ) => {
-  if (
-    !(
-      enableBackgroundRemoteNotifications === undefined ||
-      typeof enableBackgroundRemoteNotifications === 'boolean'
-    )
-  ) {
+  if (!(
+    enableBackgroundRemoteNotifications === undefined ||
+    typeof enableBackgroundRemoteNotifications === 'boolean'
+  )) {
     throw new Error(
       ERROR_MSG_PREFIX +
         `"enableBackgroundRemoteNotifications" has an invalid value: ${enableBackgroundRemoteNotifications}. Expected a boolean.`
