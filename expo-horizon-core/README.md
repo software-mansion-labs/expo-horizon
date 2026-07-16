@@ -215,30 +215,6 @@ npm run quest:release
 - **Mobile builds** will not have Horizon-specific configurations
 - Use `npx expo prebuild --clean` after changing plugin configuration to regenerate build files
 
-## Troubleshooting
-
-### `expo run:android` fails because `app:installDebug` is ambiguous
-
-The config plugin creates `mobile` and `quest` Android product flavors. As a
-result, the default `expo run:android` command cannot choose an `installDebug`
-task and may fail with:
-
-```text
-Cannot locate tasks that match 'app:installDebug' as task 'installDebug' is ambiguous.
-```
-
-Run Expo with an explicit variant instead:
-
-```bash
-npx expo run:android --variant mobileDebug
-# or, for Meta Horizon devices:
-npx expo run:android --variant questDebug
-```
-
-To avoid specifying the variant each time, add the
-[package scripts](#packagejson-scripts) above and run `npm run android` or
-`npm run quest`.
-
 ## Usage
 
 ### JavaScript/TypeScript API
@@ -315,6 +291,30 @@ Now, `horizonAppId` will contain the value of your Horizon App ID as defined in 
 - [Panel Sizing Guidelines](https://developers.meta.com/horizon/documentation/android-apps/panel-sizing)
 - [Publishing Requirements](https://developers.meta.com/horizon/resources/publish-mobile-manifest/)
 - [Expo Config Plugins](https://docs.expo.dev/config-plugins/introduction/)
+
+## Troubleshooting
+
+### `expo run:android` fails because `app:installDebug` is ambiguous
+
+The config plugin creates `mobile` and `quest` Android product flavors. As a
+result, the default `expo run:android` command cannot choose an `installDebug`
+task and may fail with:
+
+```text
+Cannot locate tasks that match 'app:installDebug' as task 'installDebug' is ambiguous.
+```
+
+Run Expo with an explicit variant instead:
+
+```bash
+npx expo run:android --variant mobileDebug
+# or, for Meta Horizon devices:
+npx expo run:android --variant questDebug
+```
+
+To avoid specifying the variant each time, add the
+[package scripts](#packagejson-scripts) above and run `npm run android` or
+`npm run quest`.
 
 ## Contributing
 
