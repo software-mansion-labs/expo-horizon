@@ -4,6 +4,17 @@
   "description": "ExpoHorizon common features.",
   "main": "build/index.js",
   "types": "build/index.d.ts",
+  "files": [
+    "build",
+    "plugin/build",
+    "ios",
+    "android/build.gradle",
+    "android/src",
+    "app.plugin.js",
+    "expo-module.config.json",
+    "plugin.js",
+    "plugin.d.ts"
+  ],
   "scripts": {
     "build": "expo-module build",
     "clean": "expo-module clean",
