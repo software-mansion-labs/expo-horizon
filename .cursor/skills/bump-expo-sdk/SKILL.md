@@ -38,9 +38,9 @@ git -C <expo-repo> worktree add --detach <temporary-directory> <ref>
 
 ## Package mapping
 
-| Horizon package | Upstream package |
-| --- | --- |
-| `expo-horizon-location` | `packages/expo-location` |
+| Horizon package              | Upstream package              |
+| ---------------------------- | ----------------------------- |
+| `expo-horizon-location`      | `packages/expo-location`      |
 | `expo-horizon-notifications` | `packages/expo-notifications` |
 
 `expo-horizon-core` is Horizon-only. Update its SDK-facing dependencies and version, but do not replace it from upstream.
@@ -93,9 +93,9 @@ Honor upstream deletions in shared/mobile trees. Never copy upstream `android/sr
 
 For every new Android API and every upstream behavior change that lacks a clear Quest equivalent, inspect its dependencies and present a batched decision list:
 
-| API/change | Upstream Android behavior | Quest capability/constraint | Proposed choice |
-| --- | --- | --- | --- |
-| ... | ... | ... | implement / no-op / reject |
+| API/change | Upstream Android behavior | Quest capability/constraint | Proposed choice            |
+| ---------- | ------------------------- | --------------------------- | -------------------------- |
+| ...        | ...                       | ...                         | implement / no-op / reject |
 
 Ask the user to choose. Do not silently decide. Implement the confirmed choice:
 

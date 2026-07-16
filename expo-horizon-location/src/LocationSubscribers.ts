@@ -18,10 +18,7 @@ let nextWatchId = 0;
 
 class Subscriber<
   CallbackType extends
-    | LocationCallback
-    | LocationHeadingCallback
-    | LocationErrorCallback
-    | MotionActivityCallback,
+    LocationCallback | LocationHeadingCallback | LocationErrorCallback | MotionActivityCallback,
 > {
   private eventName: string;
   private eventDataField: string;

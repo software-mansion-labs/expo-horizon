@@ -395,9 +395,7 @@ export type SchedulableNotificationTriggerInput =
  * A `null` trigger means that the notification should be scheduled for delivery immediately.
  */
 export type NotificationTriggerInput =
-  | null
-  | ChannelAwareTriggerInput
-  | SchedulableNotificationTriggerInput;
+  null | ChannelAwareTriggerInput | SchedulableNotificationTriggerInput;
 
 /**
  * An enum corresponding to values appropriate for Android's [`Notification#priority`](https://developer.android.com/reference/android/app/Notification#priority) field.
