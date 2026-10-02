@@ -11,23 +11,18 @@
     "build": "yarn workspaces run build",
     "prepare": "yarn workspaces run prepare",
     "clean": "yarn workspaces run clean",
-    "lint": "eslint '**/*.{js,jsx,ts,tsx}' --max-warnings 0",
-    "prettier:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,css,scss,md}\"",
-    "prettier:write": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,scss,md}\"",
+    "lint": "oxlint --config oxlint.config.mts . --max-warnings 0",
+    "prettier:check": "prettier --check \"**/*.{ts,tsx,mts,js,jsx,json,css,scss,md}\"",
+    "prettier:write": "prettier --write \"**/*.{ts,tsx,mts,js,jsx,json,css,scss,md}\"",
     "postinstall": "EXPO_NONINTERACTIVE=true yarn workspaces run build && EXPO_NONINTERACTIVE=true yarn workspaces run build plugin"
   },
   "dependencies": {
-    "eslint": "^8.57.1",
     "prettier": "^3.4.2"
   },
   "devDependencies": {
-    "@react-native/eslint-config": "^0.82.1",
     "@types/jest": "^30.0.0",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-prettier": "^5.5.4",
-    "eslint-plugin-react": "^7.37.5",
-    "eslint-plugin-react-hooks": "^7.0.1",
-    "eslint-plugin-react-native": "^5.0.0",
+    "expo-module-scripts": "^56.0.5",
+    "oxlint": "^1.86.0",
     "typescript": "~6.0.2"
   }
 }
