@@ -65,7 +65,7 @@ function setNotificationSounds(projectRoot, { sounds, project, projectName, }) {
         const sourceFilepath = (0, path_1.resolve)(projectRoot, soundFileRelativePath);
         const destinationFilepath = (0, path_1.resolve)(sourceRoot, fileName);
         // Since it's possible that the filename is the same, but the
-        // file itself id different, let's copy it regardless
+        // file itself is different, let's copy it regardless
         (0, fs_1.copyFileSync)(sourceFilepath, destinationFilepath);
         if (!project.hasFile(`${projectName}/${fileName}`)) {
             project = config_plugins_1.IOSConfig.XcodeUtils.addResourceFileToGroup({

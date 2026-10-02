@@ -38,9 +38,9 @@ export type Props = {
     /**
      * A string to set the `NSMotionUsageDescription` permission message shown when
      * `getMotionActivityAsync` or `watchMotionActivityAsync` is called for the first time.
-     * Set to `false` to omit the key. In that case, the app must add `NSMotionUsageDescription`
-     * manually to its `Info.plist`, for example via the `infoPlist` key in `app.json`.
-     * Without this key, calling motion activity APIs on iOS will throw an exception.
+     * Set to `false` to disable the motion activity feature: the key is removed from `Info.plist`,
+     * the CoreMotion features are excluded from the iOS build, motion permission methods resolve
+     * with a denied response, and calling motion activity APIs throws an exception.
      * @default "Allow $(PRODUCT_NAME) to detect your current motion activity"
      * @platform ios
      */

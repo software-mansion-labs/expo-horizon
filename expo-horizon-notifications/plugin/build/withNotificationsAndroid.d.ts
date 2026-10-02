@@ -12,18 +12,23 @@ export declare const META_DATA_FCM_NOTIFICATION_ICON_COLOR = "com.google.firebas
 export declare const META_DATA_FCM_NOTIFICATION_DEFAULT_CHANNEL_ID = "com.google.firebase.messaging.default_notification_channel_id";
 export declare const META_DATA_LOCAL_NOTIFICATION_ICON = "expo.modules.notifications.default_notification_icon";
 export declare const META_DATA_LOCAL_NOTIFICATION_ICON_COLOR = "expo.modules.notifications.default_notification_color";
+export declare const META_DATA_LOCAL_NOTIFICATION_LARGE_ICON = "expo.modules.notifications.large_notification_icon";
 export declare const NOTIFICATION_ICON = "notification_icon";
 export declare const NOTIFICATION_ICON_RESOURCE = "@drawable/notification_icon";
+export declare const NOTIFICATION_LARGE_ICON = "notification_large_icon";
+export declare const NOTIFICATION_LARGE_ICON_RESOURCE = "@drawable/notification_large_icon";
 export declare const NOTIFICATION_ICON_COLOR = "notification_icon_color";
 export declare const NOTIFICATION_ICON_COLOR_RESOURCE = "@color/notification_icon_color";
 export declare const withNotificationIcons: ConfigPlugin<{
     icon: string | null;
+    largeIcon: string | null;
 }>;
 export declare const withNotificationIconColor: ConfigPlugin<{
     color: string | null;
 }>;
 export declare const withNotificationManifest: ConfigPlugin<{
     icon: string | null;
+    largeIcon: string | null;
     color: string | null;
     defaultChannel: string | null;
 }>;
@@ -35,6 +40,10 @@ export declare function setNotificationIconColor(color: string | null, colors: A
  * Applies notification icon configuration for expo-notifications
  */
 export declare function setNotificationIconAsync(projectRoot: string, icon: string | null): Promise<void>;
+/**
+ * Applies notification large icon configuration for expo-notifications
+ */
+export declare function setNotificationLargeIconAsync(projectRoot: string, largeIcon: string | null): Promise<void>;
 /**
  * Save sound files to `<project-root>/android/app/src/main/res/raw`
  */

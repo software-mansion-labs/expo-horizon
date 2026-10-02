@@ -4,6 +4,9 @@
     "modules": ["LocationModule"]
   },
   "android": {
-    "modules": ["expo.modules.location.LocationModule"]
+    "modules": [
+      "expo.modules.location.LocationModule",
+      "expo.modules.location.next.LocationModuleNext"
+    ]
   }
 }

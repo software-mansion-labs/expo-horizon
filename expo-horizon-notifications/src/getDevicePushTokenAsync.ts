@@ -1,5 +1,5 @@
+import { UnavailabilityError, Platform } from 'expo';
 import ExpoHorizonCore from 'expo-horizon-core';
-import { UnavailabilityError, Platform } from 'expo-modules-core';
 
 import PushTokenManager from './PushTokenManager';
 import type { DevicePushToken } from './Tokens.types';
@@ -18,16 +18,13 @@ export async function getDevicePushTokenAsync(): Promise<DevicePushToken> {
   }
   warnOfExpoGoPushUsage();
 
-  let devicePushToken: string | null;
-  if (nativeTokenPromise) {
-    // Reuse existing Promise
-    devicePushToken = await nativeTokenPromise;
-  } else {
-    // Create a new Promise and clear it afterwards
-    nativeTokenPromise = PushTokenManager.getDevicePushTokenAsync();
-    devicePushToken = await nativeTokenPromise;
-    nativeTokenPromise = null;
+  if (!nativeTokenPromise) {
+    // Share one in-flight native request; clear it once it settles so a rejection can be retried
+    nativeTokenPromise = PushTokenManager.getDevicePushTokenAsync().finally(() => {
+      nativeTokenPromise = null;
+    });
   }
+  const devicePushToken = await nativeTokenPromise;
 
   if (ExpoHorizonCore.isHorizonDevice) {
     // @ts-ignore: 'horizon' is a Horizon-specific device push token type

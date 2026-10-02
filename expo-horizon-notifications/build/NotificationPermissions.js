@@ -1,4 +1,4 @@
-import { Platform, UnavailabilityError } from 'expo-modules-core';
+import { Platform, UnavailabilityError } from 'expo';
 import NotificationPermissionsModule from './NotificationPermissionsModule';
 /**
  * Calling this function checks current permissions settings related to notifications.
