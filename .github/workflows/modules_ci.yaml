@@ -14,11 +14,11 @@ on:
       # --- Shared paths for BOTH workflows ---
       - 'package.json'
       - 'yarn.lock'
-      - '.eslintrc.js'
-      - '.prettierrc'
+      - 'oxlint.config.mts'
+      - 'tsconfig.base.json'
+      - '.prettierrc.json'
       - '.prettierignore'
       - '.nvmrc'
-      - '.eslintignore'
   push:
     branches:
       - main
@@ -34,11 +34,11 @@ on:
       # --- Shared paths for BOTH workflows ---
       - 'package.json'
       - 'yarn.lock'
-      - '.eslintrc.js'
-      - '.prettierrc'
+      - 'oxlint.config.mts'
+      - 'tsconfig.base.json'
+      - '.prettierrc.json'
       - '.prettierignore'
       - '.nvmrc'
-      - '.eslintignore'
 
 jobs:
   quality-checks:
@@ -73,7 +73,7 @@ jobs:
 
       # Keep independent checks running after a failure, but respect cancellation
       # and require their setup/build prerequisites to have succeeded.
-      - name: 🤓 Run ESLint
+      - name: 🤓 Run Oxlint
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: yarn lint
 
