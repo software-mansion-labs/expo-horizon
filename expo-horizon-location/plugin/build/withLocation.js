@@ -116,6 +116,15 @@ const withLocation = (config, { locationAlwaysAndWhenInUsePermission, locationAl
     if (isIosBackgroundLocationEnabled) {
         config = withBackgroundLocation(config);
     }
+    config = (0, config_plugins_1.withPodfileProperties)(config, (config) => {
+        if (motionUsagePermission === false) {
+            config.modResults['expo.location.motionActivityEnabled'] = 'false';
+        }
+        else {
+            delete config.modResults['expo.location.motionActivityEnabled'];
+        }
+        return config;
+    });
     config = (0, exports.withForegroundServiceIcon)(config, { icon: androidForegroundServiceIcon ?? null });
     config_plugins_1.IOSConfig.Permissions.createPermissionsPlugin({
         NSLocationAlwaysAndWhenInUseUsageDescription: LOCATION_USAGE,

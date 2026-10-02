@@ -1,8 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.withNotificationsAndroid = exports.withNotificationSounds = exports.withNotificationManifest = exports.withNotificationIconColor = exports.withNotificationIcons = exports.NOTIFICATION_ICON_COLOR_RESOURCE = exports.NOTIFICATION_ICON_COLOR = exports.NOTIFICATION_ICON_RESOURCE = exports.NOTIFICATION_ICON = exports.META_DATA_LOCAL_NOTIFICATION_ICON_COLOR = exports.META_DATA_LOCAL_NOTIFICATION_ICON = exports.META_DATA_FCM_NOTIFICATION_DEFAULT_CHANNEL_ID = exports.META_DATA_FCM_NOTIFICATION_ICON_COLOR = exports.META_DATA_FCM_NOTIFICATION_ICON = exports.dpiValues = exports.ANDROID_RES_PATH = void 0;
+exports.withNotificationsAndroid = exports.withNotificationSounds = exports.withNotificationManifest = exports.withNotificationIconColor = exports.withNotificationIcons = exports.NOTIFICATION_ICON_COLOR_RESOURCE = exports.NOTIFICATION_ICON_COLOR = exports.NOTIFICATION_LARGE_ICON_RESOURCE = exports.NOTIFICATION_LARGE_ICON = exports.NOTIFICATION_ICON_RESOURCE = exports.NOTIFICATION_ICON = exports.META_DATA_LOCAL_NOTIFICATION_LARGE_ICON = exports.META_DATA_LOCAL_NOTIFICATION_ICON_COLOR = exports.META_DATA_LOCAL_NOTIFICATION_ICON = exports.META_DATA_FCM_NOTIFICATION_DEFAULT_CHANNEL_ID = exports.META_DATA_FCM_NOTIFICATION_ICON_COLOR = exports.META_DATA_FCM_NOTIFICATION_ICON = exports.dpiValues = exports.ANDROID_RES_PATH = void 0;
 exports.setNotificationIconColor = setNotificationIconColor;
 exports.setNotificationIconAsync = setNotificationIconAsync;
+exports.setNotificationLargeIconAsync = setNotificationLargeIconAsync;
 exports.setNotificationSounds = setNotificationSounds;
 const image_utils_1 = require("@expo/image-utils");
 const config_plugins_1 = require("expo/config-plugins");
@@ -19,23 +20,27 @@ exports.dpiValues = {
 };
 const { addMetaDataItemToMainApplication, getMainApplicationOrThrow, removeMetaDataItemFromMainApplication, } = config_plugins_1.AndroidConfig.Manifest;
 const BASELINE_PIXEL_SIZE = 24;
+// Matches Android's own `notification_large_icon_width`/`notification_large_icon_height` of 64dp.
+const BASELINE_LARGE_ICON_PIXEL_SIZE = 64;
 const ERROR_MSG_PREFIX = 'An error occurred while configuring Android notifications. ';
 exports.META_DATA_FCM_NOTIFICATION_ICON = 'com.google.firebase.messaging.default_notification_icon';
 exports.META_DATA_FCM_NOTIFICATION_ICON_COLOR = 'com.google.firebase.messaging.default_notification_color';
 exports.META_DATA_FCM_NOTIFICATION_DEFAULT_CHANNEL_ID = 'com.google.firebase.messaging.default_notification_channel_id';
 exports.META_DATA_LOCAL_NOTIFICATION_ICON = 'expo.modules.notifications.default_notification_icon';
 exports.META_DATA_LOCAL_NOTIFICATION_ICON_COLOR = 'expo.modules.notifications.default_notification_color';
-// TODO @vonovak add config for local notification large icon
-// expo.modules.notifications.large_notification_icon
+exports.META_DATA_LOCAL_NOTIFICATION_LARGE_ICON = 'expo.modules.notifications.large_notification_icon';
 exports.NOTIFICATION_ICON = 'notification_icon';
 exports.NOTIFICATION_ICON_RESOURCE = `@drawable/${exports.NOTIFICATION_ICON}`;
+exports.NOTIFICATION_LARGE_ICON = 'notification_large_icon';
+exports.NOTIFICATION_LARGE_ICON_RESOURCE = `@drawable/${exports.NOTIFICATION_LARGE_ICON}`;
 exports.NOTIFICATION_ICON_COLOR = 'notification_icon_color';
 exports.NOTIFICATION_ICON_COLOR_RESOURCE = `@color/${exports.NOTIFICATION_ICON_COLOR}`;
-const withNotificationIcons = (config, { icon }) => {
+const withNotificationIcons = (config, { icon, largeIcon }) => {
     return (0, config_plugins_1.withDangerousMod)(config, [
         'android',
         async (config) => {
             await setNotificationIconAsync(config.modRequest.projectRoot, icon);
+            await setNotificationLargeIconAsync(config.modRequest.projectRoot, largeIcon);
             return config;
         },
     ]);
@@ -49,9 +54,9 @@ const withNotificationIconColor = (config, { color }) => {
     });
 };
 exports.withNotificationIconColor = withNotificationIconColor;
-const withNotificationManifest = (config, { icon, color, defaultChannel }) => {
+const withNotificationManifest = (config, { icon, largeIcon, color, defaultChannel }) => {
     return (0, config_plugins_1.withAndroidManifest)(config, (config) => {
-        config.modResults = setNotificationConfig({ icon, color, defaultChannel }, config.modResults);
+        config.modResults = setNotificationConfig({ icon, largeIcon, color, defaultChannel }, config.modResults);
         return config;
     });
 };
@@ -76,11 +81,20 @@ function setNotificationIconColor(color, colors) {
  * Applies notification icon configuration for expo-notifications
  */
 async function setNotificationIconAsync(projectRoot, icon) {
+    await setDrawableIconAsync(projectRoot, icon, exports.NOTIFICATION_ICON, BASELINE_PIXEL_SIZE);
+}
+/**
+ * Applies notification large icon configuration for expo-notifications
+ */
+async function setNotificationLargeIconAsync(projectRoot, largeIcon) {
+    await setDrawableIconAsync(projectRoot, largeIcon, exports.NOTIFICATION_LARGE_ICON, BASELINE_LARGE_ICON_PIXEL_SIZE);
+}
+async function setDrawableIconAsync(projectRoot, icon, resourceName, baselinePixelSize) {
     if (icon) {
-        await writeNotificationIconImageFilesAsync(icon, projectRoot);
+        await writeNotificationIconImageFilesAsync(icon, projectRoot, resourceName, baselinePixelSize);
     }
     else {
-        removeNotificationIconImageFiles(projectRoot);
+        removeNotificationIconImageFiles(projectRoot, resourceName);
     }
 }
 function setNotificationConfig(props, manifest) {
@@ -92,6 +106,12 @@ function setNotificationConfig(props, manifest) {
     else {
         removeMetaDataItemFromMainApplication(mainApplication, exports.META_DATA_FCM_NOTIFICATION_ICON);
         removeMetaDataItemFromMainApplication(mainApplication, exports.META_DATA_LOCAL_NOTIFICATION_ICON);
+    }
+    if (props.largeIcon) {
+        addMetaDataItemToMainApplication(mainApplication, exports.META_DATA_LOCAL_NOTIFICATION_LARGE_ICON, exports.NOTIFICATION_LARGE_ICON_RESOURCE, 'resource');
+    }
+    else {
+        removeMetaDataItemFromMainApplication(mainApplication, exports.META_DATA_LOCAL_NOTIFICATION_LARGE_ICON);
     }
     if (props.color) {
         addMetaDataItemToMainApplication(mainApplication, exports.META_DATA_FCM_NOTIFICATION_ICON_COLOR, exports.NOTIFICATION_ICON_COLOR_RESOURCE, 'resource');
@@ -109,14 +129,14 @@ function setNotificationConfig(props, manifest) {
     }
     return manifest;
 }
-async function writeNotificationIconImageFilesAsync(icon, projectRoot) {
+async function writeNotificationIconImageFilesAsync(icon, projectRoot, resourceName, baselinePixelSize) {
     await Promise.all(Object.values(exports.dpiValues).map(async ({ folderName, scale }) => {
         const drawableFolderName = folderName.replace('mipmap', 'drawable');
         const dpiFolderPath = (0, path_1.resolve)(projectRoot, exports.ANDROID_RES_PATH, drawableFolderName);
         if (!(0, fs_1.existsSync)(dpiFolderPath)) {
             (0, fs_1.mkdirSync)(dpiFolderPath, { recursive: true });
         }
-        const iconSizePx = BASELINE_PIXEL_SIZE * scale;
+        const iconSizePx = baselinePixelSize * scale;
         try {
             const resizedIcon = (await (0, image_utils_1.generateImageAsync)({ projectRoot, cacheType: 'android-notification' }, {
                 src: icon,
@@ -125,18 +145,18 @@ async function writeNotificationIconImageFilesAsync(icon, projectRoot) {
                 resizeMode: 'cover',
                 backgroundColor: 'transparent',
             })).source;
-            (0, fs_1.writeFileSync)((0, path_1.resolve)(dpiFolderPath, exports.NOTIFICATION_ICON + '.png'), resizedIcon);
+            (0, fs_1.writeFileSync)((0, path_1.resolve)(dpiFolderPath, resourceName + '.png'), resizedIcon);
         }
         catch (e) {
             throw new Error(ERROR_MSG_PREFIX + 'Encountered an issue resizing Android notification icon: ' + e);
         }
     }));
 }
-function removeNotificationIconImageFiles(projectRoot) {
+function removeNotificationIconImageFiles(projectRoot, resourceName) {
     Object.values(exports.dpiValues).forEach(async ({ folderName }) => {
         const drawableFolderName = folderName.replace('mipmap', 'drawable');
         const dpiFolderPath = (0, path_1.resolve)(projectRoot, exports.ANDROID_RES_PATH, drawableFolderName);
-        const iconFile = (0, path_1.resolve)(dpiFolderPath, exports.NOTIFICATION_ICON + '.png');
+        const iconFile = (0, path_1.resolve)(dpiFolderPath, resourceName + '.png');
         if ((0, fs_1.existsSync)(iconFile)) {
             (0, fs_1.unlinkSync)(iconFile);
         }
@@ -177,10 +197,10 @@ function writeNotificationSoundFile(soundFileRelativePath, projectRoot) {
         }
     }
 }
-const withNotificationsAndroid = (config, { icon = null, color = null, sounds = [], defaultChannel = null }) => {
+const withNotificationsAndroid = (config, { icon = null, largeIcon = null, color = null, sounds = [], defaultChannel = null }) => {
     config = (0, exports.withNotificationIconColor)(config, { color });
-    config = (0, exports.withNotificationIcons)(config, { icon });
-    config = (0, exports.withNotificationManifest)(config, { icon, color, defaultChannel });
+    config = (0, exports.withNotificationIcons)(config, { icon, largeIcon });
+    config = (0, exports.withNotificationManifest)(config, { icon, largeIcon, color, defaultChannel });
     config = (0, exports.withNotificationSounds)(config, { sounds });
     return config;
 };

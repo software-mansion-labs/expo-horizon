@@ -2,6 +2,7 @@
 {
   "extends": "expo-module-scripts/tsconfig.base",
   "compilerOptions": {
+    "customConditions": ["react-native-legacy-deep-imports"],
     "outDir": "./build",
     "rootDir": "./src"
   },

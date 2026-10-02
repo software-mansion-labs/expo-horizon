@@ -1,6 +1,6 @@
 {
   "name": "expo-horizon-notifications",
-  "version": "57.0.2",
+  "version": "58.0.0",
   "description": "A fork of [`expo-notifications`](https://github.com/expo/expo/tree/main/packages/expo-notifications) that provides two implementations: - The default `expo-notifications` for Android and iOS platforms. - A Meta Horizon-compatible implementation that uses the Meta's push notification service.",
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -11,7 +11,7 @@
     "build": "expo-module build",
     "build:plugin": "expo-module build plugin",
     "clean": "expo-module clean",
-    "lint": "expo-module lint",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "test": "expo-module test",
     "prepare": "expo-module prepare",
     "prepublishOnly": "expo-module prepublishOnly",
@@ -43,21 +43,21 @@
     ]
   },
   "dependencies": {
-    "@expo/image-utils": "^0.11.5",
+    "@expo/image-utils": "^0.12.2",
     "abort-controller": "^3.0.0",
     "badgin": "^1.1.5",
-    "expo-application": "~57.0.3",
-    "expo-constants": "~57.0.20"
+    "expo-application": "~58.0.3",
+    "expo-constants": "~58.0.9"
   },
   "devDependencies": {
     "expo-horizon-core": "*",
-    "expo-module-scripts": "^56.0.3",
+    "expo-module-scripts": "^56.0.5",
     "memfs": "^3.2.0"
   },
   "peerDependencies": {
     "expo": "*",
     "react": "*",
     "react-native": "*",
-    "expo-horizon-core": "^57.0.0"
+    "expo-horizon-core": "^58.0.0"
   }
 }
