@@ -27,7 +27,6 @@ export async function getDevicePushTokenAsync(): Promise<DevicePushToken> {
   const devicePushToken = await nativeTokenPromise;
 
   if (ExpoHorizonCore.isHorizonDevice) {
-    // @ts-ignore: 'horizon' is a Horizon-specific device push token type
     return { type: 'horizon', data: devicePushToken };
   }
 
