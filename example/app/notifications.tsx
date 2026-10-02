@@ -1,6 +1,6 @@
 import * as Notifications from 'expo-horizon-notifications';
 import React from 'react';
-import { Alert, ScrollView, View } from 'react-native';
+import { Alert, Platform, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Section } from '../components/Section';
@@ -8,17 +8,6 @@ import { TestButton } from '../components/TestButton';
 import { GlobalStyles } from '../constants/styles';
 import BackgroundTaskSection from '../sections/notifications/background-task';
 import NotificationResponseSection from '../sections/notifications/notification-response';
-
-Notifications.setNotificationHandler({
-  handleNotification: async () => {
-    return {
-      shouldPlaySound: true,
-      shouldSetBadge: true,
-      shouldShowBanner: true,
-      shouldShowList: true,
-    };
-  },
-});
 
 export default function NotificationsScreen() {
   const insets = useSafeAreaInsets();
@@ -62,6 +51,33 @@ export default function NotificationsScreen() {
     }
   };
 
+  const scheduleDateNotification = async (delivery: Notifications.NotificationDelivery) => {
+    try {
+      const identifier = await Notifications.scheduleNotificationAsync({
+        content: {
+          title: 'Scheduled reminder',
+          body: 'Your two-minute reminder is ready.',
+        },
+        trigger: {
+          type: Notifications.SchedulableTriggerInputTypes.DATE,
+          date: new Date(Date.now() + 120_000),
+          delivery,
+        },
+      });
+      Alert.alert(
+        'Reminder scheduled',
+        `Identifier: ${identifier}\n${
+          delivery === 'alarmClock'
+            ? 'For precise delivery, allow Alarms & reminders for this app in system settings. Without access, delivery is best effort.'
+            : 'Delivery may be delayed by battery-saving settings.'
+        }`
+      );
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      Alert.alert('Could not schedule reminder', message);
+    }
+  };
+
   const getPushToken = async () => {
     try {
       const result = await Notifications.getDevicePushTokenAsync();
@@ -83,6 +99,16 @@ export default function NotificationsScreen() {
         </Section>
         <Section title="Local Notifications">
           <TestButton title="Send Notification" onPress={sendNotification} />
+          <TestButton
+            title="Schedule Two-Minute Reminder"
+            onPress={() => scheduleDateNotification('bestEffort')}
+          />
+          {Platform.OS === 'android' && (
+            <TestButton
+              title="Schedule Two-Minute Alarm"
+              onPress={() => scheduleDateNotification('alarmClock')}
+            />
+          )}
         </Section>
         <NotificationResponseSection />
         <BackgroundTaskSection />
