@@ -6,6 +6,8 @@
 
 ### 🎉 New features
 
+- Add `enableRemoteNotifications` config plugin option. Set it to `false` to skip the APNs entitlement for apps that use only local notifications. Defaults to `true`. ([#50891](https://github.com/expo/expo/pull/50891) by [@netmaxt3r](https://github.com/netmaxt3r))
+
 ### 🐛 Bug fixes
 
 ### 💡 Others

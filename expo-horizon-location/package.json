@@ -40,10 +40,10 @@
     "preset": "expo-module-scripts"
   },
   "dependencies": {
-    "@expo/image-utils": "^0.12.2"
+    "@expo/image-utils": "^0.12.3"
   },
   "devDependencies": {
-    "expo-module-scripts": "^56.0.5"
+    "expo-module-scripts": "^56.0.6"
   },
   "peerDependencies": {
     "expo": "*",
