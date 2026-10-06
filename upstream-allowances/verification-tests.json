@@ -1,0 +1,35 @@
+{
+  "commit": "d36f125067e9c6e67689f2b75cf4fb19254c3c59",
+  "packages": {
+    "expo-horizon-notifications": {
+      "plugin/src/__tests__/fixtures/LICENSE": {
+        "reason": "Preserve the MIT license for the pinned upstream Xcode test fixture.",
+        "upstream_sha256": null,
+        "upstream_mode": null,
+        "local_sha256": "fb3ca4a837f5779e83cef89b78253a8949cfb9429c340309f62d0465ec6610b4",
+        "local_mode": "100644"
+      },
+      "plugin/src/__tests__/fixtures/README.md": {
+        "reason": "Document provenance of the vendored upstream Xcode test fixture.",
+        "upstream_sha256": null,
+        "upstream_mode": null,
+        "local_sha256": "2780022376ae32cf92acb045ac8d3a2bc3f0bd95bce15e85abaf741c4a71881a",
+        "local_mode": "100644"
+      },
+      "plugin/src/__tests__/fixtures/project.pbxproj": {
+        "reason": "Vendor the SDK 57 Xcode fixture that upstream plugin tests expect outside their package.",
+        "upstream_sha256": null,
+        "upstream_mode": null,
+        "local_sha256": "7b7cfc31b77069762f4ef9ed4c6f86dd57dd491cfbfdd710168c578ab2e25f8f",
+        "local_mode": "100644"
+      },
+      "plugin/src/__tests__/withNotificationsiOS-test.ts": {
+        "reason": "Resolve the vendored fixture within this repository instead of the Expo monorepo template path.",
+        "upstream_sha256": "d3f5970182c36862eb914124b9bc5e046b234275e11278921a4ace994a07597d",
+        "upstream_mode": "100644",
+        "local_sha256": "1e511b8bf1455ef4de6e7eabc8d204c2be3418547e3f13d249d1ba1eea94c686",
+        "local_mode": "100644"
+      }
+    }
+  }
+}

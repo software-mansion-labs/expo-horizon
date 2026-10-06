@@ -3,32 +3,42 @@ name: Modules CI
 on:
   pull_request:
     paths:
+      - 'example/**'
       - 'expo-horizon-core/**'
       - 'expo-horizon-location/**'
       - 'expo-horizon-notifications/**'
-      - '.github/workflows/modules_ci.yml'
+      - '.github/workflows/modules_ci.yaml'
+      - 'jest.config.js'
+      - 'tests/**'
 
       # --- Shared paths for BOTH workflows ---
       - 'package.json'
       - 'yarn.lock'
       - '.eslintrc.js'
-      - '.prettierrc.json'
-      - 'tsconfig.base.json'
+      - '.prettierrc'
+      - '.prettierignore'
+      - '.nvmrc'
+      - '.eslintignore'
   push:
     branches:
       - main
     paths:
+      - 'example/**'
       - 'expo-horizon-core/**'
       - 'expo-horizon-location/**'
       - 'expo-horizon-notifications/**'
-      - '.github/workflows/modules_ci.yml'
+      - '.github/workflows/modules_ci.yaml'
+      - 'jest.config.js'
+      - 'tests/**'
 
       # --- Shared paths for BOTH workflows ---
       - 'package.json'
       - 'yarn.lock'
       - '.eslintrc.js'
-      - '.prettierrc.json'
-      - 'tsconfig.base.json'
+      - '.prettierrc'
+      - '.prettierignore'
+      - '.nvmrc'
+      - '.eslintignore'
 
 jobs:
   quality-checks:
@@ -50,23 +60,31 @@ jobs:
           cache-dependency-path: '**/yarn.lock'
 
       - name: 📦 Install all dependencies
+        id: install
         run: yarn install --frozen-lockfile
 
+      - name: 🛠️ Build libraries
+        id: build_libraries
+        run: yarn build
+
+      - name: 🔌 Build config plugins
+        id: build_plugins
+        run: yarn build:plugins
+
+      # Keep independent checks running after a failure, but respect cancellation
+      # and require their setup/build prerequisites to have succeeded.
       - name: 🤓 Run ESLint
-        run: |
-          yarn eslint expo-horizon-core/ \
-                      expo-horizon-location/ \
-                      expo-horizon-notifications/ \
-                      --ext .js,.jsx,.ts,.tsx
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: yarn lint
 
-      - name: ✨ Run Prettier check
-        run: |
-          yarn prettier --check expo-horizon-core/ \
-                                expo-horizon-location/ \
-                                expo-horizon-notifications/
+      - name: ✨ Check formatting
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: yarn prettier:check
 
-      - name: 🔍 Run TypeScript check
-        run: |
-          yarn tsc --project expo-horizon-core/tsconfig.json --noEmit
-          yarn tsc --project expo-horizon-location/tsconfig.json --noEmit
-          yarn tsc --project expo-horizon-notifications/tsconfig.json --noEmit
+      - name: 🔍 Check TypeScript
+        if: ${{ !cancelled() && steps.build_libraries.outcome == 'success' && steps.build_plugins.outcome == 'success' }}
+        run: yarn ts:check
+
+      - name: 🧪 Run Jest
+        if: ${{ !cancelled() && steps.build_libraries.outcome == 'success' && steps.build_plugins.outcome == 'success' }}
+        run: yarn test
