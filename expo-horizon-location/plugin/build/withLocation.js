@@ -1,7 +1,4 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.withForegroundServiceIcon = exports.META_DATA_FOREGROUND_SERVICE_ICON = exports.FOREGROUND_SERVICE_ICON_RESOURCE = exports.FOREGROUND_SERVICE_ICON = exports.dpiValues = exports.ANDROID_RES_PATH = void 0;
 exports.setForegroundServiceIconAsync = setForegroundServiceIconAsync;
@@ -9,12 +6,9 @@ const image_utils_1 = require("@expo/image-utils");
 const config_plugins_1 = require("expo/config-plugins");
 const fs_1 = require("fs");
 const path_1 = require("path");
-const withHorizon_1 = __importDefault(require("./withHorizon"));
 const pkg = require('../../package.json');
 const LOCATION_USAGE = 'Allow $(PRODUCT_NAME) to access your location';
 const MOTION_USAGE = 'Allow $(PRODUCT_NAME) to detect your current motion activity';
-// Horizon (Meta Quest) support is opt-in via the EXPO_HORIZON env flag.
-const useHorizon = !!process.env.EXPO_HORIZON;
 exports.ANDROID_RES_PATH = 'android/app/src/main/res/';
 exports.dpiValues = {
     mdpi: { folderName: 'mipmap-mdpi', scale: 1 },
@@ -109,10 +103,6 @@ function removeForegroundServiceIconImageFiles(projectRoot) {
     });
 }
 const withLocation = (config, { locationAlwaysAndWhenInUsePermission, locationAlwaysPermission, locationWhenInUsePermission, motionUsagePermission, isIosBackgroundLocationEnabled, isAndroidBackgroundLocationEnabled, isAndroidForegroundServiceEnabled, isAndroidMotionActivityEnabled, androidForegroundServiceIcon, } = {}) => {
-    // Add Horizon support
-    if (useHorizon) {
-        config = (0, withHorizon_1.default)(config);
-    }
     if (isIosBackgroundLocationEnabled) {
         config = withBackgroundLocation(config);
     }
@@ -140,17 +130,13 @@ const withLocation = (config, { locationAlwaysAndWhenInUsePermission, locationAl
         'android.permission.ACCESS_COARSE_LOCATION',
         'android.permission.ACCESS_FINE_LOCATION',
         // These permissions are optional, and not listed in the library AndroidManifest.xml
-        // ACCESS_BACKGROUND_LOCATION is not supported on Meta Quest devices.
-        !useHorizon &&
-            isAndroidBackgroundLocationEnabled &&
-            'android.permission.ACCESS_BACKGROUND_LOCATION',
+        // Note: permissions prohibited on the Meta Horizon Store (e.g. ACCESS_BACKGROUND_LOCATION,
+        // ACTIVITY_RECOGNITION) are stripped from the `quest` flavor manifest by `expo-horizon-core`.
+        isAndroidBackgroundLocationEnabled && 'android.permission.ACCESS_BACKGROUND_LOCATION',
         enableAndroidForegroundService && 'android.permission.FOREGROUND_SERVICE',
         enableAndroidForegroundService && 'android.permission.FOREGROUND_SERVICE_LOCATION',
-        // ACTIVITY_RECOGNITION is prohibited on the Meta Horizon Store, so never add it on Horizon.
-        !useHorizon && isAndroidMotionActivityEnabled && 'android.permission.ACTIVITY_RECOGNITION',
-        !useHorizon &&
-            isAndroidMotionActivityEnabled &&
-            'com.google.android.gms.permission.ACTIVITY_RECOGNITION',
+        isAndroidMotionActivityEnabled && 'android.permission.ACTIVITY_RECOGNITION',
+        isAndroidMotionActivityEnabled && 'com.google.android.gms.permission.ACTIVITY_RECOGNITION',
     ].filter(Boolean));
 };
 exports.default = (0, config_plugins_1.createRunOncePlugin)(withLocation, pkg.name, pkg.version);
