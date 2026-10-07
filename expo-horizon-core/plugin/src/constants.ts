@@ -3,7 +3,7 @@
  * These permissions will be automatically blocked/removed from the manifest when building for Quest.
  *
  * Source: Meta Quest Platform Requirements
- * https://developer.oculus.com/documentation/native/android/mobile-publishing-guide/
+ * https://developers.meta.com/vr/resources/permissions-prohibited/
  */
 export const PROHIBITED_PERMISSIONS = [
   'ACCEPT_HANDOVER',
