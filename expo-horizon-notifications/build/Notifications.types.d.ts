@@ -4,7 +4,7 @@
  * On Android under `remoteMessage` field a JS version of the Firebase `RemoteMessage` may be accessed.
  * On iOS under `payload` you may find full contents of [`UNNotificationContent`'s](https://developer.apple.com/documentation/usernotifications/unnotificationcontent?language=objc) [`userInfo`](https://developer.apple.com/documentation/usernotifications/unnotificationcontent/1649869-userinfo?language=objc), for example [remote notification payload](https://developer.apple.com/library/archive/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CreatingtheNotificationPayload.html).
  */
-import type { EventSubscription } from 'expo-modules-core';
+import type { EventSubscription } from 'expo';
 export type PushNotificationTrigger = {
     type: 'push';
     /**
@@ -130,6 +130,20 @@ export interface TimeIntervalNotificationTrigger {
     seconds: number;
 }
 /**
+ * Controls which `AlarmManager` API schedules a wall-clock trigger on Android.
+ *
+ * - `'bestEffort'`: the default. Uses `setExactAndAllowWhileIdle()`, which delivers at the requested time
+ *   on most devices. Some OEM Android builds defer these alarms by minutes to save battery.
+ *   Without the exact alarm permission, the system may deliver the notification later than requested.
+ * - `'alarmClock'`: uses `setAlarmClock()`. The system delivers these alarms at the requested time
+ *   and does not defer them for battery optimization. Use only for time-critical alarms, such as
+ *   alarm clocks or medication reminders. The status bar shows an alarm icon until the notification
+ *   is delivered. Requires the `SCHEDULE_EXACT_ALARM` or `USE_EXACT_ALARM` permission on Android 12
+ *   and higher. Without the permission, the notification is scheduled as `'bestEffort'`.
+ * @platform android
+ */
+export type NotificationDelivery = 'bestEffort' | 'alarmClock';
+/**
  * A trigger related to a daily notification.
  * > The same functionality will be achieved on iOS with a `CalendarNotificationTrigger`.
  * @platform android
@@ -138,6 +152,7 @@ export interface DailyNotificationTrigger {
     type: 'daily';
     hour: number;
     minute: number;
+    delivery?: NotificationDelivery;
 }
 /**
  * A trigger related to a weekly notification.
@@ -149,6 +164,7 @@ export interface WeeklyNotificationTrigger {
     weekday: number;
     hour: number;
     minute: number;
+    delivery?: NotificationDelivery;
 }
 /**
  * A trigger related to a monthly notification.
@@ -160,6 +176,7 @@ export interface MonthlyNotificationTrigger {
     day: number;
     hour: number;
     minute: number;
+    delivery?: NotificationDelivery;
 }
 /**
  * A trigger related to a yearly notification.
@@ -172,6 +189,7 @@ export interface YearlyNotificationTrigger {
     month: number;
     hour: number;
     minute: number;
+    delivery?: NotificationDelivery;
 }
 /**
  * A Firebase `RemoteMessage` that caused the notification to be delivered to the app.
@@ -280,6 +298,10 @@ export type DailyTriggerInput = {
     channelId?: string;
     hour: number;
     minute: number;
+    /**
+     * @default 'bestEffort'
+     */
+    delivery?: NotificationDelivery;
 };
 /**
  * This trigger input will cause the notification to be delivered once every week
@@ -292,6 +314,10 @@ export type WeeklyTriggerInput = {
     weekday: number;
     hour: number;
     minute: number;
+    /**
+     * @default 'bestEffort'
+     */
+    delivery?: NotificationDelivery;
 };
 /**
  * This trigger input will cause the notification to be delivered once per month
@@ -304,6 +330,10 @@ export type MonthlyTriggerInput = {
     day: number;
     hour: number;
     minute: number;
+    /**
+     * @default 'bestEffort'
+     */
+    delivery?: NotificationDelivery;
 };
 /**
  * This trigger input will cause the notification to be delivered once every year
@@ -317,6 +347,10 @@ export type YearlyTriggerInput = {
     month: number;
     hour: number;
     minute: number;
+    /**
+     * @default 'bestEffort'
+     */
+    delivery?: NotificationDelivery;
 };
 /**
  * This trigger input will cause the notification to be delivered once
@@ -327,6 +361,10 @@ export type DateTriggerInput = {
     type: SchedulableTriggerInputTypes.DATE;
     date: Date | number;
     channelId?: string;
+    /**
+     * @default 'bestEffort'
+     */
+    delivery?: NotificationDelivery;
 };
 /**
  * This trigger input will cause the notification to be delivered once or many times
@@ -518,7 +556,7 @@ export type NotificationContentInput = {
     badge?: number;
     /**
      * The notification sound. Use `false` for a silent notification.
-     * On Android version 8 and later, control the sounds via [notification channels](#setNotificationChannelAsync).
+     * On Android version 8 and later, control the sounds via [notification channels](#setnotificationchannelasyncchannelid-channel).
      * `defaultCritical` and `defaultRingtone` are applicable only on iOS, with `defaultCritical` requiring the critical alerts entitlement.
      *
      * On iOS, you can also provide a custom sound filename including the extension. The file needs to be added
@@ -562,8 +600,13 @@ export type NotificationContentInput = {
      */
     categoryIdentifier?: string;
     /**
+     * An identifier used to group related notifications together in the notification center.
+     * @platform ios
+     */
+    threadIdentifier?: string;
+    /**
      * If set to `true`, the notification cannot be dismissed by swipe. This setting defaults
-     * to `false` if not provided or is invalid. Corresponds directly do Android's `isOngoing` behavior.
+     * to `false` if not provided or is invalid. Corresponds directly to Android's `isOngoing` behavior.
      * In Firebase terms this property of a notification is called `sticky`.
      *
      * See [Android developer documentation](https://developer.android.com/reference/android/app/Notification.Builder#setOngoing(boolean))
@@ -674,7 +717,7 @@ export interface NotificationAction {
  * Defines a group of notification actions and their behavior. Categories allow you to create custom
  * action buttons that appear with notifications, enabling users to respond to notifications.
  *
- * Categories must be registered with [`setNotificationCategoryAsync`](#notificationssetnotificationcategoryasyncidentifier-actions-options)
+ * Categories must be registered with [`setNotificationCategoryAsync`](#setnotificationcategoryasyncidentifier-actions-options)
  * before they can be used. When scheduling a notification, reference the category by its `identifier` in the
  * [`NotificationContentInput.categoryIdentifier`](#notificationcontentinput) field.
  */
@@ -738,11 +781,10 @@ export type MaybeNotificationResponse = NotificationResponse | null | undefined;
  * @deprecated use the [`EventSubscription`](#eventsubscription) type instead
  * */
 export type Subscription = EventSubscription;
-export { type PermissionExpiration, type PermissionResponse, PermissionStatus } from 'expo';
-export { type EventSubscription } from 'expo-modules-core';
+export { type PermissionExpiration, type PermissionResponse, PermissionStatus, type EventSubscription, } from 'expo';
 /**
  * Payload for the background notification handler task.
- * [Read more](#run-javascript-in-response-to-incoming-notifications).
+ * See [Run JavaScript in response to incoming notifications](#run-javascript-in-response-to-incoming-notifications).
  * */
 export type NotificationTaskPayload = NotificationResponse | {
     /**
@@ -757,7 +799,7 @@ export type NotificationTaskPayload = NotificationResponse | {
         [key: string]: unknown;
     };
     /**
-     * Detailed, raw object describing the remote notification. [See more](https://developer.apple.com/documentation/usernotifications/generating-a-remote-notification#Payload-key-reference).
+     * Detailed, raw object describing the remote notification. See [Apple's payload key reference](https://developer.apple.com/documentation/usernotifications/generating-a-remote-notification#Payload-key-reference).
      * @platform ios
      */
     aps?: Record<string, unknown>;

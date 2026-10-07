@@ -3,6 +3,8 @@ plugins {
   id 'expo-module-gradle-plugin'
 }
 
+version = '58.0.0'
+
 expoModule {
   canBePublished false
 }
@@ -13,8 +15,11 @@ android {
   namespace "expo.modules.horizon"
   defaultConfig {
     versionCode 1
-    versionName "0.1.0"
+    versionName "58.0.0"
     buildConfigField "String", "META_HORIZON_APP_ID", horizonAppIdConfigField
+  }
+  buildFeatures {
+    buildConfig true
   }
   lintOptions {
     abortOnError false

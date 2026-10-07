@@ -1,4 +1,4 @@
-import { Platform } from 'expo-modules-core';
+import { Platform } from 'expo';
 import PushTokenManager from './PushTokenManager';
 import { warnOfExpoGoPushUsage } from './warnOfExpoGoPushUsage';
 // Web uses SyntheticEventEmitter

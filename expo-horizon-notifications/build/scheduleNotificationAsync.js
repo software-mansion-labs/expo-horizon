@@ -1,4 +1,4 @@
-import { Platform, UnavailabilityError, uuid } from 'expo-modules-core';
+import { Platform, UnavailabilityError, uuid } from 'expo';
 import NotificationScheduler from './NotificationScheduler';
 import { SchedulableTriggerInputTypes } from './Notifications.types';
 import { hasValidTriggerObject } from './hasValidTriggerObject';
@@ -147,6 +147,9 @@ function parseDateTrigger(trigger) {
         if (trigger.channelId) {
             result.channelId = trigger.channelId;
         }
+        if (trigger.delivery) {
+            result.delivery = trigger.delivery;
+        }
         return result;
     }
     else {
@@ -173,6 +176,9 @@ function parseDailyTrigger(trigger) {
         if (trigger.channelId) {
             result.channelId = trigger.channelId;
         }
+        if (trigger.delivery) {
+            result.delivery = trigger.delivery;
+        }
         return result;
     }
     return undefined;
@@ -191,6 +197,9 @@ function parseWeeklyTrigger(trigger) {
         };
         if (trigger.channelId) {
             result.channelId = trigger.channelId;
+        }
+        if (trigger.delivery) {
+            result.delivery = trigger.delivery;
         }
         return result;
     }
@@ -211,6 +220,9 @@ function parseMonthlyTrigger(trigger) {
         if (trigger.channelId) {
             result.channelId = trigger.channelId;
         }
+        if (trigger.delivery) {
+            result.delivery = trigger.delivery;
+        }
         return result;
     }
     return undefined;
@@ -230,6 +242,9 @@ function parseYearlyTrigger(trigger) {
         };
         if (trigger.channelId) {
             result.channelId = trigger.channelId;
+        }
+        if (trigger.delivery) {
+            result.delivery = trigger.delivery;
         }
         return result;
     }

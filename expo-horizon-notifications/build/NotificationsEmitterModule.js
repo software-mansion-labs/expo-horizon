@@ -1,4 +1,4 @@
-import { Platform } from 'expo-modules-core';
+import { Platform } from 'expo';
 let warningHasBeenShown = false;
 export default {
     addListener: () => {
@@ -6,7 +6,13 @@ export default {
             console.warn(`[expo-notifications] Emitting notifications is not yet fully supported on ${Platform.OS}. Adding a listener will have no effect.`);
             warningHasBeenShown = true;
         }
+        return {
+            remove: () => { },
+        };
     },
-    removeListeners: () => { },
+    removeListener: () => { },
+    removeAllListeners: () => { },
+    emit: () => { },
+    listenerCount: () => 0,
 };
 //# sourceMappingURL=NotificationsEmitterModule.js.map

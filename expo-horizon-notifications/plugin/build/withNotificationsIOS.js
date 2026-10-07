@@ -6,13 +6,23 @@ const config_plugins_1 = require("expo/config-plugins");
 const fs_1 = require("fs");
 const path_1 = require("path");
 const ERROR_MSG_PREFIX = 'An error occurred while configuring iOS notifications. ';
-const withNotificationsIOS = (config, { mode = 'development', sounds = [], enableBackgroundRemoteNotifications }) => {
-    config = (0, config_plugins_1.withEntitlementsPlist)(config, (config) => {
-        if (!config.modResults['aps-environment']) {
-            config.modResults['aps-environment'] = mode;
-        }
-        return config;
-    });
+const withNotificationsIOS = (config, { mode = 'development', sounds = [], enableRemoteNotifications = true, enableBackgroundRemoteNotifications, }) => {
+    if (typeof enableRemoteNotifications !== 'boolean') {
+        throw new Error(ERROR_MSG_PREFIX +
+            `"enableRemoteNotifications" has an invalid value: ${enableRemoteNotifications}. Expected a boolean.`);
+    }
+    if (!enableRemoteNotifications && enableBackgroundRemoteNotifications) {
+        throw new Error(ERROR_MSG_PREFIX +
+            `"enableBackgroundRemoteNotifications" requires "enableRemoteNotifications" to be true, because background remote notifications are delivered through APNs. Set "enableRemoteNotifications" to true, or remove "enableBackgroundRemoteNotifications" from the expo-notifications plugin options.`);
+    }
+    if (enableRemoteNotifications) {
+        config = (0, config_plugins_1.withEntitlementsPlist)(config, (config) => {
+            if (!config.modResults['aps-environment']) {
+                config.modResults['aps-environment'] = mode;
+            }
+            return config;
+        });
+    }
     config = withNotificationSounds(config, { sounds });
     config = withBackgroundRemoteNotifications(config, enableBackgroundRemoteNotifications);
     return config;
@@ -65,7 +75,7 @@ function setNotificationSounds(projectRoot, { sounds, project, projectName, }) {
         const sourceFilepath = (0, path_1.resolve)(projectRoot, soundFileRelativePath);
         const destinationFilepath = (0, path_1.resolve)(sourceRoot, fileName);
         // Since it's possible that the filename is the same, but the
-        // file itself id different, let's copy it regardless
+        // file itself is different, let's copy it regardless
         (0, fs_1.copyFileSync)(sourceFilepath, destinationFilepath);
         if (!project.hasFile(`${projectName}/${fileName}`)) {
             project = config_plugins_1.IOSConfig.XcodeUtils.addResourceFileToGroup({

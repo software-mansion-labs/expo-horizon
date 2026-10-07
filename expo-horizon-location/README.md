@@ -11,7 +11,7 @@ You can choose which implementation to use with the `quest` / `mobile` build var
 
 ## Prerequisites
 
-- Expo SDK 57 or later (`expo` package version 57.0.15+)
+- Expo SDK 58 or later (`expo` package version 58.0.3+)
 - (Recommended) `expo-horizon-core` package installed. See [expo-horizon-core](../expo-horizon-core/README.md) for more details
 
 ## Usage
@@ -79,6 +79,8 @@ Our goal is to align the version numbers of `expo-horizon-location` and `expo-lo
 
 | `expo-horizon-location` | `expo-location` | Expo SDK Version |
 | ----------------------- | --------------- | ---------------- |
+| 58.0.0 (unreleased)     | 58.0.11         | 58               |
+| 57.0.3 (unreleased)     | 57.0.20         | 57               |
 | 57.0.2                  | 57.0.16         | 57               |
 | 57.0.1                  | 57.0.12         | 57               |
 | 57.0.0                  | 57.0.2          | 57               |

@@ -6,12 +6,12 @@ on:
       - 'expo-horizon-core/**'
       - 'expo-horizon-location/**'
       - 'expo-horizon-notifications/**'
-      - '.github/workflows/modules_ci.yml'
+      - '.github/workflows/modules_ci.yaml'
 
       # --- Shared paths for BOTH workflows ---
       - 'package.json'
       - 'yarn.lock'
-      - '.eslintrc.js'
+      - 'oxlint.config.mts'
       - '.prettierrc.json'
       - 'tsconfig.base.json'
   push:
@@ -21,12 +21,12 @@ on:
       - 'expo-horizon-core/**'
       - 'expo-horizon-location/**'
       - 'expo-horizon-notifications/**'
-      - '.github/workflows/modules_ci.yml'
+      - '.github/workflows/modules_ci.yaml'
 
       # --- Shared paths for BOTH workflows ---
       - 'package.json'
       - 'yarn.lock'
-      - '.eslintrc.js'
+      - 'oxlint.config.mts'
       - '.prettierrc.json'
       - 'tsconfig.base.json'
 
@@ -52,12 +52,11 @@ jobs:
       - name: 📦 Install all dependencies
         run: yarn install --frozen-lockfile
 
-      - name: 🤓 Run ESLint
+      - name: 🤓 Run Oxlint
         run: |
-          yarn eslint expo-horizon-core/ \
-                      expo-horizon-location/ \
-                      expo-horizon-notifications/ \
-                      --ext .js,.jsx,.ts,.tsx
+          yarn workspace expo-horizon-core lint
+          yarn workspace expo-horizon-location lint
+          yarn workspace expo-horizon-notifications lint
 
       - name: ✨ Run Prettier check
         run: |
