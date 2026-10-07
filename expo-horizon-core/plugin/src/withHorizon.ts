@@ -83,6 +83,9 @@ const withHorizonAppId: ConfigPlugin<HorizonOptions> = (config, options = {}) =>
   return withGradleProperties(config, (config) => {
     const horizonAppId = options.horizonAppId ?? '';
 
+    config.modResults = config.modResults.filter(
+      (item) => item.type !== 'property' || item.key !== 'horizonAppId'
+    );
     config.modResults.push({
       type: 'property',
       key: 'horizonAppId',
