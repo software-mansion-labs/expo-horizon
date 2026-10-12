@@ -11,14 +11,9 @@ import {
 import { writeFileSync, unlinkSync, existsSync, mkdirSync } from 'fs';
 import { resolve } from 'path';
 
-import withHorizon from './withHorizon';
-
 const pkg = require('../../package.json');
 const LOCATION_USAGE = 'Allow $(PRODUCT_NAME) to access your location';
 const MOTION_USAGE = 'Allow $(PRODUCT_NAME) to detect your current motion activity';
-
-// Horizon (Meta Quest) support is opt-in via the EXPO_HORIZON env flag.
-const useHorizon = !!process.env.EXPO_HORIZON;
 
 type DPIString = 'mdpi' | 'hdpi' | 'xhdpi' | 'xxhdpi' | 'xxxhdpi';
 type dpiMap = Record<DPIString, { folderName: string; scale: number }>;
@@ -221,11 +216,6 @@ const withLocation: ConfigPlugin<Props | void> = (
     androidForegroundServiceIcon,
   } = {}
 ) => {
-  // Add Horizon support
-  if (useHorizon) {
-    config = withHorizon(config);
-  }
-
   if (isIosBackgroundLocationEnabled) {
     config = withBackgroundLocation(config);
   }
@@ -260,17 +250,13 @@ const withLocation: ConfigPlugin<Props | void> = (
       'android.permission.ACCESS_COARSE_LOCATION',
       'android.permission.ACCESS_FINE_LOCATION',
       // These permissions are optional, and not listed in the library AndroidManifest.xml
-      // ACCESS_BACKGROUND_LOCATION is not supported on Meta Quest devices.
-      !useHorizon &&
-        isAndroidBackgroundLocationEnabled &&
-        'android.permission.ACCESS_BACKGROUND_LOCATION',
+      // Note: permissions prohibited on the Meta Horizon Store (e.g. ACCESS_BACKGROUND_LOCATION,
+      // ACTIVITY_RECOGNITION) are stripped from the `quest` flavor manifest by `expo-horizon-core`.
+      isAndroidBackgroundLocationEnabled && 'android.permission.ACCESS_BACKGROUND_LOCATION',
       enableAndroidForegroundService && 'android.permission.FOREGROUND_SERVICE',
       enableAndroidForegroundService && 'android.permission.FOREGROUND_SERVICE_LOCATION',
-      // ACTIVITY_RECOGNITION is prohibited on the Meta Horizon Store, so never add it on Horizon.
-      !useHorizon && isAndroidMotionActivityEnabled && 'android.permission.ACTIVITY_RECOGNITION',
-      !useHorizon &&
-        isAndroidMotionActivityEnabled &&
-        'com.google.android.gms.permission.ACTIVITY_RECOGNITION',
+      isAndroidMotionActivityEnabled && 'android.permission.ACTIVITY_RECOGNITION',
+      isAndroidMotionActivityEnabled && 'com.google.android.gms.permission.ACTIVITY_RECOGNITION',
     ].filter(Boolean) as string[]
   );
 };

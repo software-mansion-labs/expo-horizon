@@ -10,6 +10,9 @@
 
 ### 💡 Others
 
+- Removed the `EXPO_HORIZON` env flag and the `withHorizon` config plugin step from `expo-horizon-location`. Horizon configuration (gradle properties, prohibited permissions) is now handled entirely by `expo-horizon-core`.
+- Removed the unused `SharedHelpers.kt` from the Android sources. Both the `mobile` and `quest` flavors use their own `LocationHelpers.kt`.
+
 ## 57.0.2 — 2026-09-07
 
 ### 💡 Others

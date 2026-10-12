@@ -10,6 +10,8 @@
 
 ### 💡 Others
 
+- Removed the bundled `android/libs/android-platform-sdk-v79.aar`. The Meta Horizon Platform SDK is consumed via the `com.meta.horizon.platform.sdk:push-notification-kotlin` Gradle dependency instead.
+
 ## 57.0.2 — 2026-09-07
 
 ### 💡 Others
