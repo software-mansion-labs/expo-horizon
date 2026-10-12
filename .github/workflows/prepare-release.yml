@@ -1,0 +1,92 @@
+name: Prepare stable release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: 'Version bump (major requires an upgraded Expo SDK checkout)'
+        type: choice
+        options: [patch, minor, major]
+        default: patch
+        required: true
+      dry-run:
+        description: 'Preview the changes without pushing a branch or opening a PR'
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: horizon-stable-release
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version-file: .nvmrc
+      - name: Require a branch
+        env:
+          REF_TYPE: ${{ github.ref_type }}
+        run: test "$REF_TYPE" = branch
+      - name: Test release guardrails
+        run: node --test scripts/__tests__/release.test.mjs
+      - name: Resolve and prepare release
+        id: release
+        env:
+          RELEASE_BUMP: ${{ inputs.bump }}
+        run: node scripts/release.mjs prepare
+      - name: Install and build packages and config plugins
+        run: |
+          npm install --global yarn@1.22.22
+          yarn install --frozen-lockfile --non-interactive
+      - name: Format and validate prepared files
+        run: |
+          yarn prettier --write expo-horizon-{core,location,notifications}/{package.json,README.md} expo-horizon-{location,notifications}/CHANGELOG.md
+          node scripts/release.mjs check
+          yarn eslint expo-horizon-{core,location,notifications}/ --ext .js,.jsx,.ts,.tsx
+          for package in expo-horizon-{core,location,notifications}; do
+            yarn tsc --project "$package/tsconfig.json" --noEmit
+          done
+          git diff --check
+          git diff --binary > "$RUNNER_TEMP/release.patch"
+      - name: Upload reviewable changes
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: release-preparation-${{ steps.release.outputs.version }}
+          path: ${{ runner.temp }}/release.patch
+      - name: Open release PR
+        if: ${{ !inputs.dry-run }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.release.outputs.version }}
+          BASE_BRANCH: ${{ github.ref_name }}
+        run: |
+          if git diff --quiet; then
+            echo "Release $VERSION is already prepared. Run Publish stable release from this commit." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          branch="release/prepare-$VERSION"
+          if test -n "$(git ls-remote --heads origin "refs/heads/$branch")"; then
+            echo "Branch $branch already exists. Review its release PR; refusing to create a duplicate or overwrite it." >&2
+            exit 1
+          fi
+          git switch -c "$branch"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add expo-horizon-{core,location,notifications}/package.json expo-horizon-{core,location,notifications}/README.md expo-horizon-{location,notifications}/android/build.gradle expo-horizon-{location,notifications}/CHANGELOG.md
+          git commit -m "chore: prepare release $VERSION"
+          git push --set-upstream origin "$branch"
+          cat > "$RUNNER_TEMP/release-pr.md" <<BODY
+          Prepare all three packages for $VERSION. Versions are resolved against npm for the checked-out Expo SDK, reusing any matching manual bump.
+
+          Updates npm and Android versions, compatibility tables, changelogs, and the core peer range when the SDK changes. Dependency installation, package/plugin builds, ESLint, TypeScript, and release guardrail tests passed during preparation.
+
+          Review the changes and run the applicable native/device checks. Approve GitHub Actions checks on this bot-created PR if prompted. After merging, run **Publish stable release** with dry-run enabled, then repeat with the exact source SHA and dry-run disabled. This PR does not publish anything.
+          BODY
+          gh pr create --base "$BASE_BRANCH" --head "$branch" --title "chore: prepare release $VERSION" --body-file "$RUNNER_TEMP/release-pr.md" | tee -a "$GITHUB_STEP_SUMMARY"
