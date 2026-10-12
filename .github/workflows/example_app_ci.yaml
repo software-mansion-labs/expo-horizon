@@ -10,7 +10,7 @@ on:
       - 'package.json'
       - 'yarn.lock'
       - 'oxlint.config.mts'
-      - '.prettierrc.json'
+      - '.prettierrc'
       - 'tsconfig.base.json'
   push:
     branches:
@@ -23,7 +23,7 @@ on:
       - 'package.json'
       - 'yarn.lock'
       - 'oxlint.config.mts'
-      - '.prettierrc.json'
+      - '.prettierrc'
       - 'tsconfig.base.json'
 
 jobs:
