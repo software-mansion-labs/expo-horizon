@@ -40,15 +40,44 @@
     "preset": "expo-module-scripts"
   },
   "dependencies": {
-    "@expo/image-utils": "^0.12.3"
+    "@expo/image-utils": "^0.12.4"
   },
   "devDependencies": {
-    "expo-module-scripts": "^56.0.6"
+    "expo-module-scripts": "^56.0.8",
+    "expo-task-manager": "~58.0.11"
   },
   "peerDependencies": {
     "expo": "*",
     "expo-horizon-core": "^58.0.0",
     "react": "*",
-    "react-native": "*"
+    "react-native": "*",
+    "expo-task-manager": "*"
+  },
+  "exports": {
+    "./app.plugin": "./app.plugin.js",
+    "./app.plugin.js": "./app.plugin.js",
+    "./package.json": "./package.json",
+    "./plugin": "./plugin/build/index.js",
+    ".": {
+      "types": {
+        "expo-source": "./src/index.ts",
+        "default": "./build/index.d.ts"
+      },
+      "expo-source": "./src/index.ts",
+      "default": "./build/index.js"
+    },
+    "./next": {
+      "types": {
+        "expo-source": "./src/next/index.ts",
+        "default": "./build/next/index.d.ts"
+      },
+      "expo-source": "./src/next/index.ts",
+      "default": "./build/next/index.js"
+    }
+  },
+  "peerDependenciesMeta": {
+    "expo-task-manager": {
+      "optional": true
+    }
   }
 }

@@ -54,7 +54,7 @@ class LocationModuleNext : Module() {
     }
 
     // Permissions
-    AsyncFunction("requestForegroundPermissions") Coroutine { options: RequestForegroundPermissionsOptions? ->
+    AsyncFunction("requestForegroundPermissions") Coroutine { options: RequestPermissionsOptions? ->
       permissionsManager.requestForegroundPermissions(options)
       return@Coroutine permissionsManager.getLocationPermissions(background = false)
     }
@@ -63,7 +63,7 @@ class LocationModuleNext : Module() {
       return@Coroutine permissionsManager.getLocationPermissions(background = false)
     }
 
-    AsyncFunction("requestBackgroundPermissions") Coroutine { ->
+    AsyncFunction("requestBackgroundPermissions") Coroutine { _: RequestPermissionsOptions? ->
       return@Coroutine unsupportedBackgroundPermissions()
     }
 

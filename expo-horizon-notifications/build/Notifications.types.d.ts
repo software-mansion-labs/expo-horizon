@@ -518,6 +518,10 @@ export type NotificationContentAndroid = {
      * The pattern with which to vibrate.
      */
     vibrationPattern?: number[];
+    /**
+     * An identifier used to group related notifications together.
+     */
+    threadIdentifier: string | null;
 };
 /**
  * An object represents a request to present a notification. It has content — how it's being represented, and a trigger — what triggers the notification.
@@ -600,8 +604,11 @@ export type NotificationContentInput = {
      */
     categoryIdentifier?: string;
     /**
-     * An identifier used to group related notifications together in the notification center.
-     * @platform ios
+     * An identifier used to group related notifications together.
+     *
+     * On Android: the notification's group key, which enables notification stacking.
+     *
+     * On iOS: `threadIdentifier`, which groups notifications in the notification center.
      */
     threadIdentifier?: string;
     /**
