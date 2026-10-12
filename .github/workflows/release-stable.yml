@@ -51,13 +51,8 @@ jobs:
           node scripts/release.mjs check
       - name: Install and build packages and config plugins
         run: yarn install --frozen-lockfile --non-interactive
-      - name: Check packages
-        run: |
-          yarn eslint expo-horizon-{core,location,notifications}/ --ext .js,.jsx,.ts,.tsx
-          yarn prettier --check expo-horizon-{core,location,notifications}/
-          for package in expo-horizon-{core,location,notifications}; do
-            yarn tsc --project "$package/tsconfig.json" --noEmit
-          done
+      - name: Run shared workspace verification
+        run: yarn verify
       - name: Validate all tarballs and publish core first
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

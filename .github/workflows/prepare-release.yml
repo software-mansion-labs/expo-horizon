@@ -49,10 +49,7 @@ jobs:
         run: |
           yarn prettier --write expo-horizon-{core,location,notifications}/{package.json,README.md} expo-horizon-{location,notifications}/CHANGELOG.md
           node scripts/release.mjs check
-          yarn eslint expo-horizon-{core,location,notifications}/ --ext .js,.jsx,.ts,.tsx
-          for package in expo-horizon-{core,location,notifications}; do
-            yarn tsc --project "$package/tsconfig.json" --noEmit
-          done
+          yarn verify
           git diff --check
           git diff --binary > "$RUNNER_TEMP/release.patch"
       - name: Upload reviewable changes
@@ -85,7 +82,7 @@ jobs:
           cat > "$RUNNER_TEMP/release-pr.md" <<BODY
           Prepare all three packages for $VERSION. Versions are resolved against npm for the checked-out Expo SDK, reusing any matching manual bump.
 
-          Updates npm and Android versions, compatibility tables, changelogs, and the core peer range when the SDK changes. Dependency installation, package/plugin builds, ESLint, TypeScript, and release guardrail tests passed during preparation.
+          Updates npm and Android versions, compatibility tables, changelogs, and the core peer range when the SDK changes. Dependency installation, the shared yarn verify checks (builds, lint, formatting, package/example types, and Jest), and release guardrail tests passed during preparation.
 
           Review the changes and run the applicable native/device checks. Approve GitHub Actions checks on this bot-created PR if prompted. After merging, run **Publish stable release** with dry-run enabled, then repeat with the exact source SHA and dry-run disabled. This PR does not publish anything.
           BODY

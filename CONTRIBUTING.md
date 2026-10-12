@@ -31,7 +31,7 @@ Use **Prepare stable release** and **Publish stable release** for future stable 
 
 ### One-time setup
 
-Merge the automation into the default branch so the workflows appear in Actions. Enable **Allow GitHub Actions to create and approve pull requests** in the repository's Actions settings. Bot-created PR checks may require a maintainer to click **Approve workflows to run**. Preparation also runs its own builds and checks before opening the PR.
+Merge the automation into the default branch so the workflows appear in Actions. Enable **Allow GitHub Actions to create and approve pull requests** in the repository's Actions settings. Bot-created PR checks may require a maintainer to click **Approve workflows to run**. Preparation runs the shared `yarn verify` checks before opening the PR; publication reruns them on the exact source commit. These include package/plugin builds, lint, formatting, package/example type checks, and Jest. The generated PR also matches the Modules CI and Native Compatibility path filters; require those checks before merging.
 
 Publishing uses the existing `NPM_TOKEN` secret. If the packages use npm trusted publishing instead, configure **each package** to trust `release-stable.yml` in this repository. A successful dry run validates packaging and metadata; it cannot prove that npm will authorize a real upload. Keep the release workflows on maintained SDK branches as well as `main`.
 
