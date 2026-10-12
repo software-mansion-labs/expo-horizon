@@ -14,7 +14,11 @@
     "lint": "eslint '**/*.{js,jsx,ts,tsx}' --max-warnings 0",
     "prettier:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,css,scss,md}\"",
     "prettier:write": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,scss,md}\"",
-    "postinstall": "EXPO_NONINTERACTIVE=true yarn workspaces run build && EXPO_NONINTERACTIVE=true yarn workspaces run build plugin"
+    "postinstall": "EXPO_NONINTERACTIVE=true yarn workspaces run build && EXPO_NONINTERACTIVE=true yarn workspaces run build plugin",
+    "build:plugins": "yarn workspaces run build plugin",
+    "test": "jest --runInBand",
+    "ts:check": "tsc -p expo-horizon-core --noEmit && tsc -p expo-horizon-location --noEmit && tsc -p expo-horizon-notifications --noEmit && yarn workspace app ts:check",
+    "verify": "yarn build && yarn build:plugins && yarn lint && yarn prettier:check && yarn ts:check && yarn test"
   },
   "dependencies": {
     "eslint": "^8.57.1",
@@ -22,12 +26,15 @@
   },
   "devDependencies": {
     "@react-native/eslint-config": "^0.82.1",
+    "@react-native/jest-preset": "0.86.3",
     "@types/jest": "^30.0.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-native": "^5.0.0",
+    "jest": "^29.7.0",
+    "jest-expo": "~57.0.0",
     "typescript": "~6.0.2"
   }
 }
