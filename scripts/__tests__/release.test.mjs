@@ -252,7 +252,7 @@ async function publishFixture(t) {
       console.log(JSON.stringify([{name,version:'57.0.3',integrity:'sha512-YWJj',filename:name+'.tgz',files:['build/index.js','build/index.d.ts','app.plugin.js','expo-module.config.json','android/build.gradle','plugin/build/withHorizon.js','plugin/build/withLocation.js','plugin/build/withNotifications.js','plugin.js','plugin.d.ts','plugin/build/plugin.js','android/src/main/test.kt','android/src/mobile/test.kt','android/src/quest/test.kt','ios/ExpoHorizon.podspec','ios/ExpoLocation.podspec','ios/ExpoNotifications.podspec'].map(path=>({path}))}]));
     } else if(args[0]==='publish') {
       const name=require('node:path').basename(args[1],'.tgz');
-      if(process.env.FAIL_PACKAGE===name) process.exit(1);
+      if(process.env.FAIL_PACKAGE===name && (!process.env.FAIL_UPLOAD_ONLY || !args.includes('--dry-run'))) process.exit(1);
       if(!args.includes('--dry-run')) {
         const records=JSON.parse(fs.readFileSync(root+'/registry.json'));
         records.find(r=>r.name===name).versions['57.0.3']={dist:{integrity:'sha512-YWJj'}};
@@ -345,4 +345,20 @@ test('publication cannot bypass a partial previous release or skip versions', ()
     () => publicationPlan(packed('57.0.9'), registries(), '57.0.9'),
     /version conflict/
   );
+});
+
+test('CLI resumes a failed upload without republishing successful packages', async (t) => {
+  const f = await publishFixture(t);
+  const failed = f.run(false, { FAIL_PACKAGE: packages[2], FAIL_UPLOAD_ONLY: '1' });
+  assert.notEqual(failed.status, 0);
+  assert(!f.calls().some((c) => c.tool === 'git' && c.args[0] === 'tag'));
+  f.put('calls.jsonl', '');
+  const retried = f.run(false);
+  assert.equal(retried.status, 0, retried.stderr);
+  const uploads = f
+    .calls()
+    .filter((c) => c.tool === 'npm' && c.args[0] === 'publish' && !c.args.includes('--dry-run'));
+  assert.equal(uploads.length, 1);
+  assert(uploads[0].args[1].endsWith('expo-horizon-notifications.tgz'));
+  assert(f.calls().some((c) => c.tool === 'git' && c.args[0] === 'tag'));
 });
