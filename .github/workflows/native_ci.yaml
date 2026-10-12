@@ -1,0 +1,88 @@
+name: Native Compatibility
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'expo-horizon-*/**'
+      - 'example/**'
+      - 'package.json'
+      - 'yarn.lock'
+      - '.nvmrc'
+      - '.github/workflows/native_ci.yaml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: native-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CI: '1'
+  EXPO_NO_TELEMETRY: '1'
+
+jobs:
+  android:
+    name: Android mobile and Quest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: 🏗 Setup repo
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - name: 🌿 Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version-file: '.nvmrc'
+      - name: 📦 Install workspace
+        run: |
+          npm install --global yarn@1.22.22
+          yarn install --frozen-lockfile --non-interactive
+      - name: ☕ Select Java 17
+        run: |
+          echo "JAVA_HOME=$JAVA_HOME_17_X64" >> "$GITHUB_ENV"
+          echo "$JAVA_HOME_17_X64/bin" >> "$GITHUB_PATH"
+      - name: ⚙️ Generate Android project
+        id: prebuild
+        run: yarn --cwd example expo prebuild --platform android --no-install
+      - name: 📱 Build Android Mobile
+        working-directory: example/android
+        run: |
+          ./gradlew --no-daemon --console=plain \
+            :app:assembleMobileDebug \
+            -PreactNativeArchitectures=arm64-v8a
+      - name: 🥽 Build Quest
+        if: ${{ !cancelled() && steps.prebuild.outcome == 'success' }}
+        working-directory: example/android
+        run: |
+          ./gradlew --no-daemon --console=plain \
+            :app:assembleQuestDebug \
+            -PreactNativeArchitectures=arm64-v8a
+
+  ios:
+    name: iOS simulator
+    runs-on: macos-26
+    timeout-minutes: 45
+    steps:
+      - name: 🏗 Setup repo
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - name: 🌿 Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version-file: '.nvmrc'
+      - name: 📦 Install workspace
+        run: |
+          npm install --global yarn@1.22.22
+          yarn install --frozen-lockfile --non-interactive
+      - name: ⚙️ Generate iOS project
+        run: yarn --cwd example expo prebuild --platform ios --no-install
+      - name: 📦 Install pods
+        working-directory: example/ios
+        run: pod install
+      - name: 🍎 Build iOS simulator app without signing
+        working-directory: example/ios
+        run: |
+          xcodebuild -workspace expohorizondemo.xcworkspace \
+            -scheme expohorizondemo -configuration Debug \
+            -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO build
