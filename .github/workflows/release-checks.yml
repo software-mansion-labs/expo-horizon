@@ -4,7 +4,11 @@ on:
   pull_request:
     paths:
       - scripts/release.mjs
-      - scripts/__tests__/release.test.mjs
+      - scripts/__tests__/**
+      - .cursor/skills/**
+      - AGENTS.md
+      - CONTRIBUTING.md
+      - .github/pull_request_template.md
       - .github/workflows/prepare-release.yml
       - .github/workflows/release-stable.yml
       - .github/workflows/release-checks.yml
@@ -12,7 +16,11 @@ on:
     branches: [main]
     paths:
       - scripts/release.mjs
-      - scripts/__tests__/release.test.mjs
+      - scripts/__tests__/**
+      - .cursor/skills/**
+      - AGENTS.md
+      - CONTRIBUTING.md
+      - .github/pull_request_template.md
       - .github/workflows/prepare-release.yml
       - .github/workflows/release-stable.yml
       - .github/workflows/release-checks.yml
@@ -28,7 +36,7 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version-file: .nvmrc
-      - run: node --test scripts/__tests__/release.test.mjs
+      - run: node --test scripts/__tests__/*.test.mjs
       - name: Validate workflow syntax and expressions
         run: |
           curl --fail --silent --show-error --location https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz --output "$RUNNER_TEMP/actionlint.tar.gz"
