@@ -116,8 +116,8 @@ Add the plugin to your `app.json` or `app.config.[js|ts]`:
 | Option                  | Type      | Required | Default   | Description                                                                                                                                                                                                                      |
 | ----------------------- | --------- | -------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `horizonAppId`          | `string`  | No       | `""`      | Your Meta Horizon application ID. Used by other libraries (like `expo-horizon-notifications`) to identify your app.                                                                                                              |
-| `defaultHeight`         | `string`  | No       | Not added | Default panel height in dp (e.g., `"640dp"`). See [Panel Sizing](https://developers.meta.com/horizon/documentation/android-apps/panel-sizing)                                                                                    |
-| `defaultWidth`          | `string`  | No       | Not added | Default panel width in dp (e.g., `"1024dp"`). See [Panel Sizing](https://developers.meta.com/horizon/documentation/android-apps/panel-sizing)                                                                                    |
+| `defaultHeight`         | `string`  | No       | Not added | Default panel height in dp (e.g., `"640dp"`). See [Panel Sizing](https://developers.meta.com/vr/essentials/horizon-os-panel-sizing/)                                                                                             |
+| `defaultWidth`          | `string`  | No       | Not added | Default panel width in dp (e.g., `"1024dp"`). See [Panel Sizing](https://developers.meta.com/vr/essentials/horizon-os-panel-sizing/)                                                                                             |
 | `supportedDevices`      | `string`  | Yes      | None      | Pipe-separated list of supported Quest devices: `"quest2\|quest3\|quest3s"`. See [Mobile Manifest](https://developers.meta.com/horizon/resources/publish-mobile-manifest/)                                                       |
 | `disableVrHeadtracking` | `boolean` | No       | `false`   | Set to `true` to disable VR headtracking feature. By default, adds `android.hardware.vr.headtracking` to AndroidManifest.                                                                                                        |
 | `allowBackup`           | `boolean` | No       | `false`   | Set to `true` in the Quest build to enable Android's `allowBackup` feature. The default value is `false` which removes the "allowBackup=true" warning in the Meta Horizon Store. This does not affect your mobile build variant. |
@@ -288,7 +288,7 @@ Now, `horizonAppId` will contain the value of your Horizon App ID as defined in 
 ## Resources
 
 - [Meta Horizon Mobile App Development](https://developers.meta.com/horizon/documentation/android-apps/mobile-overview)
-- [Panel Sizing Guidelines](https://developers.meta.com/horizon/documentation/android-apps/panel-sizing)
+- [Panel Sizing Guidelines](https://developers.meta.com/vr/essentials/horizon-os-panel-sizing/)
 - [Publishing Requirements](https://developers.meta.com/horizon/resources/publish-mobile-manifest/)
 - [Expo Config Plugins](https://docs.expo.dev/config-plugins/introduction/)
 
