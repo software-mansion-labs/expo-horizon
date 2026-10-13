@@ -61,7 +61,9 @@ The new API is available from `expo-horizon-location/next`. This fork follows
   iOS, Android mobile, and Quest. Google Play Services providers and background
   permissions remain unavailable on Quest.
 - `LocationUpdatesHandle` currently has a native implementation only on iOS.
-  Constructing it on Android, including Quest, throws a JavaScript error.
+  Constructing it on Quest throws `ERR_QUEST_FEATURE_UNAVAILABLE` with an explicit
+  message that background location updates are unsupported. On standard Android,
+  constructing it still throws a generic JavaScript error.
 - On iOS, calling `LocationUpdatesHandle.stop()` for a task that has not started
   crashes the app. Avoid this call for inactive tasks; `hasStarted()` reports
   whether the task is registered.

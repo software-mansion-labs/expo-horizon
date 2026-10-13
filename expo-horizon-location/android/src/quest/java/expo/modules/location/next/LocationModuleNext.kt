@@ -144,6 +144,12 @@ class LocationModuleNext : Module() {
       }
     }
 
+    Class("LocationUpdatesHandle") {
+      Constructor { _: String ->
+        throw QuestFeatureUnavailableException("Background location updates are not supported on Meta Quest devices.")
+      }
+    }
+
     Class(PositionWatchHandle::class) {
       Constructor {
         throw PositionWatchHandleCreationException()
