@@ -10,6 +10,11 @@
 
 ### 💡 Others
 
+## 57.0.3 — 2026-10-12
+
+### 💡 Others
+
+- Aligned dependencies and the Swift Package Manager iOS minimum with upstream `expo-location@57.0.20` (Expo SDK 57). ([#78](https://github.com/software-mansion-labs/expo-horizon/pull/78))
 - Removed the `EXPO_HORIZON` env flag and the `withHorizon` config plugin step from `expo-horizon-location`. Horizon configuration (gradle properties, prohibited permissions) is now handled entirely by `expo-horizon-core`.
 - Removed the unused `SharedHelpers.kt` from the Android sources. Both the `mobile` and `quest` flavors use their own `LocationHelpers.kt`.
 

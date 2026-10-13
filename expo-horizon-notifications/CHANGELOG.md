@@ -10,6 +10,11 @@
 
 ### 💡 Others
 
+## 57.0.3 — 2026-10-12
+
+### 💡 Others
+
+- Aligned dependencies and the Swift Package Manager iOS minimum with upstream `expo-notifications@57.0.21` (Expo SDK 57). ([#78](https://github.com/software-mansion-labs/expo-horizon/pull/78))
 - Removed the bundled `android/libs/android-platform-sdk-v79.aar`. The Meta Horizon Platform SDK is consumed via the `com.meta.horizon.platform.sdk:push-notification-kotlin` Gradle dependency instead.
 
 ## 57.0.2 — 2026-09-07
