@@ -31,8 +31,8 @@ yarn ts:check
 The root Jest configuration runs the existing location tests on Android and iOS,
 notifications tests on iOS (including the existing export snapshot), core SDK version
 fallback tests on web, and config plugin tests in Node. The Horizon native bridge
-is mocked as a mobile device for
-these JS tests; they do not establish Quest native behavior. The existing Android
+is mocked as a mobile device for these JS tests; they do not establish Quest native
+behavior. The existing Android
 Google Maps geocoding test remains skipped because it requires an API key.
 
 The restored Xcode fixture and its test-path adjustment are recorded as exact,
