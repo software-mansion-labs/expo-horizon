@@ -71,10 +71,17 @@ parity against the exact Expo target, run `yarn verify`, and perform the
 example app as required; the script imports only location and notifications.
 Record the upstream SHAs, intentional differences, and verification results in the PR.
 
-The existing [parity helper](.cursor/skills/validate-upstream-parity/SKILL.md)
-must run in a disposable Expo worktree. It prints tracked-file diffs but does not
-fail on drift or include untracked additions in its diff. Inspect added files and
-review plugins and metadata separately.
+Run the [read-only parity helper](.cursor/skills/validate-upstream-parity/SKILL.md)
+against the same pinned target:
+
+```bash
+.cursor/skills/validate-upstream-parity/scripts/validate-parity.sh /path/to/expo <printed-target-sha>
+```
+
+It leaves both checkouts untouched, includes additions and deletions, and returns
+1 for native differences or 2 for an invalid input/comparison error. TypeScript
+differences are printed for manual review. Review plugins, metadata, and native
+build configuration separately; an exit code of 0 does not validate those areas.
 
 ## Undo
 

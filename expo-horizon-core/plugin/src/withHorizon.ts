@@ -15,14 +15,14 @@ export type HorizonOptions = {
   /**
    * Default panel height in dp.
    * @example "640dp"
-   * @see https://developers.meta.com/horizon/documentation/android-apps/panel-sizing
+   * @see https://developers.meta.com/vr/essentials/horizon-os-panel-sizing/
    */
   defaultHeight?: string;
 
   /**
    * Default panel width in dp.
    * @example "1024dp"
-   * @see https://developers.meta.com/horizon/documentation/android-apps/panel-sizing
+   * @see https://developers.meta.com/vr/essentials/horizon-os-panel-sizing/
    */
   defaultWidth?: string;
 

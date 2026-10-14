@@ -1,52 +1,33 @@
 ---
 name: validate-upstream-parity
-description: Validate that the Horizon fork's native code (iOS + Android mobile flavor) is identical to upstream expo, and manually review TypeScript src/ for unexpected drift. Use when checking parity with upstream expo, validating an upstream sync, or before publishing expo-horizon-location / expo-horizon-notifications.
+description: Compare Expo Horizon iOS and flattened Android mobile sources with a pinned Expo commit, and review TypeScript drift without modifying either checkout. Use for upstream parity, SDK sync validation, or pre-release native verification.
 disable-model-invocation: true
 ---
 
 # Validate Upstream Parity
 
-Verify this repo's fork of `expo-location` and `expo-notifications` still matches upstream [`expo/expo`](https://github.com/expo/expo) after the Android `quest`/`mobile` flavor split.
+Read [AGENTS.md](../../../AGENTS.md). Compare the Horizon location/notification forks with the exact upstream ref used for the SDK migration. Reuse the upstream path/ref from the current task; ask only if they cannot be established. Do not silently use upstream `main` or its current checkout branch.
 
-| Local                        | Upstream                      |
+| Local package                | Upstream package              |
 | ---------------------------- | ----------------------------- |
 | `expo-horizon-location`      | `packages/expo-location`      |
 | `expo-horizon-notifications` | `packages/expo-notifications` |
 
-## What to compare
-
-- **Native (must be identical):** local `ios/` vs upstream `ios/`, and local `src/main` + `src/mobile` (flattened) vs upstream `android/src/main`. Android `src/quest` (package `expo.modules`) is Horizon-only and excluded.
-- **TypeScript `src/` (manual review):** allowed to differ; just flag anything unexpected.
-- **Ignored:** `build/`, `package.json`, `README`, `CHANGELOG`, `plugin/`.
-
-Upstream keeps all Android source in `src/main`; the fork splits it into `main` (shared) + `mobile` (upstream's main, e.g. `LocationModule.kt`) + `quest` (Horizon-only). So the upstream-equivalent tree is `main ∪ mobile`. The script rebuilds that for you.
-
-## Steps
-
-1. Get the path to the user's local `expo/expo` repository (ask if unknown), resolve the matching SDK ref to a full commit SHA, and create a disposable detached worktree at that SHA. Use that temporary worktree as `<upstream-path>` below; never run the helper on the user's normal Expo checkout. This repo's branch: `git branch --show-current`.
-
-2. Run the helper. It copies local files into the upstream working copy and prints the diff:
+## Run a read-only comparison
 
 ```bash
-.cursor/skills/validate-upstream-parity/scripts/validate-parity.sh <upstream-path>
+.cursor/skills/validate-upstream-parity/scripts/validate-parity.sh <expo-repo> <resolved-commit>
 ```
 
-3. Read the output:
-   - **Native section:** review every difference. iOS must match exactly; flattened Android differences must be understood and documented, or moved into Quest/flavor configuration.
-   - **TypeScript section:** flag only unexpected differences; expected Horizon changes are fine.
+The helper archives tracked upstream files at that commit into a temporary directory and assembles a separate local comparison tree. It never replaces, checks out, or cleans files in either repository. Local source edits are included in the comparison; upstream working-tree edits are not used as the baseline. No `--restore` step is needed. It reports added and removed files as well as modifications.
 
-   The helper prints tracked-file diffs and exits successfully even when differences exist. Its diff omits untracked additions. Inspect those files too:
+## Interpret the results
 
-   ```bash
-   git -C <upstream-path> status --short --untracked-files=all -- packages/expo-location packages/expo-notifications
-   ```
+- **iOS:** should be byte-for-byte equivalent to the selected upstream source. Investigate every difference.
+- **Android mobile:** compare upstream `android/src/main` with local `src/main` plus `src/mobile`, where mobile wins on an overlapping relative path. Quest is excluded. Investigate native differences; do not label one intentional just because it existed before. Record any justified fork exception and its evidence rather than silently weakening the check.
+- **TypeScript `src/`:** review each difference. Known Horizon exports and push-token extensions can be intentional. A clean native result does not approve arbitrary JS drift.
+- **Outside this comparison:** core, plugins, metadata, docs/changelogs, dependencies, and generated build output. Review these separately during an upgrade or release; a parity pass does not verify them.
 
-   An empty printed diff alone is not a parity pass. Plugins, package metadata, and native build configuration outside the compared trees require separate review during an upgrade.
+The helper returns 0 when native trees match, 1 for native differences, and 2 for invalid input or a comparison error. TypeScript differences are printed for review but do not change the native result. Review diff output even on exit 0. Follow the contributor changelog policy for any user-facing Horizon changes needed to resolve a difference.
 
-4. After review, restore the disposable upstream worktree and remove it with `git worktree remove` from the source Expo repository:
-
-```bash
-.cursor/skills/validate-upstream-parity/scripts/validate-parity.sh <upstream-path> --restore
-```
-
-The helper never modifies this repo. It overwrites files in the supplied upstream worktree, and `--restore` checks out tracked files and deletes untracked package files. This is why the supplied worktree must be disposable.
+Run the shared workspace verification and applicable native/device checks described in [docs/verification.md](../../../docs/verification.md). Report the exact upstream commit, native result, reviewed exceptions, TypeScript findings, and validation limitations. Do not claim overall parity until every difference is accounted for.

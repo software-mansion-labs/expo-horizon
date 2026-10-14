@@ -8,14 +8,14 @@ disable-model-invocation: true
 
 Migrate the Horizon forks to a target `expo/expo` branch. Upstream is authoritative for iOS and standard Android; Quest behavior remains an explicit product decision.
 
-See [Upstream upgrades](../../../UPSTREAM_SYNC.md) for the supported workflow and current parity-helper limitations.
+See [Upstream upgrades](../../../UPSTREAM_SYNC.md) for the supported preparation and validation workflow.
 
 ## Required inputs
 
-Before changing files, obtain both:
+Read [AGENTS.md](../../../AGENTS.md) and [Changelog ownership](../../../CONTRIBUTING.md#changelog-ownership). Reuse the following inputs from the user’s request or established session context; ask only for a missing or ambiguous value:
 
 1. The exact upstream ref, such as `sdk-57`. If omitted, ask the user; never default to `main` or infer it.
-2. The path to the user's local `expo/expo` repository. If omitted, ask.
+2. The path to the user's local `expo/expo` repository. Check recorded workspace context before asking.
 
 Resolve and report the target versions:
 
@@ -29,15 +29,15 @@ The version resolver needs Node.js on `PATH`. If upstream removes or reorganizes
 
 ## Safety
 
-- Require a clean Horizon worktree before starting. Do not discard unrelated changes.
+- Use a clean, isolated Horizon worktree when the current checkout has unrelated changes. Preserve the user’s checkout and report which source commit is being upgraded.
 - Do not switch or modify the user's `expo/expo` checkout. Create a temporary detached worktree at the requested ref and remove it after validation:
 
 ```bash
 git -C <expo-repo> worktree add --detach <temporary-directory> <resolved-commit-sha>
 ```
 
-- If creating a branch, use `kosmydel/expo-sdk-<sdk-major>`.
-- Do not commit, push, or publish unless explicitly requested.
+- Reuse the authorized branch or use the branch name requested by the user; otherwise use the coding agent’s normal branch convention.
+- Follow the user’s existing authorization for commits and PR work. An SDK upgrade alone does not authorize publication.
 - Track the migration as a checklist. Stop at unresolved merge conflicts or product decisions.
 
 ## Package mapping
@@ -113,7 +113,7 @@ For every new Android API and every upstream behavior change that lacks a clear 
 | ---------- | ------------------------- | --------------------------- | -------------------------- |
 | ...        | ...                       | ...                         | implement / no-op / reject |
 
-Ask the user to choose. Do not silently decide. Implement the confirmed choice:
+Reuse decisions already made by the user or explicitly documented in the repository. Ask the user to choose only when the product behavior remains unresolved; do not silently change an established decision. Implement the confirmed choice:
 
 - **Implement:** provide equivalent Quest behavior and tests.
 - **No-op:** return a documented, type-correct result with no side effect.
@@ -125,33 +125,26 @@ Also ask when a previously classified Quest API changes semantics upstream. Keep
 
 Follow the repository convention unless the user requests another release version:
 
-- Set all three Horizon package versions to `<sdk-major>.0.0`; confirm if that version already exists or release policy is ambiguous.
+- For the first release of a new SDK line, keep or set all three Horizon package versions to `<sdk-major>.0.0`. Check npm first: never reset an already released SDK line to `.0.0` or blindly increment a manually prepared version. Use the release skill for an existing SDK line or an explicit release request.
 - Update `expo-horizon-core` peer ranges in location and notifications.
 - Copy target-compatible dependency ranges from upstream package metadata, especially `expo-application` and `expo-constants`.
 - Update `expo-module-scripts`, Expo, React Native, example-app dependencies, and lockfile based on the target SDK's own metadata and install tooling.
-- Update Android `version`/`versionName`; review `versionCode` rather than changing it blindly.
+- Keep location/notification Android `version` and `versionName` aligned with their package versions. Core’s Android `versionName` is unrelated to npm releases. Review `versionCode` rather than changing it blindly.
 - Update all three README prerequisites and compatibility tables with exact upstream package versions.
 
-Treat changelogs as release history, not a migration report:
-
-- Preserve upstream changelog content verbatim when syncing it. Do not summarize, rewrite, reclassify, or duplicate upstream entries.
-- Do not add entries for mechanical SDK synchronization, dependency/version bumps, parity results, files changed, or claims such as “no native or TypeScript changes.” Those belong in the handoff or PR description.
-- Add a Horizon changelog item only for an actual user-facing Horizon behavior or API change, and state only that change in the existing terse style.
-- Do not invent a release heading or date. Ask the user before cutting a release entry. Until then, put genuine user-facing changes under `Unpublished`.
-- If the user requests a release entry with no user-facing changes, use the repository's existing sentence: `_This version does not introduce any user-facing changes._`
+Apply [Changelog ownership](../../../CONTRIBUTING.md#changelog-ownership) while implementing the upgrade. Inspect every Horizon behavior change, including Quest implement/no-op/reject decisions, and write the corresponding genuine note under `Unpublished` in the same change. Preserve upstream wording and historical entries. Explain in the PR when only mechanical synchronization occurred; do not manufacture release notes from a version bump. Use the release skill when preparation of a dated release is explicitly requested.
 
 Do not edit podspec versions when they read from `package.json`.
 
 ### 7. Validate parity
 
-Run the existing parity helper against the temporary target-ref worktree:
+Read the parity skill and run its read-only helper against the resolved upstream commit:
 
 ```bash
-.cursor/skills/validate-upstream-parity/scripts/validate-parity.sh <temporary-expo-worktree>
-git -C <temporary-expo-worktree> status --short --untracked-files=all -- packages/expo-location packages/expo-notifications
+.cursor/skills/validate-upstream-parity/scripts/validate-parity.sh <expo-repo> <resolved-commit>
 ```
 
-The helper prints tracked-file diffs but does not fail on differences or include untracked additions in its diff. Review added files and separately inspect plugins, metadata, and native build configuration. After review, run the helper with `--restore` and remove the disposable worktree.
+The helper leaves both checkouts untouched, reports additions and deletions, and fails on native differences. TypeScript differences are printed for review. Separately inspect plugins, metadata, and native build configuration outside the compared source trees.
 
 Acceptance gates:
 
@@ -159,17 +152,19 @@ Acceptance gates:
 - Flattened Android mobile diff is empty except documented, unavoidable fork differences. Prefer moving such differences into Quest/flavor configuration until it is empty.
 - Every TypeScript difference is understood and intentional.
 - Quest exposes the expected API surface and matches every recorded implement/no-op/reject decision.
-- The temporary upstream worktree is restored and removed.
+- Any temporary upstream worktree created for migration is removed. The parity helper itself leaves both checkouts untouched.
 - The proposed `upstream-sync.json` target matches the validated Expo SHA. Commit it with the upgrade only after validation; do not treat staged metadata as evidence that the upgrade is complete.
 
 ### 8. Verify
 
-Run, fixing failures before handoff:
+Use the Node version in `.nvmrc` and run the branch's shared verification entry point:
 
 ```bash
-yarn install
+yarn install --frozen-lockfile
 yarn verify
 ```
+
+When changing dependencies for the upgrade, deliberately regenerate and review the lockfile first, then check that the frozen install works. Use [docs/verification.md](../../../docs/verification.md) for focused reruns; do not substitute the older per-package test commands for the root Jest configuration.
 
 Also build or run both Android variants (`mobileDebug`, `questDebug`) and iOS when the environment supports them. Clearly report any native validation not run.
 
