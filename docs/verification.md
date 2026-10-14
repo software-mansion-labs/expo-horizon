@@ -146,3 +146,18 @@ These results verify the SDK query on this OS version and its independence from
 the build flavor. Older Horizon OS fallback paths and minimum-SDK installation
 restrictions still require devices with the corresponding OS versions. This run
 did not exercise location or notifications.
+
+### Direct version field verification — 2026-10-14
+
+Verified commit `c80a339c` on the same Quest 3 / Horizon OS SDK 207. In both
+optimized release variants, **Current SDK version** displayed `207` immediately,
+before using the comparison helper. The mobile build still reported
+`isHorizonBuild: false`, confirming that the field is independent of build flavor.
+The helper still returned `true` for 207 and `false` for 208 in both builds,
+and the version field remained `207` afterward. The Quest release was restored.
+
+`yarn verify` passed (139 tests, one existing skip), all seven native core tests
+passed in each Android variant, both optimized Android releases built, and the
+iOS simulator build succeeded. Native tests cover absent OS classes and fallback
+between version APIs; web tests verify that the field is `null`. Physical older
+Horizon OS releases remain unverified.
