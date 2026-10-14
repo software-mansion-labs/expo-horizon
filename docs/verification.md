@@ -170,3 +170,17 @@ passed in each Android variant, both optimized Android releases built, and the
 iOS simulator build succeeded. Native tests cover absent OS classes and fallback
 between version APIs; web tests verify that the field is `null`. Physical older
 Horizon OS releases remain unverified.
+
+### OS display version and detector verification — 2026-10-14
+
+Verified commit `40cb53f7` on the same Quest 3. The device reports the
+`horizonos.software.horizon_os` system feature. Both optimized release variants
+displayed `isHorizonDevice: true`, OS version `2.7.0`, and SDK version `207`.
+`isHorizonBuild` was `true` for Quest and `false` for mobile. The SDK 207 helper
+still returned `true`, and neither run produced a fatal app error.
+
+`yarn verify` passed (140 tests, one existing skip), all 17 native tests passed in
+each Android variant, both optimized Android releases built, and the iOS simulator
+build succeeded. The native detector tests run Meta's actual utility against
+simulated system features, including a device without Quest model branding and
+older Quest model fallback. Older physical headsets remain unverified.
