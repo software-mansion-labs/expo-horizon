@@ -15,6 +15,7 @@ android {
     versionCode 1
     versionName "0.1.0"
     buildConfigField "String", "META_HORIZON_APP_ID", horizonAppIdConfigField
+    consumerProguardFiles 'consumer-rules.pro'
   }
   lintOptions {
     abortOnError false
@@ -25,4 +26,10 @@ android {
     quest { dimension "device" }
     mobile { dimension "device" }
   }
+}
+
+dependencies {
+  // This compatibility library is safe on older Horizon OS and other Android devices.
+  implementation 'com.meta.metavrx.util:util:1.0.0'
+  testImplementation 'junit:junit:4.13.2'
 }

@@ -24,6 +24,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     '../expo-horizon-notifications/app.plugin.js',
     horizonCorePlugin({
       horizonAppId: 'DEMO_APP_ID',
+      // Keep the minimum unset so the version-check demo can run on older Quest OS releases.
+      horizonTargetSdkVersion: 207,
       defaultHeight: '640dp',
       defaultWidth: '1024dp',
       supportedDevices: 'quest2|quest3|quest3s',

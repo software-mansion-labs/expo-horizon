@@ -13,6 +13,21 @@ export type HorizonOptions = {
   horizonAppId?: string;
 
   /**
+   * Minimum Meta VR OS SDK version for the Quest build, independent of Android's API level.
+   * Omitted by default so existing apps keep their OS compatibility.
+   * Older OS releases may ignore the declaration; also guard newer APIs at runtime.
+   * @see https://developers.meta.com/vr/documentation/android-apps/metavr-os-sdk-versioning/
+   */
+  horizonMinSdkVersion?: number;
+
+  /**
+   * Meta VR OS SDK behavior version targeted by the Quest build.
+   * Must be at least horizonMinSdkVersion when both are set. Omitted by default.
+   * @see https://developers.meta.com/vr/documentation/android-apps/metavr-os-sdk-versioning/
+   */
+  horizonTargetSdkVersion?: number;
+
+  /**
    * Default panel height in dp.
    * @example "640dp"
    * @see https://developers.meta.com/vr/essentials/horizon-os-panel-sizing/
@@ -50,6 +65,7 @@ export type HorizonOptions = {
 const USE_EXPERIMENTAL_PLUGIN = true;
 
 const withHorizon: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
+  validateHorizonSdkVersions(options);
   config = withHorizonAppId(config, options);
 
   if (USE_EXPERIMENTAL_PLUGIN) {
@@ -66,6 +82,28 @@ const withHorizon: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
 
   return config;
 };
+
+function validateHorizonSdkVersions(options: HorizonOptions) {
+  for (const key of ['horizonMinSdkVersion', 'horizonTargetSdkVersion'] as const) {
+    const version = options[key];
+    if (
+      version !== undefined &&
+      (!Number.isInteger(version) || version < 61 || version > 2147483647)
+    ) {
+      throw new Error(`[expo-horizon-core] ${key} must be an integer between 61 and 2147483647.`);
+    }
+  }
+
+  if (
+    options.horizonMinSdkVersion !== undefined &&
+    options.horizonTargetSdkVersion !== undefined &&
+    options.horizonTargetSdkVersion < options.horizonMinSdkVersion
+  ) {
+    throw new Error(
+      '[expo-horizon-core] horizonTargetSdkVersion must be greater than or equal to horizonMinSdkVersion.'
+    );
+  }
+}
 
 const withHorizonEnabled: ConfigPlugin = (config) => {
   return withGradleProperties(config, (config) => {

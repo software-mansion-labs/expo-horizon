@@ -34,6 +34,7 @@ delete pluginPreset.prettierPath;
 
 module.exports = {
   projects: [
+    nativeProject('expo-horizon-core', 'web'),
     nativeProject('expo-horizon-location', 'ios'),
     nativeProject('expo-horizon-location', 'android'),
     nativeProject('expo-horizon-notifications', 'ios'),

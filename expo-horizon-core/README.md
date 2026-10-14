@@ -10,6 +10,7 @@ A comprehensive Expo module for building Android applications for Meta Quest dev
 - 📱 **Build Flavors** - Automatically generates Horizon-specific build variants alongside your standard Android builds
 - ✅ **Manifest Alignment** - Ensures your AndroidManifest meets [Meta Horizon requirements](https://developers.meta.com/horizon/resources/publish-mobile-manifest)
 - 🔍 **Runtime Detection** - JavaScript constants to detect Horizon devices and builds at runtime
+- 🧩 **Horizon OS SDK Checks** - Check OS API availability and configure Horizon minimum/target SDK versions
 - 🛠️ **Native Module Support** - Access Horizon app ID from custom native modules
 - ⚙️ **Flexible Configuration** - Customize panel sizing, device support, and VR features
 
@@ -113,6 +114,13 @@ Add the plugin to your `app.json` or `app.config.[js|ts]`:
 
 #### Available Options
 
+Horizon OS SDK options (see [SDK version configuration](#horizon-os-sdk-versions)):
+
+| Option                    | Type     | Default   | Description                                        |
+| ------------------------- | -------- | --------- | -------------------------------------------------- |
+| `horizonMinSdkVersion`    | `number` | Not added | Minimum Meta VR OS SDK required by the Quest app.  |
+| `horizonTargetSdkVersion` | `number` | Not added | Meta VR OS SDK behavior targeted by the Quest app. |
+
 | Option                  | Type      | Required | Default   | Description                                                                                                                                                                                                                      |
 | ----------------------- | --------- | -------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `horizonAppId`          | `string`  | No       | `""`      | Your Meta Horizon application ID. Used by other libraries (like `expo-horizon-notifications`) to identify your app.                                                                                                              |
@@ -127,6 +135,41 @@ Add the plugin to your `app.json` or `app.config.[js|ts]`:
 > If the application is storing sensitive information on the device, it is recommended to disable backups by setting `allowBackup="false"` in your application's AndroidManifest.
 
 ### Configuration Examples
+
+#### Horizon OS SDK versions
+
+The optional `horizonMinSdkVersion` and `horizonTargetSdkVersion` settings declare
+the Meta VR OS SDK versions for the **Quest build**. They do not change Android's
+`minSdkVersion` or `targetSdkVersion`, or the mobile build's manifest.
+
+```json
+{
+  "plugins": [
+    [
+      "expo-horizon-core",
+      {
+        "supportedDevices": "quest2|quest3|quest3s",
+        "horizonTargetSdkVersion": 207
+      }
+    ]
+  ]
+}
+```
+
+- `horizonMinSdkVersion`: the oldest Meta VR OS SDK your app requires. Leave it
+  unset if newer features are optional and your app supplies a fallback.
+- `horizonTargetSdkVersion`: the Meta VR OS SDK behavior version your app targets.
+  Set it to a version against which you test your app.
+
+Both settings are omitted by default. Values must be integers from 61 through
+2147483647; when both are supplied, the target must be at least the minimum.
+The plugin writes the namespaced `metavr:uses-metavr-sdk` element in the Quest
+manifest. Raising the minimum can prevent installation on OS versions below that
+minimum. Horizon OS recognizes this declaration from SDK 207 onward; older
+releases can ignore it, so continue to guard newer API calls at runtime.
+See [Meta VR OS SDK versioning](https://developers.meta.com/vr/documentation/android-apps/metavr-os-sdk-versioning/).
+
+#### Panel and device settings
 
 ```json
 {
@@ -231,6 +274,9 @@ The module provides runtime constants and utilities to help you build Horizon-aw
 
 #### Basic Usage
 
+The synchronous method `isHorizonSdkVersionAtLeast(version: number): boolean`
+checks OS SDK availability. See [Checking Horizon OS SDK support](#checking-horizon-os-sdk-support).
+
 ```typescript
 import ExpoHorizon from 'expo-horizon-core';
 
@@ -248,6 +294,30 @@ if (ExpoHorizon.isHorizonBuild) {
 const appId = ExpoHorizon.horizonAppId;
 console.log('Horizon App ID:', appId ?? 'Not configured');
 ```
+
+### Checking Horizon OS SDK support
+
+```typescript
+import ExpoHorizon from 'expo-horizon-core';
+
+const supportsSdk207 = ExpoHorizon.isHorizonSdkVersionAtLeast(207);
+// Use this result to enable an optional SDK 207 feature or show its fallback.
+```
+
+`isHorizonSdkVersionAtLeast(version: number): boolean` synchronously checks the
+device's **Meta VR OS SDK version**, which is independent of Android's API level,
+the user-facing OS version string, and the app's build flavor. A mobile build
+running on Horizon OS can also return `true`.
+
+The method returns `false` on non-Horizon Android devices, iOS, web, and older
+Horizon OS versions where the requested SDK is unavailable. It throws for
+non-integer values, versions below 61, or values above 2147483647. You do not need
+an app ID, permission, or Platform SDK service connection to call it.
+
+Android uses Meta's [OS Utility Library](https://developers.meta.com/vr/documentation/android-apps/metavrx-os-utility-library/)
+(`com.meta.metavrx.util:util:1.0.0`) to handle absent OS APIs safely. Rebuild your
+development client after updating the package. This check does not itself enable
+features or guarantee that a feature's hardware and permissions are available.
 
 ### Usage in Custom Native Modules
 

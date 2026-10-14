@@ -105,3 +105,54 @@ it('applies Quest option changes without leaving old feature declarations', asyn
     })
   );
 });
+
+it('writes namespaced Horizon SDK settings only to the Quest overlay', async () => {
+  await prebuild({ horizonMinSdkVersion: 207, horizonTargetSdkVersion: 208 });
+  const [questManifest] = await readOutput();
+  expect(questManifest).toContain('xmlns:metavr="http://schemas.meta.com/metavr-sdk"');
+  expect(questManifest).toContain(
+    '<metavr:uses-metavr-sdk metavr:minSdkVersion="207" metavr:targetSdkVersion="208"/>'
+  );
+  expect(
+    await fs.readFile(path.join(projectRoot, 'android/app/src/main/AndroidManifest.xml'), 'utf8')
+  ).toBe(mobileManifest);
+  const first = await readOutput();
+  await prebuild({ horizonMinSdkVersion: 207, horizonTargetSdkVersion: 208 });
+  expect(await readOutput()).toEqual(first);
+});
+
+it('supports either SDK setting alone and removes declarations when options are removed', async () => {
+  await prebuild({ horizonMinSdkVersion: 207 });
+  let [questManifest] = await readOutput();
+  expect(questManifest).toContain('<metavr:uses-metavr-sdk metavr:minSdkVersion="207"/>');
+  expect(questManifest).not.toContain('metavr:targetSdkVersion');
+
+  await prebuild({ horizonTargetSdkVersion: 208 });
+  [questManifest] = await readOutput();
+  expect(questManifest).toContain('<metavr:uses-metavr-sdk metavr:targetSdkVersion="208"/>');
+  expect(questManifest).not.toContain('metavr:minSdkVersion');
+
+  await prebuild();
+  [questManifest] = await readOutput();
+  expect(questManifest).not.toContain('metavr');
+});
+
+describe.each(['horizonMinSdkVersion', 'horizonTargetSdkVersion'] as const)('%s', (key) => {
+  it.each([60, -1, 0, 207.5, NaN, Infinity, 2147483648, '207', null])(
+    'rejects invalid configuration %s',
+    (version) => {
+      expect(() =>
+        withHorizon({ name: 'test', slug: 'test' }, { [key]: version } as HorizonOptions)
+      ).toThrow(`${key} must be an integer between 61 and 2147483647`);
+    }
+  );
+});
+
+it('rejects a target SDK lower than the minimum', () => {
+  expect(() =>
+    withHorizon(
+      { name: 'test', slug: 'test' },
+      { horizonMinSdkVersion: 208, horizonTargetSdkVersion: 207 }
+    )
+  ).toThrow('horizonTargetSdkVersion must be greater than or equal to horizonMinSdkVersion');
+});

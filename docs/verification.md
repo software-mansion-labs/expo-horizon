@@ -29,8 +29,9 @@ yarn ts:check
 ```
 
 The root Jest configuration runs the existing location tests on Android and iOS,
-notifications tests on iOS (including the existing export snapshot), and config
-plugin tests in Node. The Horizon native bridge is mocked as a mobile device for
+notifications tests on iOS (including the existing export snapshot), core SDK version
+fallback tests on web, and config plugin tests in Node. The Horizon native bridge
+is mocked as a mobile device for
 these JS tests; they do not establish Quest native behavior. The existing Android
 Google Maps geocoding test remains skipped because it requires an API key.
 
@@ -41,6 +42,8 @@ hashes and their pinned Expo commit when changing the fixture or upgrading the S
 Core plugin tests run Expo's mod compiler against temporary native files. They
 check mobile/Quest permission separation, Quest options, and repeatable output,
 including updating `horizonAppId`. Temporary files are removed after each test.
+SDK version tests also check the namespaced Quest declaration, optional values,
+invalid configuration, and removal of settings on a subsequent prebuild.
 This validates generated overlays; native builds must still validate manifest
 merging and Gradle compatibility.
 
@@ -78,3 +81,32 @@ flavors or app ID entries.
 Save a short result table with pass/fail/unverified and error codes or log excerpts.
 Avoid saving exact coordinates or push-token contents in committed evidence. A JS
 unit-test pass, a successful build, and a device smoke pass are separate evidence.
+
+## Horizon OS SDK version checks
+
+After Android prebuild, run the native compatibility tests from `example/android`:
+
+```sh
+./gradlew :expo-horizon-core:testMobileDebugUnitTest :expo-horizon-core:testQuestDebugUnitTest
+```
+
+These exercise the real Meta utility library without Horizon OS classes, verifying
+the fallback on non-Horizon systems and rejection of invalid version numbers.
+They run in the native Android CI jobs too. They do not prove detection on a Quest.
+Native CI also builds an optimized Quest release to validate the consumer R8
+rules for classes supplied by Horizon OS.
+
+On the example's Horizon screen, use the **Horizon OS SDK** section:
+
+| Input      | Expected result                                                                                 |
+| ---------- | ----------------------------------------------------------------------------------------------- |
+| 61         | `true` on a Quest with SDK 61 or newer; `false` on non-Horizon Android, iOS, and web.           |
+| 207        | Matches whether the Quest's Meta VR OS SDK is 207 or newer, independent of Android's API level. |
+| 2147483647 | `false` on current devices, without a crash.                                                    |
+| 60 or 61.5 | A validation error displayed in the result field, without a crash.                              |
+
+Repeat with the mobile build on Quest: SDK availability must not depend on the
+build flavor. Record the device, OS/SDK version, build variant, and results. The
+example declares target SDK 207 but leaves the minimum unset so older Quest
+releases can still exercise the runtime fallback. Inspect merged manifests to
+confirm the Meta target appears only in the Quest build.

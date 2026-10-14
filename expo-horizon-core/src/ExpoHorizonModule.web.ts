@@ -6,6 +6,13 @@ class ExpoHorizonModule extends NativeModule {
   isHorizonBuild = false;
 
   horizonAppId = null;
+
+  isHorizonSdkVersionAtLeast(version: number): boolean {
+    if (!Number.isInteger(version) || version < 61 || version > 2147483647) {
+      throw new RangeError('Horizon SDK version must be an integer between 61 and 2147483647.');
+    }
+    return false;
+  }
 }
 
 export default registerWebModule(ExpoHorizonModule, 'ExpoHorizonModule');

@@ -16,6 +16,14 @@ declare class ExpoHorizonModule extends NativeModule {
    * Note: First check if you are on a Horizon device using `isHorizonDevice`.
    */
   horizonAppId: string | null;
+
+  /**
+   * Whether the device supports at least the given Meta VR OS SDK version.
+   * This is independent of Android's API level and the app's build flavor.
+   * Returns false on iOS, web, non-Horizon Android, and unsupported older OS versions.
+   * @throws If version is not an integer between 61 and 2147483647.
+   */
+  isHorizonSdkVersionAtLeast(version: number): boolean;
 }
 
 export default requireNativeModule<ExpoHorizonModule>('ExpoHorizon');

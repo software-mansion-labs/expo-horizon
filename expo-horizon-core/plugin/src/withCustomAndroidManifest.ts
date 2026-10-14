@@ -8,25 +8,14 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import { PROHIBITED_PERMISSIONS } from './constants';
-
-type HorizonManifestOptions = {
-  horizonAppId?: string;
-  defaultHeight?: string;
-  defaultWidth?: string;
-  supportedDevices?: string;
-  disableVrHeadtracking?: boolean;
-  allowBackup?: boolean;
-};
+import type { HorizonOptions } from './withHorizon';
 
 /**
  * Creates a separate AndroidManifest.xml for the Horizon flavor.
  * This plugin uses withDangerousMod to directly manipulate files and
  * modifies the app build.gradle to add flavor dimensions.
  */
-export const withCustomAndroidManifest: ConfigPlugin<HorizonManifestOptions> = (
-  config,
-  options = {}
-) => {
+export const withCustomAndroidManifest: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
   // Add flavor dimensions to build.gradle
   config = withQuestFlavorDimensions(config);
 
@@ -113,9 +102,7 @@ const withQuestFlavorDimensions: ConfigPlugin = (config) => {
  * This manifest will be merged with the main manifest, so we only include
  * Horizon-specific features to avoid conflicts.
  */
-function createQuestManifest(
-  options: HorizonManifestOptions
-): AndroidConfig.Manifest.AndroidManifest {
+function createQuestManifest(options: HorizonOptions): AndroidConfig.Manifest.AndroidManifest {
   const manifest: AndroidConfig.Manifest.AndroidManifest = {
     manifest: {
       $: {
@@ -128,6 +115,22 @@ function createQuestManifest(
       application: [],
     },
   };
+
+  if (options.horizonMinSdkVersion !== undefined || options.horizonTargetSdkVersion !== undefined) {
+    manifest.manifest.$['xmlns:metavr'] = 'http://schemas.meta.com/metavr-sdk';
+    const sdkAttributes: Record<string, string> = {};
+    if (options.horizonMinSdkVersion !== undefined) {
+      sdkAttributes['metavr:minSdkVersion'] = String(options.horizonMinSdkVersion);
+    }
+    if (options.horizonTargetSdkVersion !== undefined) {
+      sdkAttributes['metavr:targetSdkVersion'] = String(options.horizonTargetSdkVersion);
+    }
+    // Expo's Android manifest types do not yet include Meta's namespaced element.
+    const horizonManifest = manifest.manifest as typeof manifest.manifest & {
+      'metavr:uses-metavr-sdk': { $: Record<string, string> }[];
+    };
+    horizonManifest['metavr:uses-metavr-sdk'] = [{ $: sdkAttributes }];
+  }
 
   // Block prohibited permissions
   for (const permission of PROHIBITED_PERMISSIONS) {
