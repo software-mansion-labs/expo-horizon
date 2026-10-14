@@ -49,6 +49,7 @@ jobs:
         working-directory: example/android
         run: |
           ./gradlew --no-daemon --console=plain \
+            :expo-horizon-core:testMobileDebugUnitTest \
             :app:assembleMobileDebug \
             -PreactNativeArchitectures=arm64-v8a
       - name: 🥽 Build Quest
@@ -56,7 +57,15 @@ jobs:
         working-directory: example/android
         run: |
           ./gradlew --no-daemon --console=plain \
+            :expo-horizon-core:testQuestDebugUnitTest \
             :app:assembleQuestDebug \
+            -PreactNativeArchitectures=arm64-v8a
+      - name: 🥽 Build optimized Quest release
+        working-directory: example/android
+        run: |
+          ./gradlew --no-daemon --console=plain \
+            :app:assembleQuestRelease \
+            -Pandroid.enableMinifyInReleaseBuilds=true \
             -PreactNativeArchitectures=arm64-v8a
 
   ios:

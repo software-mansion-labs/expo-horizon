@@ -13,6 +13,21 @@ export type HorizonOptions = {
   horizonAppId?: string;
 
   /**
+   * Minimum Meta VR OS SDK version for the Quest build, independent of Android's API level.
+   * Omitted by default so existing apps keep their OS compatibility.
+   * Older OS releases may ignore the declaration; also guard newer APIs at runtime.
+   * @see https://developers.meta.com/vr/documentation/android-apps/metavr-os-sdk-versioning/
+   */
+  horizonMinSdkVersion?: number;
+
+  /**
+   * Meta VR OS SDK behavior version targeted by the Quest build.
+   * Must be at least horizonMinSdkVersion when both are set. Omitted by default.
+   * @see https://developers.meta.com/vr/documentation/android-apps/metavr-os-sdk-versioning/
+   */
+  horizonTargetSdkVersion?: number;
+
+  /**
    * Default panel height in dp.
    * @example "640dp"
    * @see https://developers.meta.com/vr/essentials/horizon-os-panel-sizing/
@@ -25,6 +40,20 @@ export type HorizonOptions = {
    * @see https://developers.meta.com/vr/essentials/horizon-os-panel-sizing/
    */
   defaultWidth?: string;
+
+  /**
+   * Minimum panel width in dp for the Quest build. Omitted by default.
+   * Must be a positive dp dimension.
+   * @example "600dp"
+   */
+  minWidth?: string;
+
+  /**
+   * Minimum panel height in dp for the Quest build. Omitted by default.
+   * Must be a positive dp dimension.
+   * @example "400dp"
+   */
+  minHeight?: string;
 
   /**
    * Pipe-separated list of supported Quest devices.
@@ -50,6 +79,8 @@ export type HorizonOptions = {
 const USE_EXPERIMENTAL_PLUGIN = true;
 
 const withHorizon: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
+  validateHorizonSdkVersions(options);
+  validatePanelMinimums(options);
   config = withHorizonAppId(config, options);
 
   if (USE_EXPERIMENTAL_PLUGIN) {
@@ -66,6 +97,43 @@ const withHorizon: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
 
   return config;
 };
+
+function validatePanelMinimums(options: HorizonOptions) {
+  for (const key of ['minWidth', 'minHeight'] as const) {
+    const value = options[key];
+    if (
+      value !== undefined &&
+      (typeof value !== 'string' ||
+        !/^\d+(?:\.\d+)?dp$/.test(value) ||
+        !Number.isFinite(parseFloat(value)) ||
+        parseFloat(value) <= 0)
+    ) {
+      throw new Error(`[expo-horizon-core] ${key} must be a positive dp dimension, e.g. "360dp".`);
+    }
+  }
+}
+
+function validateHorizonSdkVersions(options: HorizonOptions) {
+  for (const key of ['horizonMinSdkVersion', 'horizonTargetSdkVersion'] as const) {
+    const version = options[key];
+    if (
+      version !== undefined &&
+      (!Number.isInteger(version) || version < 61 || version > 2147483647)
+    ) {
+      throw new Error(`[expo-horizon-core] ${key} must be an integer between 61 and 2147483647.`);
+    }
+  }
+
+  if (
+    options.horizonMinSdkVersion !== undefined &&
+    options.horizonTargetSdkVersion !== undefined &&
+    options.horizonTargetSdkVersion < options.horizonMinSdkVersion
+  ) {
+    throw new Error(
+      '[expo-horizon-core] horizonTargetSdkVersion must be greater than or equal to horizonMinSdkVersion.'
+    );
+  }
+}
 
 const withHorizonEnabled: ConfigPlugin = (config) => {
   return withGradleProperties(config, (config) => {
@@ -99,7 +167,12 @@ const withHorizonAppId: ConfigPlugin<HorizonOptions> = (config, options = {}) =>
 const withPanelSize: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
   return withAndroidManifest(config, (config) => {
     // Only add layout if at least one dimension is provided
-    if (!options.defaultHeight && !options.defaultWidth) {
+    if (
+      !options.defaultHeight &&
+      !options.defaultWidth &&
+      !options.minWidth &&
+      !options.minHeight
+    ) {
       return config;
     }
 
@@ -118,6 +191,12 @@ const withPanelSize: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
       }
       if (options.defaultWidth) {
         layoutAttrs['android:defaultWidth'] = options.defaultWidth;
+      }
+      if (options.minWidth) {
+        layoutAttrs['android:minWidth'] = options.minWidth;
+      }
+      if (options.minHeight) {
+        layoutAttrs['android:minHeight'] = options.minHeight;
       }
 
       mainActivity.layout.push({

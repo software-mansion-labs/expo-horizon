@@ -10,6 +10,7 @@ A comprehensive Expo module for building Android applications for Meta Quest dev
 - 📱 **Build Flavors** - Automatically generates Horizon-specific build variants alongside your standard Android builds
 - ✅ **Manifest Alignment** - Ensures your AndroidManifest meets [Meta Horizon requirements](https://developers.meta.com/horizon/resources/publish-mobile-manifest)
 - 🔍 **Runtime Detection** - JavaScript constants to detect Horizon devices and builds at runtime
+- 🧩 **Horizon OS SDK Checks** - Check OS API availability and configure Horizon minimum/target SDK versions
 - 🛠️ **Native Module Support** - Access Horizon app ID from custom native modules
 - ⚙️ **Flexible Configuration** - Customize panel sizing, device support, and VR features
 
@@ -113,11 +114,20 @@ Add the plugin to your `app.json` or `app.config.[js|ts]`:
 
 #### Available Options
 
+Horizon OS SDK options (see [SDK version configuration](#horizon-os-sdk-versions)):
+
+| Option                    | Type     | Default   | Description                                        |
+| ------------------------- | -------- | --------- | -------------------------------------------------- |
+| `horizonMinSdkVersion`    | `number` | Not added | Minimum Meta VR OS SDK required by the Quest app.  |
+| `horizonTargetSdkVersion` | `number` | Not added | Meta VR OS SDK behavior targeted by the Quest app. |
+
 | Option                  | Type      | Required | Default   | Description                                                                                                                                                                                                                      |
 | ----------------------- | --------- | -------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `horizonAppId`          | `string`  | No       | `""`      | Your Meta Horizon application ID. Used by other libraries (like `expo-horizon-notifications`) to identify your app.                                                                                                              |
 | `defaultHeight`         | `string`  | No       | Not added | Default panel height in dp (e.g., `"640dp"`). See [Panel Sizing](https://developers.meta.com/vr/essentials/horizon-os-panel-sizing/)                                                                                             |
 | `defaultWidth`          | `string`  | No       | Not added | Default panel width in dp (e.g., `"1024dp"`). See [Panel Sizing](https://developers.meta.com/vr/essentials/horizon-os-panel-sizing/)                                                                                             |
+| `minWidth`              | `string`  | No       | Not added | Minimum panel width for the Quest build, as a positive dp dimension (e.g., `"600dp"`).                                                                                                                                           |
+| `minHeight`             | `string`  | No       | Not added | Minimum panel height for the Quest build, as a positive dp dimension (e.g., `"400dp"`).                                                                                                                                          |
 | `supportedDevices`      | `string`  | Yes      | None      | Pipe-separated list of supported Quest devices: `"quest2\|quest3\|quest3s"`. See [Mobile Manifest](https://developers.meta.com/horizon/resources/publish-mobile-manifest/)                                                       |
 | `disableVrHeadtracking` | `boolean` | No       | `false`   | Set to `true` to disable VR headtracking feature. By default, adds `android.hardware.vr.headtracking` to AndroidManifest.                                                                                                        |
 | `allowBackup`           | `boolean` | No       | `false`   | Set to `true` in the Quest build to enable Android's `allowBackup` feature. The default value is `false` which removes the "allowBackup=true" warning in the Meta Horizon Store. This does not affect your mobile build variant. |
@@ -128,6 +138,41 @@ Add the plugin to your `app.json` or `app.config.[js|ts]`:
 
 ### Configuration Examples
 
+#### Horizon OS SDK versions
+
+The optional `horizonMinSdkVersion` and `horizonTargetSdkVersion` settings declare
+the Meta VR OS SDK versions for the **Quest build**. They do not change Android's
+`minSdkVersion` or `targetSdkVersion`, or the mobile build's manifest.
+
+```json
+{
+  "plugins": [
+    [
+      "expo-horizon-core",
+      {
+        "supportedDevices": "quest2|quest3|quest3s",
+        "horizonTargetSdkVersion": 207
+      }
+    ]
+  ]
+}
+```
+
+- `horizonMinSdkVersion`: the oldest Meta VR OS SDK your app requires. Leave it
+  unset if newer features are optional and your app supplies a fallback.
+- `horizonTargetSdkVersion`: the Meta VR OS SDK behavior version your app targets.
+  Set it to a version against which you test your app.
+
+Both settings are omitted by default. Values must be integers from 61 through
+2147483647; when both are supplied, the target must be at least the minimum.
+The plugin writes the namespaced `metavr:uses-metavr-sdk` element in the Quest
+manifest. Raising the minimum can prevent installation on OS versions below that
+minimum. Horizon OS recognizes this declaration from SDK 207 onward; older
+releases can ignore it, so continue to guard newer API calls at runtime.
+See [Meta VR OS SDK versioning](https://developers.meta.com/vr/documentation/android-apps/metavr-os-sdk-versioning/).
+
+#### Panel and device settings
+
 ```json
 {
   "plugins": [
@@ -137,6 +182,8 @@ Add the plugin to your `app.json` or `app.config.[js|ts]`:
         "horizonAppId": "1234567890",
         "defaultHeight": "800dp",
         "defaultWidth": "1280dp",
+        "minWidth": "600dp",
+        "minHeight": "400dp",
         "supportedDevices": "quest2|quest3|quest3s",
         "disableVrHeadtracking": false
       }
@@ -144,6 +191,17 @@ Add the plugin to your `app.json` or `app.config.[js|ts]`:
   ]
 }
 ```
+
+`defaultWidth` and `defaultHeight` set the initial panel size. The optional
+`minWidth` and `minHeight` declare the smallest dimensions the panel can resize
+to. Choose minimums only if your layout becomes unusable below those sizes; the
+app still needs to adapt to other panel sizes.
+
+Minimums must be positive dp strings, such as `"600dp"` or `"360.5dp"`. Either
+can be configured independently, with or without default dimensions. Unset values
+are omitted from the manifest. These settings apply to the Quest build only;
+rerun Android prebuild and rebuild the app after changing them.
+See Meta's [Android app configuration](https://developers.meta.com/vr/documentation/android-apps/create-app/).
 
 > **Setting default dimensions:**
 >
@@ -223,13 +281,18 @@ The module provides runtime constants and utilities to help you build Horizon-aw
 
 #### API Reference
 
-| Property          | Type             | Description                                                                     |
-| ----------------- | ---------------- | ------------------------------------------------------------------------------- |
-| `isHorizonDevice` | `boolean`        | Returns `true` if the app is running on a physical Horizon device.              |
-| `isHorizonBuild`  | `boolean`        | Returns `true` if the app was built with the Quest build flavor.                |
-| `horizonAppId`    | `string \| null` | The Horizon App ID configured via the config plugin. Returns `null` if not set. |
+| Property            | Type             | Description                                                                     |
+| ------------------- | ---------------- | ------------------------------------------------------------------------------- |
+| `isHorizonDevice`   | `boolean`        | Detects Horizon OS, with a fallback for older Quest devices.                    |
+| `isHorizonBuild`    | `boolean`        | Returns `true` if the app was built with the Quest build flavor.                |
+| `horizonAppId`      | `string \| null` | The Horizon App ID configured via the config plugin. Returns `null` if not set. |
+| `horizonSdkVersion` | `number \| null` | The device's current Horizon OS SDK version, or `null` when unavailable.        |
+| `horizonOsVersion`  | `string \| null` | The user-facing Horizon OS version label, or `null` when unavailable.           |
 
 #### Basic Usage
+
+The synchronous method `isHorizonSdkVersionAtLeast(version: number): boolean`
+checks OS SDK availability. See [Checking Horizon OS SDK support](#checking-horizon-os-sdk-support).
 
 ```typescript
 import ExpoHorizon from 'expo-horizon-core';
@@ -247,7 +310,67 @@ if (ExpoHorizon.isHorizonBuild) {
 // Access the Horizon App ID
 const appId = ExpoHorizon.horizonAppId;
 console.log('Horizon App ID:', appId ?? 'Not configured');
+
+// Display the OS version in an About screen or diagnostic report.
+console.log('Horizon OS:', ExpoHorizon.horizonOsVersion ?? 'Unavailable');
 ```
+
+### Horizon OS detection and display version
+
+On Android, `isHorizonDevice` uses Meta's
+[Horizon OS detector](https://developers.meta.com/vr/reference/metavrx-os-utility/v1.0/class_metavrx_os_horizon_os_detector/)
+to check system features, independently of the device's manufacturer/model name
+and the app's build flavor. If the detector returns `false`, the previous Expo
+Quest model check remains as a fallback for older devices. It returns `false` on
+iOS and web.
+
+`horizonOsVersion: string | null` is a read-only, user-facing version label from
+[`Build.Version.getDisplayName()`](https://developers.meta.com/vr/reference/metavr-os-jsdk/v207/class_metavr_os_build/).
+Android falls back to the earlier `horizonos` API name when needed. The value is
+returned unchanged; do not parse it or use it for version comparisons. Use
+`horizonSdkVersion` or `isHorizonSdkVersionAtLeast()` for API compatibility checks.
+
+The display version is `null` on non-Horizon Android, iOS, web, and Horizon
+releases without a supported display-version API. It requires no permissions,
+app ID, or Platform SDK connection.
+
+### Checking Horizon OS SDK support
+
+```typescript
+import ExpoHorizon from 'expo-horizon-core';
+
+// Read the version directly for display, diagnostics, or your own comparisons.
+const sdkVersion = ExpoHorizon.horizonSdkVersion;
+console.log('Horizon OS SDK:', sdkVersion ?? 'Unavailable');
+
+const supportsSdk207 = ExpoHorizon.isHorizonSdkVersionAtLeast(207);
+// Use this result to enable an optional SDK 207 feature or show its fallback.
+```
+
+`horizonSdkVersion: number | null` is a read-only constant containing the device's
+current **Meta VR OS SDK version**, such as `207`. This is independent of Android's
+API level, the user-facing OS version string, the app's configured minimum/target
+SDK, and the app's build flavor. A mobile build running on Horizon OS can also
+read the version. It returns `null` on non-Horizon Android, iOS, web, and older
+Horizon releases without a supported version API.
+
+Android reads the [OS SDK version API](https://developers.meta.com/vr/reference/metavr-os-jsdk/v207/class_metavr_os_build/),
+falling back to its earlier Horizon OS and VR OS names when needed. The JSDK is a
+compile-only dependency: its API stubs are not packaged in your app.
+
+`isHorizonSdkVersionAtLeast(version: number): boolean` is a synchronous convenience
+method for checking SDK availability without reading and comparing the number.
+
+On Android, the method returns `false` on non-Horizon devices and older Horizon OS
+versions where the requested SDK is unavailable. It throws for non-integer values,
+versions below 61, or values above 2147483647. On iOS and web, it is a stub that
+ignores the version and always returns `false`. You do not need an app ID,
+permission, or Platform SDK service connection to call it.
+
+Android uses Meta's [OS Utility Library](https://developers.meta.com/vr/documentation/android-apps/metavrx-os-utility-library/)
+(`com.meta.metavrx.util:util:1.0.0`) to handle absent OS APIs safely. Rebuild your
+development client after updating the package. This check does not itself enable
+features or guarantee that a feature's hardware and permissions are available.
 
 ### Usage in Custom Native Modules
 

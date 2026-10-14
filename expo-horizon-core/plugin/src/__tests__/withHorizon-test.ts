@@ -105,3 +105,120 @@ it('applies Quest option changes without leaving old feature declarations', asyn
     })
   );
 });
+
+it('writes namespaced Horizon SDK settings only to the Quest overlay', async () => {
+  await prebuild({ horizonMinSdkVersion: 207, horizonTargetSdkVersion: 208 });
+  const [questManifest] = await readOutput();
+  expect(questManifest).toContain('xmlns:metavr="http://schemas.meta.com/metavr-sdk"');
+  expect(questManifest).toContain(
+    '<metavr:uses-metavr-sdk metavr:minSdkVersion="207" metavr:targetSdkVersion="208"/>'
+  );
+  expect(
+    await fs.readFile(path.join(projectRoot, 'android/app/src/main/AndroidManifest.xml'), 'utf8')
+  ).toBe(mobileManifest);
+  const first = await readOutput();
+  await prebuild({ horizonMinSdkVersion: 207, horizonTargetSdkVersion: 208 });
+  expect(await readOutput()).toEqual(first);
+});
+
+it('supports either SDK setting alone and removes declarations when options are removed', async () => {
+  await prebuild({ horizonMinSdkVersion: 207 });
+  let [questManifest] = await readOutput();
+  expect(questManifest).toContain('<metavr:uses-metavr-sdk metavr:minSdkVersion="207"/>');
+  expect(questManifest).not.toContain('metavr:targetSdkVersion');
+
+  await prebuild({ horizonTargetSdkVersion: 208 });
+  [questManifest] = await readOutput();
+  expect(questManifest).toContain('<metavr:uses-metavr-sdk metavr:targetSdkVersion="208"/>');
+  expect(questManifest).not.toContain('metavr:minSdkVersion');
+
+  await prebuild();
+  [questManifest] = await readOutput();
+  expect(questManifest).not.toContain('metavr');
+});
+
+describe.each(['horizonMinSdkVersion', 'horizonTargetSdkVersion'] as const)('%s', (key) => {
+  it.each([60, -1, 0, 207.5, NaN, Infinity, 2147483648, '207', null])(
+    'rejects invalid configuration %s',
+    (version) => {
+      expect(() =>
+        withHorizon({ name: 'test', slug: 'test' }, { [key]: version } as HorizonOptions)
+      ).toThrow(`${key} must be an integer between 61 and 2147483647`);
+    }
+  );
+});
+
+it('rejects a target SDK lower than the minimum', () => {
+  expect(() =>
+    withHorizon(
+      { name: 'test', slug: 'test' },
+      { horizonMinSdkVersion: 208, horizonTargetSdkVersion: 207 }
+    )
+  ).toThrow('horizonTargetSdkVersion must be greater than or equal to horizonMinSdkVersion');
+});
+
+async function readQuestLayouts() {
+  const { manifest } = await AndroidConfig.Manifest.readAndroidManifestAsync(
+    path.join(projectRoot, 'android/app/src/quest/AndroidManifest.xml')
+  );
+  return manifest.application![0].activity?.find(
+    (activity) => activity.$['android:name'] === '.MainActivity'
+  )?.layout;
+}
+
+it('writes default and minimum panel dimensions only to the Quest overlay', async () => {
+  const options = {
+    defaultWidth: '1024dp',
+    defaultHeight: '640dp',
+    minWidth: '600dp',
+    minHeight: '400dp',
+  };
+  await prebuild(options);
+  expect(await readQuestLayouts()).toEqual([
+    {
+      $: {
+        'android:defaultWidth': '1024dp',
+        'android:defaultHeight': '640dp',
+        'android:minWidth': '600dp',
+        'android:minHeight': '400dp',
+      },
+    },
+  ]);
+  expect(
+    await fs.readFile(path.join(projectRoot, 'android/app/src/main/AndroidManifest.xml'), 'utf8')
+  ).toBe(mobileManifest);
+  const first = await readOutput();
+  await prebuild(options);
+  expect(await readOutput()).toEqual(first);
+});
+
+it.each(['minWidth', 'minHeight'] as const)(
+  'supports %s without default dimensions',
+  async (key) => {
+    await prebuild({ [key]: '360.5dp' });
+    expect(await readQuestLayouts()).toEqual([{ $: { [`android:${key}`]: '360.5dp' } }]);
+  }
+);
+
+it('updates and removes panel minimums without retaining stale attributes', async () => {
+  await prebuild({ defaultWidth: '1024dp', minWidth: '600dp', minHeight: '400dp' });
+  await prebuild({ defaultWidth: '1024dp', minWidth: '500dp' });
+  expect(await readQuestLayouts()).toEqual([
+    { $: { 'android:defaultWidth': '1024dp', 'android:minWidth': '500dp' } },
+  ]);
+  await prebuild({ defaultWidth: '1024dp' });
+  expect(await readQuestLayouts()).toEqual([{ $: { 'android:defaultWidth': '1024dp' } }]);
+  await prebuild();
+  expect(await readQuestLayouts()).toBeUndefined();
+});
+
+describe.each(['minWidth', 'minHeight'] as const)('%s', (key) => {
+  it.each(['', '0dp', '-1dp', 'NaNdp', 'Infinitydp', '600', '600px', '50%', ' 600dp', 600, null])(
+    'rejects invalid configuration %s',
+    (value) => {
+      expect(() =>
+        withHorizon({ name: 'test', slug: 'test' }, { [key]: value } as HorizonOptions)
+      ).toThrow(`${key} must be a positive dp dimension`);
+    }
+  );
+});

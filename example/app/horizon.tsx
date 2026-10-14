@@ -1,6 +1,6 @@
 import ExpoHorizon from 'expo-horizon-core';
-import React from 'react';
-import { ScrollView, View } from 'react-native';
+import React, { useState } from 'react';
+import { Button, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Section } from '../components/Section';
@@ -9,6 +9,17 @@ import { GlobalStyles } from '../constants/styles';
 
 export default function HorizonScreen() {
   const insets = useSafeAreaInsets();
+  const [sdkVersion, setSdkVersion] = useState('');
+  const [sdkResult, setSdkResult] = useState('Not checked');
+
+  function checkSdkVersion() {
+    try {
+      const supported = ExpoHorizon.isHorizonSdkVersionAtLeast(Number(sdkVersion));
+      setSdkResult(`SDK ${sdkVersion} or newer: ${supported}`);
+    } catch (error) {
+      setSdkResult(error instanceof Error ? error.message : String(error));
+    }
+  }
 
   return (
     <View style={GlobalStyles.screenContainer}>
@@ -19,11 +30,45 @@ export default function HorizonScreen() {
           <TestProperty title="Is Horizon Device" value={ExpoHorizon.isHorizonDevice.toString()} />
           <TestProperty title="Is Horizon Build" value={ExpoHorizon.isHorizonBuild.toString()} />
           <TestProperty
+            title="Horizon OS version"
+            value={ExpoHorizon.horizonOsVersion ?? 'Unavailable'}
+          />
+          <TestProperty
             title="Horizon App ID"
             value={ExpoHorizon.horizonAppId?.toString() || 'Not set'}
           />
+        </Section>
+        <Section title="Horizon OS SDK">
+          <TestProperty
+            title="Current SDK version"
+            value={ExpoHorizon.horizonSdkVersion?.toString() ?? 'Unavailable'}
+          />
+          <View style={GlobalStyles.contentContainer}>
+            <Text style={[GlobalStyles.itemTitle, styles.sdkLabel]}>
+              isHorizonSdkVersionAtLeast:
+            </Text>
+            <TextInput
+              accessibilityLabel="Horizon SDK version"
+              placeholder="Version (e.g. 207)"
+              value={sdkVersion}
+              onChangeText={setSdkVersion}
+              keyboardType="numeric"
+              style={[GlobalStyles.infoBox, styles.sdkInput]}
+            />
+            <Button
+              title="Check"
+              onPress={checkSdkVersion}
+              disabled={sdkVersion.trim().length === 0}
+            />
+          </View>
+          <TestProperty title="Result" value={sdkResult} />
         </Section>
       </ScrollView>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  sdkLabel: { marginBottom: 8 },
+  sdkInput: { borderWidth: 1, minHeight: 48 },
+});
