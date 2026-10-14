@@ -35,6 +35,10 @@ export default function HorizonScreen() {
           />
         </Section>
         <Section title="Horizon OS SDK">
+          <TestProperty
+            title="Current SDK version"
+            value={ExpoHorizon.horizonSdkVersion?.toString() ?? 'Unavailable'}
+          />
           <Text style={GlobalStyles.dataText}>
             Check a Meta VR OS SDK version, independent of Android's API level. Try 61, 207,
             2147483647 (future version), or 60 (invalid).

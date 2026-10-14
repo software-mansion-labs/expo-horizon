@@ -29,6 +29,8 @@ android {
 }
 
 dependencies {
+  // Only API stubs: Horizon OS supplies the implementation at runtime.
+  compileOnly 'com.meta.metavr:metavr-os-jsdk:207'
   // This compatibility library is safe on older Horizon OS and other Android devices.
   implementation 'com.meta.metavrx.util:util:1.0.0'
   testImplementation 'junit:junit:4.13.2'

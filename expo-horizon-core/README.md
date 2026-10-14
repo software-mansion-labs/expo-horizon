@@ -266,11 +266,12 @@ The module provides runtime constants and utilities to help you build Horizon-aw
 
 #### API Reference
 
-| Property          | Type             | Description                                                                     |
-| ----------------- | ---------------- | ------------------------------------------------------------------------------- |
-| `isHorizonDevice` | `boolean`        | Returns `true` if the app is running on a physical Horizon device.              |
-| `isHorizonBuild`  | `boolean`        | Returns `true` if the app was built with the Quest build flavor.                |
-| `horizonAppId`    | `string \| null` | The Horizon App ID configured via the config plugin. Returns `null` if not set. |
+| Property            | Type             | Description                                                                     |
+| ------------------- | ---------------- | ------------------------------------------------------------------------------- |
+| `isHorizonDevice`   | `boolean`        | Returns `true` if the app is running on a physical Horizon device.              |
+| `isHorizonBuild`    | `boolean`        | Returns `true` if the app was built with the Quest build flavor.                |
+| `horizonAppId`      | `string \| null` | The Horizon App ID configured via the config plugin. Returns `null` if not set. |
+| `horizonSdkVersion` | `number \| null` | The device's current Horizon OS SDK version, or `null` when unavailable.        |
 
 #### Basic Usage
 
@@ -300,14 +301,27 @@ console.log('Horizon App ID:', appId ?? 'Not configured');
 ```typescript
 import ExpoHorizon from 'expo-horizon-core';
 
+// Read the version directly for display, diagnostics, or your own comparisons.
+const sdkVersion = ExpoHorizon.horizonSdkVersion;
+console.log('Horizon OS SDK:', sdkVersion ?? 'Unavailable');
+
 const supportsSdk207 = ExpoHorizon.isHorizonSdkVersionAtLeast(207);
 // Use this result to enable an optional SDK 207 feature or show its fallback.
 ```
 
-`isHorizonSdkVersionAtLeast(version: number): boolean` synchronously checks the
-device's **Meta VR OS SDK version**, which is independent of Android's API level,
-the user-facing OS version string, and the app's build flavor. A mobile build
-running on Horizon OS can also return `true`.
+`horizonSdkVersion: number | null` is a read-only constant containing the device's
+current **Meta VR OS SDK version**, such as `207`. This is independent of Android's
+API level, the user-facing OS version string, the app's configured minimum/target
+SDK, and the app's build flavor. A mobile build running on Horizon OS can also
+read the version. It returns `null` on non-Horizon Android, iOS, web, and older
+Horizon releases without a supported version API.
+
+Android reads the [OS SDK version API](https://developers.meta.com/vr/reference/metavr-os-jsdk/v207/class_metavr_os_build/),
+falling back to its earlier Horizon OS and VR OS names when needed. The JSDK is a
+compile-only dependency: its API stubs are not packaged in your app.
+
+`isHorizonSdkVersionAtLeast(version: number): boolean` is a synchronous convenience
+method for checking SDK availability without reading and comparing the number.
 
 The method returns `false` on non-Horizon Android devices, iOS, web, and older
 Horizon OS versions where the requested SDK is unavailable. It throws for

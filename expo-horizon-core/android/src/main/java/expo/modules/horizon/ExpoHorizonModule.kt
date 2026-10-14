@@ -11,6 +11,8 @@ class ExpoHorizonModule : Module() {
 
         Constant("isHorizonBuild") { Config.isHorizonBuild }
 
+        Constant("horizonSdkVersion") { HorizonSdkVersion.current() }
+
         Constant("horizonAppId") {
             if (BuildConfig.META_HORIZON_APP_ID == "") null else BuildConfig.META_HORIZON_APP_ID
         }

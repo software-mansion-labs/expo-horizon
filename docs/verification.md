@@ -98,6 +98,11 @@ rules for classes supplied by Horizon OS.
 
 On the example's Horizon screen, use the **Horizon OS SDK** section:
 
+The **Current SDK version** row reads `ExpoHorizon.horizonSdkVersion` directly.
+It should show the device's numeric Horizon SDK version (207 on the tested Quest),
+or `Unavailable` on non-Horizon Android, iOS, and web. Check this before using the
+comparison button so the constant is verified independently of the helper.
+
 | Input      | Expected result                                                                                 |
 | ---------- | ----------------------------------------------------------------------------------------------- |
 | 61         | `true` on a Quest with SDK 61 or newer; `false` on non-Horizon Android, iOS, and web.           |

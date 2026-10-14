@@ -18,6 +18,13 @@ declare class ExpoHorizonModule extends NativeModule {
   horizonAppId: string | null;
 
   /**
+   * The device's current Meta VR OS SDK version, independent of Android's API level
+   * and the app's build flavor. Returns null when the OS version API is unavailable,
+   * including on non-Horizon Android, iOS, and web.
+   */
+  readonly horizonSdkVersion: number | null;
+
+  /**
    * Whether the device supports at least the given Meta VR OS SDK version.
    * This is independent of Android's API level and the app's build flavor.
    * Returns false on iOS, web, non-Horizon Android, and unsupported older OS versions.

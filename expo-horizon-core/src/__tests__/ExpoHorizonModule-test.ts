@@ -1,5 +1,9 @@
 import ExpoHorizon from '../ExpoHorizonModule.web';
 
+it('reports the current SDK version as unavailable on web', () => {
+  expect(ExpoHorizon.horizonSdkVersion).toBeNull();
+});
+
 it.each([61, 207, 2147483647])('reports SDK %s as unavailable on web', (version) => {
   expect(ExpoHorizon.isHorizonSdkVersionAtLeast(version)).toBe(false);
 });

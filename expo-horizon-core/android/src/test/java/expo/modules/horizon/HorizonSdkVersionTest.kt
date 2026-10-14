@@ -1,10 +1,46 @@
 package expo.modules.horizon
 
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertThrows
 import org.junit.Test
 
 class HorizonSdkVersionTest {
+  @Test
+  fun returnsNullWhenHorizonOsVersionApisAreAbsent() {
+    assertNull(HorizonSdkVersion.current())
+  }
+
+  @Test
+  fun prefersTheCurrentApiWithoutCallingLegacyApis() {
+    assertEquals(207, HorizonSdkVersion.firstAvailableVersion(
+      { 207 },
+      { error("Legacy API should not be called") }
+    ))
+  }
+
+  @Test
+  fun fallsBackWhenClassesOrMethodsAreMissing() {
+    assertEquals(61, HorizonSdkVersion.firstAvailableVersion(
+      { throw NoClassDefFoundError() },
+      { throw NoSuchMethodError() },
+      { 61 }
+    ))
+  }
+
+  @Test
+  fun doesNotExposeInvalidVersionNumbers() {
+    assertNull(HorizonSdkVersion.firstAvailableVersion({ 0 }, { -1 }))
+  }
+
+  @Test
+  fun doesNotHideUnexpectedErrors() {
+    assertThrows(IllegalStateException::class.java) {
+      HorizonSdkVersion.firstAvailableVersion({ error("Unexpected SDK failure") })
+    }
+  }
+
   @Test
   fun returnsFalseWhenHorizonOsClassesAreAbsent() {
     // Exercise the real Meta utility AAR on the JVM, where neither OS API exists.
