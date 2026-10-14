@@ -213,3 +213,25 @@ each Android variant, both optimized Android releases built, and the iOS simulat
 build succeeded. The native detector tests run Meta's actual utility against
 simulated system features, including a device without Quest model branding and
 older Quest model fallback. Older physical headsets remain unverified.
+
+### Verification after rebasing onto main — 2026-10-14
+
+Verified commit `86d00133`, based on `main` commit `9629beea`, with Expo `57.0.26`
+and React Native `0.86.3`. Earlier dated records retain the original commit hashes
+from the SDK 58 branch; these checks were rerun after rebasing the Horizon changes
+without the SDK 58 upgrade.
+
+- Frozen-lockfile installation and `yarn verify` passed: 14 suites, 128 tests,
+  and one existing skip.
+- All 17 native core tests passed in each Android variant.
+- Both Android release variants built with
+  `-Pandroid.enableMinifyInReleaseBuilds=true`; the iOS simulator build passed.
+  SDK 57 requires the explicit Gradle property to enable R8, which is also set in CI.
+- Merged manifests contained SDK target 207 and all four panel dimensions only
+  in the Quest variant.
+- Both optimized releases ran on the same physical Quest 3. They reported OS
+  `2.7.0`, SDK `207`, and `isHorizonDevice: true`; `isHorizonBuild` matched each
+  variant. The SDK 207 comparison returned `true`, with no fatal app error.
+
+Headset resize-handle enforcement, older physical OS fallback paths, and
+minimum-SDK installation restrictions remain unverified.
