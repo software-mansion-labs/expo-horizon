@@ -1,6 +1,6 @@
 import ExpoHorizon from 'expo-horizon-core';
 import React, { useState } from 'react';
-import { Button, ScrollView, TextInput, View } from 'react-native';
+import { Button, ScrollView, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Section } from '../components/Section';
@@ -39,6 +39,9 @@ export default function HorizonScreen() {
             title="Current SDK version"
             value={ExpoHorizon.horizonSdkVersion?.toString() ?? 'Unavailable'}
           />
+          <Text style={[GlobalStyles.itemTitle, { marginBottom: 8 }]}>
+            isHorizonSdkVersionAtLeast:
+          </Text>
           <TextInput
             accessibilityLabel="Horizon SDK version"
             placeholder="Version (e.g. 207)"
@@ -48,7 +51,7 @@ export default function HorizonScreen() {
             style={[GlobalStyles.infoBox, { borderWidth: 1, minHeight: 48 }]}
           />
           <Button
-            title="isHorizonSdkVersionAtLeast"
+            title="Check"
             onPress={checkSdkVersion}
             disabled={sdkVersion.trim().length === 0}
           />
