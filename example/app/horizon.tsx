@@ -1,6 +1,6 @@
 import ExpoHorizon from 'expo-horizon-core';
 import React, { useState } from 'react';
-import { Button, ScrollView, Text, TextInput, View } from 'react-native';
+import { Button, ScrollView, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Section } from '../components/Section';
@@ -9,7 +9,7 @@ import { GlobalStyles } from '../constants/styles';
 
 export default function HorizonScreen() {
   const insets = useSafeAreaInsets();
-  const [sdkVersion, setSdkVersion] = useState('207');
+  const [sdkVersion, setSdkVersion] = useState('');
   const [sdkResult, setSdkResult] = useState('Not checked');
 
   function checkSdkVersion() {
@@ -39,18 +39,19 @@ export default function HorizonScreen() {
             title="Current SDK version"
             value={ExpoHorizon.horizonSdkVersion?.toString() ?? 'Unavailable'}
           />
-          <Text style={GlobalStyles.dataText}>
-            Check a Meta VR OS SDK version, independent of Android's API level. Try 61, 207,
-            2147483647 (future version), or 60 (invalid).
-          </Text>
           <TextInput
             accessibilityLabel="Horizon SDK version"
+            placeholder="Version (e.g. 207)"
             value={sdkVersion}
             onChangeText={setSdkVersion}
             keyboardType="numeric"
             style={[GlobalStyles.infoBox, { borderWidth: 1, minHeight: 48 }]}
           />
-          <Button title="Check SDK version" onPress={checkSdkVersion} />
+          <Button
+            title="isHorizonSdkVersionAtLeast"
+            onPress={checkSdkVersion}
+            disabled={sdkVersion.trim().length === 0}
+          />
           <TestProperty title="Result" value={sdkResult} />
         </Section>
       </ScrollView>
