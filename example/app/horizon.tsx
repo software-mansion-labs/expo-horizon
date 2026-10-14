@@ -39,22 +39,24 @@ export default function HorizonScreen() {
             title="Current SDK version"
             value={ExpoHorizon.horizonSdkVersion?.toString() ?? 'Unavailable'}
           />
-          <Text style={[GlobalStyles.itemTitle, { marginBottom: 8 }]}>
-            isHorizonSdkVersionAtLeast:
-          </Text>
-          <TextInput
-            accessibilityLabel="Horizon SDK version"
-            placeholder="Version (e.g. 207)"
-            value={sdkVersion}
-            onChangeText={setSdkVersion}
-            keyboardType="numeric"
-            style={[GlobalStyles.infoBox, { borderWidth: 1, minHeight: 48 }]}
-          />
-          <Button
-            title="Check"
-            onPress={checkSdkVersion}
-            disabled={sdkVersion.trim().length === 0}
-          />
+          <View style={GlobalStyles.contentContainer}>
+            <Text style={[GlobalStyles.itemTitle, { marginBottom: 8 }]}>
+              isHorizonSdkVersionAtLeast:
+            </Text>
+            <TextInput
+              accessibilityLabel="Horizon SDK version"
+              placeholder="Version (e.g. 207)"
+              value={sdkVersion}
+              onChangeText={setSdkVersion}
+              keyboardType="numeric"
+              style={[GlobalStyles.infoBox, { borderWidth: 1, minHeight: 48 }]}
+            />
+            <Button
+              title="Check"
+              onPress={checkSdkVersion}
+              disabled={sdkVersion.trim().length === 0}
+            />
+          </View>
           <TestProperty title="Result" value={sdkResult} />
         </Section>
       </ScrollView>
