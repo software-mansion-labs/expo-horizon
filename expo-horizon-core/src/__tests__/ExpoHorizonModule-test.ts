@@ -1,5 +1,10 @@
 import ExpoHorizon from '../ExpoHorizonModule.web';
 
+it('reports no Horizon OS on web', () => {
+  expect(ExpoHorizon.isHorizonDevice).toBe(false);
+  expect(ExpoHorizon.horizonOsVersion).toBeNull();
+});
+
 it('reports the current SDK version as unavailable on web', () => {
   expect(ExpoHorizon.horizonSdkVersion).toBeNull();
 });

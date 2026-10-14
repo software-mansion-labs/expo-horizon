@@ -2,4 +2,5 @@
 # and our version reader handle missing APIs on older OS and other Android devices.
 -dontwarn metavr.os.Build$Version
 -dontwarn horizonos.os.Build$HorizonOsSdk
+-dontwarn horizonos.os.Build$Version
 -dontwarn vros.os.VrosBuild

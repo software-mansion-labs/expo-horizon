@@ -92,6 +92,9 @@ After Android prebuild, run the native compatibility tests from `example/android
 
 These exercise the real Meta utility library without Horizon OS classes, verifying
 the fallback on non-Horizon systems and rejection of invalid version numbers.
+OS display-version tests cover unavailable APIs, legacy names, and preserving the
+opaque label. Robolectric tests exercise Meta's real OS detector with modern and
+legacy system features, Quest model fallback, and ordinary Android devices.
 They run in the native Android CI jobs too. They do not prove detection on a Quest.
 Native CI also builds an optimized Quest release to validate the consumer R8
 rules for classes supplied by Horizon OS.
@@ -102,6 +105,12 @@ The **Current SDK version** row reads `ExpoHorizon.horizonSdkVersion` directly.
 It should show the device's numeric Horizon SDK version (207 on the tested Quest),
 or `Unavailable` on non-Horizon Android, iOS, and web. Check this before using the
 comparison button so the constant is verified independently of the helper.
+
+The **Horizon OS version** row displays the user-facing OS label, separately from
+the numeric SDK version. Expect a non-empty label where the OS display API is
+available, or `Unavailable` elsewhere. Confirm the label is unchanged between
+Quest and mobile builds on the same device and that **Is Horizon Device** remains
+`true` in both.
 
 | Input      | Expected result                                                                                 |
 | ---------- | ----------------------------------------------------------------------------------------------- |

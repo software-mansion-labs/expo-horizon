@@ -2,7 +2,7 @@ import { NativeModule, requireNativeModule } from 'expo';
 
 declare class ExpoHorizonModule extends NativeModule {
   /**
-   * Returns true if the current device is a Horizon device.
+   * Returns true when Horizon OS is detected, with a fallback for older Quest devices.
    */
   isHorizonDevice: boolean;
 
@@ -23,6 +23,13 @@ declare class ExpoHorizonModule extends NativeModule {
    * including on non-Horizon Android, iOS, and web.
    */
   readonly horizonSdkVersion: number | null;
+
+  /**
+   * The user-facing Horizon OS version string, or null when unavailable.
+   * Treat this as an opaque display label; use horizonSdkVersion for comparisons.
+   * Returns null on non-Horizon Android, iOS, and web.
+   */
+  readonly horizonOsVersion: string | null;
 
   /**
    * Whether the device supports at least the given Meta VR OS SDK version.

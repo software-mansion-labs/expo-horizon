@@ -268,10 +268,11 @@ The module provides runtime constants and utilities to help you build Horizon-aw
 
 | Property            | Type             | Description                                                                     |
 | ------------------- | ---------------- | ------------------------------------------------------------------------------- |
-| `isHorizonDevice`   | `boolean`        | Returns `true` if the app is running on a physical Horizon device.              |
+| `isHorizonDevice`   | `boolean`        | Detects Horizon OS, with a fallback for older Quest devices.                    |
 | `isHorizonBuild`    | `boolean`        | Returns `true` if the app was built with the Quest build flavor.                |
 | `horizonAppId`      | `string \| null` | The Horizon App ID configured via the config plugin. Returns `null` if not set. |
 | `horizonSdkVersion` | `number \| null` | The device's current Horizon OS SDK version, or `null` when unavailable.        |
+| `horizonOsVersion`  | `string \| null` | The user-facing Horizon OS version label, or `null` when unavailable.           |
 
 #### Basic Usage
 
@@ -294,7 +295,29 @@ if (ExpoHorizon.isHorizonBuild) {
 // Access the Horizon App ID
 const appId = ExpoHorizon.horizonAppId;
 console.log('Horizon App ID:', appId ?? 'Not configured');
+
+// Display the OS version in an About screen or diagnostic report.
+console.log('Horizon OS:', ExpoHorizon.horizonOsVersion ?? 'Unavailable');
 ```
+
+### Horizon OS detection and display version
+
+On Android, `isHorizonDevice` uses Meta's
+[Horizon OS detector](https://developers.meta.com/vr/reference/metavrx-os-utility/v1.0/class_metavrx_os_horizon_os_detector/)
+to check system features, independently of the device's manufacturer/model name
+and the app's build flavor. If the detector returns `false`, the previous Expo
+Quest model check remains as a fallback for older devices. It returns `false` on
+iOS and web.
+
+`horizonOsVersion: string | null` is a read-only, user-facing version label from
+[`Build.Version.getDisplayName()`](https://developers.meta.com/vr/reference/metavr-os-jsdk/v207/class_metavr_os_build/).
+Android falls back to the earlier `horizonos` API name when needed. The value is
+returned unchanged; do not parse it or use it for version comparisons. Use
+`horizonSdkVersion` or `isHorizonSdkVersionAtLeast()` for API compatibility checks.
+
+The display version is `null` on non-Horizon Android, iOS, web, and Horizon
+releases without a supported display-version API. It requires no permissions,
+app ID, or Platform SDK connection.
 
 ### Checking Horizon OS SDK support
 

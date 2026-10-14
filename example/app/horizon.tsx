@@ -30,6 +30,10 @@ export default function HorizonScreen() {
           <TestProperty title="Is Horizon Device" value={ExpoHorizon.isHorizonDevice.toString()} />
           <TestProperty title="Is Horizon Build" value={ExpoHorizon.isHorizonBuild.toString()} />
           <TestProperty
+            title="Horizon OS version"
+            value={ExpoHorizon.horizonOsVersion ?? 'Unavailable'}
+          />
+          <TestProperty
             title="Horizon App ID"
             value={ExpoHorizon.horizonAppId?.toString() || 'Not set'}
           />

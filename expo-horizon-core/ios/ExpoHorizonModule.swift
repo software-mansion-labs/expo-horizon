@@ -20,6 +20,10 @@ public class ExpoHorizonModule: Module {
             nil as Int?
         }
 
+        Constant("horizonOsVersion") {
+            nil as String?
+        }
+
         Function("isHorizonSdkVersionAtLeast") { (version: Double) -> Bool in
             guard version.isFinite,
                   version >= 61,

@@ -9,6 +9,8 @@ class ExpoHorizonModule extends NativeModule {
 
   readonly horizonSdkVersion: number | null = null;
 
+  readonly horizonOsVersion: string | null = null;
+
   isHorizonSdkVersionAtLeast(version: number): boolean {
     if (!Number.isInteger(version) || version < 61 || version > 2147483647) {
       throw new RangeError('Horizon SDK version must be an integer between 61 and 2147483647.');
