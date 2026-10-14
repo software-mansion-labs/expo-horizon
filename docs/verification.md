@@ -110,3 +110,34 @@ build flavor. Record the device, OS/SDK version, build variant, and results. The
 example declares target SDK 207 but leaves the minimum unset so older Quest
 releases can still exercise the runtime fallback. Inspect merged manifests to
 confirm the Meta target appears only in the Quest build.
+
+### Physical Quest verification — 2026-10-14
+
+Verified commit `3bef2645` on a Quest 3 running Horizon OS SDK 207
+(`ro.vros.build.version`), Android 14 / API 34, OS build `52433670048800520`.
+Installed the optimized `questRelease` and `mobileRelease` example APKs in turn
+and exercised the Horizon screen through Android UI Automator and ADB input.
+Both builds used their bundled JavaScript without Metro, covering the JS-to-native
+bridge and the Meta utility in release builds.
+
+| Check                           | `questRelease` | `mobileRelease` |
+| ------------------------------- | -------------- | --------------- |
+| `isHorizonDevice`               | `true`         | `true`          |
+| `isHorizonBuild`                | `true`         | `false`         |
+| SDK 61 or newer                 | `true`         | `true`          |
+| SDK 207 or newer                | `true`         | `true`          |
+| SDK 208 or newer                | `false`        | `false`         |
+| SDK 2147483647 or newer         | `false`        | `false`         |
+| Input 60                        | Error shown    | Error shown     |
+| Input 61.5                      | Error shown    | Error shown     |
+| SDK 207 after validation errors | `true`         | `true`          |
+
+All checks passed. Invalid input displayed the native validation message,
+`Horizon SDK version must be an integer between 61 and 2147483647.` The app
+remained responsive, and process-filtered AndroidRuntime/ReactNativeJS logs showed
+no crash during either run. The Quest release was restored after testing.
+
+These results verify the SDK query on this OS version and its independence from
+the build flavor. Older Horizon OS fallback paths and minimum-SDK installation
+restrictions still require devices with the corresponding OS versions. This run
+did not exercise location or notifications.
