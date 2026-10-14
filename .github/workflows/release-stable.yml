@@ -1,0 +1,71 @@
+name: Publish stable release
+
+on:
+  workflow_dispatch:
+    inputs:
+      source-sha:
+        description: 'Full prepared commit SHA (required; use the same SHA for dry run, real run, and retries)'
+        type: string
+        required: true
+      dry-run:
+        description: 'Validate and pack all packages without publishing or pushing a tag'
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+  id-token: write
+
+concurrency:
+  group: horizon-stable-release
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require an exact source commit
+        env:
+          SOURCE_SHA: ${{ inputs.source-sha }}
+        run: '[[ "$SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]]'
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ inputs.source-sha }}
+          fetch-depth: 0
+      - name: Require source to belong to the selected release branch
+        env:
+          RELEASE_BRANCH: ${{ github.ref_name }}
+          REF_TYPE: ${{ github.ref_type }}
+        run: |
+          test "$REF_TYPE" = branch
+          git merge-base --is-ancestor HEAD "refs/remotes/origin/$RELEASE_BRANCH"
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version-file: .nvmrc
+          registry-url: https://registry.npmjs.org/
+      - name: Install release tools
+        run: npm install --global yarn@1.22.22 npm@11.11.0
+      - name: Test and validate committed release metadata
+        run: |
+          node --test scripts/__tests__/release.test.mjs
+          node scripts/release.mjs check
+      - name: Install and build packages and config plugins
+        run: yarn install --frozen-lockfile --non-interactive
+      - name: Run shared workspace verification
+        run: yarn verify
+      - name: Validate all tarballs and publish core first
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          RELEASE_DRY_RUN: ${{ inputs.dry-run }}
+          RELEASE_ARTIFACTS: ${{ runner.temp }}/release-packages
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          node scripts/release.mjs publish
+      - name: Save exact release tarballs
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: stable-release-${{ inputs.source-sha }}
+          path: ${{ runner.temp }}/release-packages/*.tgz
+          if-no-files-found: ignore
