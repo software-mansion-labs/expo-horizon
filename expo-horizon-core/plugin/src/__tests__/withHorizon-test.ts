@@ -156,3 +156,69 @@ it('rejects a target SDK lower than the minimum', () => {
     )
   ).toThrow('horizonTargetSdkVersion must be greater than or equal to horizonMinSdkVersion');
 });
+
+async function readQuestLayouts() {
+  const { manifest } = await AndroidConfig.Manifest.readAndroidManifestAsync(
+    path.join(projectRoot, 'android/app/src/quest/AndroidManifest.xml')
+  );
+  return manifest.application![0].activity?.find(
+    (activity) => activity.$['android:name'] === '.MainActivity'
+  )?.layout;
+}
+
+it('writes default and minimum panel dimensions only to the Quest overlay', async () => {
+  const options = {
+    defaultWidth: '1024dp',
+    defaultHeight: '640dp',
+    minWidth: '600dp',
+    minHeight: '400dp',
+  };
+  await prebuild(options);
+  expect(await readQuestLayouts()).toEqual([
+    {
+      $: {
+        'android:defaultWidth': '1024dp',
+        'android:defaultHeight': '640dp',
+        'android:minWidth': '600dp',
+        'android:minHeight': '400dp',
+      },
+    },
+  ]);
+  expect(
+    await fs.readFile(path.join(projectRoot, 'android/app/src/main/AndroidManifest.xml'), 'utf8')
+  ).toBe(mobileManifest);
+  const first = await readOutput();
+  await prebuild(options);
+  expect(await readOutput()).toEqual(first);
+});
+
+it.each(['minWidth', 'minHeight'] as const)(
+  'supports %s without default dimensions',
+  async (key) => {
+    await prebuild({ [key]: '360.5dp' });
+    expect(await readQuestLayouts()).toEqual([{ $: { [`android:${key}`]: '360.5dp' } }]);
+  }
+);
+
+it('updates and removes panel minimums without retaining stale attributes', async () => {
+  await prebuild({ defaultWidth: '1024dp', minWidth: '600dp', minHeight: '400dp' });
+  await prebuild({ defaultWidth: '1024dp', minWidth: '500dp' });
+  expect(await readQuestLayouts()).toEqual([
+    { $: { 'android:defaultWidth': '1024dp', 'android:minWidth': '500dp' } },
+  ]);
+  await prebuild({ defaultWidth: '1024dp' });
+  expect(await readQuestLayouts()).toEqual([{ $: { 'android:defaultWidth': '1024dp' } }]);
+  await prebuild();
+  expect(await readQuestLayouts()).toBeUndefined();
+});
+
+describe.each(['minWidth', 'minHeight'] as const)('%s', (key) => {
+  it.each(['', '0dp', '-1dp', 'NaNdp', 'Infinitydp', '600', '600px', '50%', ' 600dp', 600, null])(
+    'rejects invalid configuration %s',
+    (value) => {
+      expect(() =>
+        withHorizon({ name: 'test', slug: 'test' }, { [key]: value } as HorizonOptions)
+      ).toThrow(`${key} must be a positive dp dimension`);
+    }
+  );
+});

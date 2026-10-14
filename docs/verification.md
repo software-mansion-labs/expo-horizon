@@ -44,6 +44,9 @@ check mobile/Quest permission separation, Quest options, and repeatable output,
 including updating `horizonAppId`. Temporary files are removed after each test.
 SDK version tests also check the namespaced Quest declaration, optional values,
 invalid configuration, and removal of settings on a subsequent prebuild.
+Panel sizing tests cover optional `minWidth` and `minHeight`, positive dp
+validation, minimums without default dimensions, repeatable output, and updating
+or removing minimums while leaving the mobile manifest unchanged.
 This validates generated overlays; native builds must still validate manifest
 merging and Gradle compatibility.
 
@@ -81,6 +84,20 @@ flavors or app ID entries.
 Save a short result table with pass/fail/unverified and error codes or log excerpts.
 Avoid saving exact coordinates or push-token contents in committed evidence. A JS
 unit-test pass, a successful build, and a device smoke pass are separate evidence.
+
+## Panel size checks
+
+After Android prebuild, build both Android variants and inspect their merged
+manifests. The example's Quest `MainActivity` layout should contain
+`defaultWidth="1024dp"`, `defaultHeight="640dp"`, `minWidth="600dp"`, and
+`minHeight="400dp"`, all in the Android namespace. The mobile variant should
+have no panel layout added by the plugin.
+
+Install the Quest build and resize its panel using the headset's window controls.
+Verify that it starts at the configured default size, can grow, and stops
+shrinking at the configured minimums. Check the UI at the smallest permitted
+size. A successful manifest check or app launch alone does not verify the
+headset's resizing behavior.
 
 ## Horizon OS SDK version checks
 

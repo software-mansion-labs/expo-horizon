@@ -42,6 +42,20 @@ export type HorizonOptions = {
   defaultWidth?: string;
 
   /**
+   * Minimum panel width in dp for the Quest build. Omitted by default.
+   * Must be a positive dp dimension.
+   * @example "600dp"
+   */
+  minWidth?: string;
+
+  /**
+   * Minimum panel height in dp for the Quest build. Omitted by default.
+   * Must be a positive dp dimension.
+   * @example "400dp"
+   */
+  minHeight?: string;
+
+  /**
    * Pipe-separated list of supported Quest devices.
    * @example "quest2|quest3|quest3s"
    * @see https://developers.meta.com/horizon/resources/publish-mobile-manifest/
@@ -66,6 +80,7 @@ const USE_EXPERIMENTAL_PLUGIN = true;
 
 const withHorizon: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
   validateHorizonSdkVersions(options);
+  validatePanelMinimums(options);
   config = withHorizonAppId(config, options);
 
   if (USE_EXPERIMENTAL_PLUGIN) {
@@ -82,6 +97,21 @@ const withHorizon: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
 
   return config;
 };
+
+function validatePanelMinimums(options: HorizonOptions) {
+  for (const key of ['minWidth', 'minHeight'] as const) {
+    const value = options[key];
+    if (
+      value !== undefined &&
+      (typeof value !== 'string' ||
+        !/^\d+(?:\.\d+)?dp$/.test(value) ||
+        !Number.isFinite(parseFloat(value)) ||
+        parseFloat(value) <= 0)
+    ) {
+      throw new Error(`[expo-horizon-core] ${key} must be a positive dp dimension, e.g. "360dp".`);
+    }
+  }
+}
 
 function validateHorizonSdkVersions(options: HorizonOptions) {
   for (const key of ['horizonMinSdkVersion', 'horizonTargetSdkVersion'] as const) {
@@ -137,7 +167,12 @@ const withHorizonAppId: ConfigPlugin<HorizonOptions> = (config, options = {}) =>
 const withPanelSize: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
   return withAndroidManifest(config, (config) => {
     // Only add layout if at least one dimension is provided
-    if (!options.defaultHeight && !options.defaultWidth) {
+    if (
+      !options.defaultHeight &&
+      !options.defaultWidth &&
+      !options.minWidth &&
+      !options.minHeight
+    ) {
       return config;
     }
 
@@ -156,6 +191,12 @@ const withPanelSize: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
       }
       if (options.defaultWidth) {
         layoutAttrs['android:defaultWidth'] = options.defaultWidth;
+      }
+      if (options.minWidth) {
+        layoutAttrs['android:minWidth'] = options.minWidth;
+      }
+      if (options.minHeight) {
+        layoutAttrs['android:minHeight'] = options.minHeight;
       }
 
       mainActivity.layout.push({

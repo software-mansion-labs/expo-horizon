@@ -28,6 +28,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       horizonTargetSdkVersion: 207,
       defaultHeight: '640dp',
       defaultWidth: '1024dp',
+      minWidth: '600dp',
+      minHeight: '400dp',
       supportedDevices: 'quest2|quest3|quest3s',
       disableVrHeadtracking: false,
       allowBackup: false,

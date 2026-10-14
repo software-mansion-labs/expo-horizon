@@ -185,13 +185,19 @@ function createQuestManifest(options: HorizonOptions): AndroidConfig.Manifest.An
   }
 
   // Add MainActivity with panel size
-  if (options.defaultHeight || options.defaultWidth) {
+  if (options.defaultHeight || options.defaultWidth || options.minWidth || options.minHeight) {
     const layoutAttrs: any = {};
     if (options.defaultHeight) {
       layoutAttrs['android:defaultHeight'] = options.defaultHeight;
     }
     if (options.defaultWidth) {
       layoutAttrs['android:defaultWidth'] = options.defaultWidth;
+    }
+    if (options.minWidth) {
+      layoutAttrs['android:minWidth'] = options.minWidth;
+    }
+    if (options.minHeight) {
+      layoutAttrs['android:minHeight'] = options.minHeight;
     }
 
     application.activity.push({
