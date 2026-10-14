@@ -99,6 +99,18 @@ shrinking at the configured minimums. Check the UI at the smallest permitted
 size. A successful manifest check or app launch alone does not verify the
 headset's resizing behavior.
 
+### Panel minimum configuration verification — 2026-10-14
+
+Verified commit `1b1a43b6`. `yarn verify` passed (166 tests, one existing skip),
+and both optimized Android release variants built successfully. The merged Quest
+manifest contained the four dimensions above; the mobile manifest contained no
+panel layout.
+
+Installed and opened `questRelease` on the Quest 3 running Horizon OS `2.7.0`
+/ SDK 207. Android reported an initial window of `1024 × 640dp`, and the Horizon
+screen displayed the expected device/build flags and OS version without a fatal
+app error. Shrinking and growing the panel with headset controls remains unverified.
+
 ## Horizon OS SDK version checks
 
 After Android prebuild, run the native compatibility tests from `example/android`:
