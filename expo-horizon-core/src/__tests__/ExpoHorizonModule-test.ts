@@ -14,8 +14,8 @@ it.each([61, 207, 2147483647])('reports SDK %s as unavailable on web', (version)
 });
 
 it.each([-1, 0, 60, 61.5, NaN, Infinity, -Infinity, 2147483648])(
-  'rejects invalid SDK version %s on web',
+  'returns false without validating SDK version %s on web',
   (version) => {
-    expect(() => ExpoHorizon.isHorizonSdkVersionAtLeast(version)).toThrow(RangeError);
+    expect(ExpoHorizon.isHorizonSdkVersionAtLeast(version)).toBe(false);
   }
 );

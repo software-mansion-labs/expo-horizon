@@ -35,7 +35,8 @@ declare class ExpoHorizonModule extends NativeModule {
    * Whether the device supports at least the given Meta VR OS SDK version.
    * This is independent of Android's API level and the app's build flavor.
    * Returns false on iOS, web, non-Horizon Android, and unsupported older OS versions.
-   * @throws If version is not an integer between 61 and 2147483647.
+   * On iOS and web, this is a stub that ignores the version and returns false.
+   * @throws On Android, if version is not an integer between 61 and 2147483647.
    */
   isHorizonSdkVersionAtLeast(version: number): boolean;
 }

@@ -146,7 +146,7 @@ Quest and mobile builds on the same device and that **Is Horizon Device** remain
 | 61         | `true` on a Quest with SDK 61 or newer; `false` on non-Horizon Android, iOS, and web.           |
 | 207        | Matches whether the Quest's Meta VR OS SDK is 207 or newer, independent of Android's API level. |
 | 2147483647 | `false` on current devices, without a crash.                                                    |
-| 60 or 61.5 | A validation error displayed in the result field, without a crash.                              |
+| 60 or 61.5 | A validation error on Android, without a crash; `false` on iOS and web.                         |
 
 Repeat with the mobile build on Quest: SDK availability must not depend on the
 build flavor. Record the device, OS/SDK version, build variant, and results. The

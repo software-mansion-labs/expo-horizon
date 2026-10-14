@@ -361,10 +361,11 @@ compile-only dependency: its API stubs are not packaged in your app.
 `isHorizonSdkVersionAtLeast(version: number): boolean` is a synchronous convenience
 method for checking SDK availability without reading and comparing the number.
 
-The method returns `false` on non-Horizon Android devices, iOS, web, and older
-Horizon OS versions where the requested SDK is unavailable. It throws for
-non-integer values, versions below 61, or values above 2147483647. You do not need
-an app ID, permission, or Platform SDK service connection to call it.
+On Android, the method returns `false` on non-Horizon devices and older Horizon OS
+versions where the requested SDK is unavailable. It throws for non-integer values,
+versions below 61, or values above 2147483647. On iOS and web, it is a stub that
+ignores the version and always returns `false`. You do not need an app ID,
+permission, or Platform SDK service connection to call it.
 
 Android uses Meta's [OS Utility Library](https://developers.meta.com/vr/documentation/android-apps/metavrx-os-utility-library/)
 (`com.meta.metavrx.util:util:1.0.0`) to handle absent OS APIs safely. Rebuild your
