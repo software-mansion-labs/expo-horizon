@@ -7,20 +7,21 @@ export type HorizonOptions = {
   /**
    * Your Meta Horizon application ID.
    * Used by other libraries (like expo-horizon-notifications) to identify your app.
+   * Use a string without whitespace, quotes, or backslashes.
    * @default ""
    * @see https://developers.meta.com/horizon/resources/publish-overview-appID/#creating-an-app-id
    */
   horizonAppId?: string;
 
   /**
-   * Default panel height in dp.
+   * Default panel height as a positive dp dimension.
    * @example "640dp"
    * @see https://developers.meta.com/vr/essentials/horizon-os-panel-sizing/
    */
   defaultHeight?: string;
 
   /**
-   * Default panel width in dp.
+   * Default panel width as a positive dp dimension.
    * @example "1024dp"
    * @see https://developers.meta.com/vr/essentials/horizon-os-panel-sizing/
    */
@@ -28,6 +29,7 @@ export type HorizonOptions = {
 
   /**
    * Pipe-separated list of supported Quest devices.
+   * Device names may contain letters, digits, underscores, or hyphens.
    * @example "quest2|quest3|quest3s"
    * @see https://developers.meta.com/horizon/resources/publish-mobile-manifest/
    */
@@ -50,6 +52,7 @@ export type HorizonOptions = {
 const USE_EXPERIMENTAL_PLUGIN = true;
 
 const withHorizon: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
+  validateHorizonOptions(options);
   config = withHorizonAppId(config, options);
 
   if (USE_EXPERIMENTAL_PLUGIN) {
@@ -66,6 +69,54 @@ const withHorizon: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
 
   return config;
 };
+
+function validateHorizonOptions(options: HorizonOptions) {
+  if (options === null || typeof options !== 'object' || Array.isArray(options)) {
+    throw new Error('[expo-horizon-core] Plugin options must be an object.');
+  }
+
+  if (
+    options.horizonAppId !== undefined &&
+    (typeof options.horizonAppId !== 'string' || /[\s"'\\]/.test(options.horizonAppId))
+  ) {
+    throw new Error(
+      '[expo-horizon-core] horizonAppId must be a string without whitespace, quotes, or backslashes. Use "" to leave it unset.'
+    );
+  }
+
+  if (
+    options.supportedDevices !== undefined &&
+    (typeof options.supportedDevices !== 'string' ||
+      !/^[A-Za-z0-9_-]+(?:\|[A-Za-z0-9_-]+)*$/.test(options.supportedDevices))
+  ) {
+    throw new Error(
+      '[expo-horizon-core] supportedDevices must be a non-empty pipe-separated string of device names (letters, digits, underscores, or hyphens), e.g. "quest2|quest3|quest3s".'
+    );
+  }
+
+  for (const key of ['disableVrHeadtracking', 'allowBackup'] as const) {
+    if (options[key] !== undefined && typeof options[key] !== 'boolean') {
+      throw new Error(`[expo-horizon-core] ${key} must be a boolean (true or false).`);
+    }
+  }
+
+  validatePanelDimensions(options);
+}
+
+function validatePanelDimensions(options: HorizonOptions) {
+  for (const key of ['defaultWidth', 'defaultHeight'] as const) {
+    const value = options[key];
+    if (
+      value !== undefined &&
+      (typeof value !== 'string' ||
+        !/^\d+(?:\.\d+)?dp$/.test(value) ||
+        !Number.isFinite(parseFloat(value)) ||
+        parseFloat(value) <= 0)
+    ) {
+      throw new Error(`[expo-horizon-core] ${key} must be a positive dp dimension, e.g. "360dp".`);
+    }
+  }
+}
 
 const withHorizonEnabled: ConfigPlugin = (config) => {
   return withGradleProperties(config, (config) => {
