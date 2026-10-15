@@ -28,12 +28,12 @@ export type HorizonOptions = {
   defaultWidth?: string;
 
   /**
-   * Required pipe-separated list of supported Quest devices; no default is supplied.
+   * Pipe-separated list of supported Quest devices.
    * Device names may contain letters, digits, underscores, or hyphens.
    * @example "quest2|quest3|quest3s"
    * @see https://developers.meta.com/horizon/resources/publish-mobile-manifest/
    */
-  supportedDevices: string;
+  supportedDevices?: string;
 
   /**
    * Set to `true` to disable VR headtracking feature.
@@ -51,7 +51,7 @@ export type HorizonOptions = {
 
 const USE_EXPERIMENTAL_PLUGIN = true;
 
-const withHorizon: ConfigPlugin<HorizonOptions> = (config, options) => {
+const withHorizon: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
   validateHorizonOptions(options);
   config = withHorizonAppId(config, options);
 
@@ -72,9 +72,7 @@ const withHorizon: ConfigPlugin<HorizonOptions> = (config, options) => {
 
 function validateHorizonOptions(options: HorizonOptions) {
   if (options === null || typeof options !== 'object' || Array.isArray(options)) {
-    throw new Error(
-      '[expo-horizon-core] Plugin options must be an object with a supportedDevices list.'
-    );
+    throw new Error('[expo-horizon-core] Plugin options must be an object.');
   }
 
   if (
@@ -87,11 +85,12 @@ function validateHorizonOptions(options: HorizonOptions) {
   }
 
   if (
-    typeof options.supportedDevices !== 'string' ||
-    !/^[A-Za-z0-9_-]+(?:\|[A-Za-z0-9_-]+)*$/.test(options.supportedDevices)
+    options.supportedDevices !== undefined &&
+    (typeof options.supportedDevices !== 'string' ||
+      !/^[A-Za-z0-9_-]+(?:\|[A-Za-z0-9_-]+)*$/.test(options.supportedDevices))
   ) {
     throw new Error(
-      '[expo-horizon-core] supportedDevices is required and must be a non-empty pipe-separated string of device names (letters, digits, underscores, or hyphens), e.g. "quest2|quest3|quest3s".'
+      '[expo-horizon-core] supportedDevices must be a non-empty pipe-separated string of device names (letters, digits, underscores, or hyphens), e.g. "quest2|quest3|quest3s".'
     );
   }
 
@@ -131,7 +130,7 @@ const withHorizonEnabled: ConfigPlugin = (config) => {
   });
 };
 
-const withHorizonAppId: ConfigPlugin<HorizonOptions> = (config, options) => {
+const withHorizonAppId: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
   return withGradleProperties(config, (config) => {
     const horizonAppId = options.horizonAppId ?? '';
 
@@ -148,7 +147,7 @@ const withHorizonAppId: ConfigPlugin<HorizonOptions> = (config, options) => {
   });
 };
 
-const withPanelSize: ConfigPlugin<HorizonOptions> = (config, options) => {
+const withPanelSize: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
   return withAndroidManifest(config, (config) => {
     // Only add layout if at least one dimension is provided
     if (!options.defaultHeight && !options.defaultWidth) {
@@ -181,7 +180,7 @@ const withPanelSize: ConfigPlugin<HorizonOptions> = (config, options) => {
   });
 };
 
-const withSupportedDevices: ConfigPlugin<HorizonOptions> = (config, options) => {
+const withSupportedDevices: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
   return withAndroidManifest(config, (config) => {
     // Only add meta-data if supportedDevices is explicitly provided
     if (!options.supportedDevices) {
@@ -207,7 +206,7 @@ const withSupportedDevices: ConfigPlugin<HorizonOptions> = (config, options) => 
   });
 };
 
-const withVrHeadtracking: ConfigPlugin<HorizonOptions> = (config, options) => {
+const withVrHeadtracking: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
   return withAndroidManifest(config, (config) => {
     // Add VR headtracking by default unless explicitly disabled
     if (options.disableVrHeadtracking === true) {
