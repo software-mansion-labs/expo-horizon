@@ -23,10 +23,13 @@ export async function getDevicePushTokenAsync(): Promise<DevicePushToken> {
     // Reuse existing Promise
     devicePushToken = await nativeTokenPromise;
   } else {
-    // Create a new Promise and clear it afterwards
+    // Create a new Promise and clear it after success or failure so callers can retry.
     nativeTokenPromise = PushTokenManager.getDevicePushTokenAsync();
-    devicePushToken = await nativeTokenPromise;
-    nativeTokenPromise = null;
+    try {
+      devicePushToken = await nativeTokenPromise;
+    } finally {
+      nativeTokenPromise = null;
+    }
   }
 
   if (ExpoHorizonCore.isHorizonDevice) {

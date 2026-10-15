@@ -8,6 +8,8 @@
 
 ### 🐛 Bug fixes
 
+- Allow `getDevicePushTokenAsync()` to retry after a failed native push-token registration on Horizon, Android, and iOS.
+
 ### 💡 Others
 
 ## 57.0.3 — 2026-10-12
