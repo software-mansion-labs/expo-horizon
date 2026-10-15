@@ -113,23 +113,19 @@ Add the plugin to your `app.json` or `app.config.[js|ts]`:
 
 #### Available Options
 
-| Option                  | Type      | Required                | Default   | Description                                                                                                                                                                                                                      |
-| ----------------------- | --------- | ----------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `horizonAppId`          | `string`  | No                      | `""`      | Your Meta Horizon application ID. Used by other libraries (like `expo-horizon-notifications`) to identify your app.                                                                                                              |
-| `defaultHeight`         | `string`  | No                      | Not added | Default panel height in dp (e.g., `"640dp"`). See [Panel Sizing](https://developers.meta.com/vr/essentials/horizon-os-panel-sizing/)                                                                                             |
-| `defaultWidth`          | `string`  | No                      | Not added | Default panel width in dp (e.g., `"1024dp"`). See [Panel Sizing](https://developers.meta.com/vr/essentials/horizon-os-panel-sizing/)                                                                                             |
-| `supportedDevices`      | `string`  | Yes, for Store releases | Not added | Pipe-separated list of supported Quest devices: `"quest2\|quest3\|quest3s"`. See the Store release requirement below.                                                                                                            |
-| `disableVrHeadtracking` | `boolean` | No                      | `false`   | Set to `true` to disable VR headtracking feature. By default, adds `android.hardware.vr.headtracking` to AndroidManifest.                                                                                                        |
-| `allowBackup`           | `boolean` | No                      | `false`   | Set to `true` in the Quest build to enable Android's `allowBackup` feature. The default value is `false` which removes the "allowBackup=true" warning in the Meta Horizon Store. This does not affect your mobile build variant. |
+| Option                  | Type      | Required | Default   | Description                                                                                                                                                                                                                      |
+| ----------------------- | --------- | -------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `horizonAppId`          | `string`  | No       | `""`      | Your Meta Horizon application ID. Used by other libraries (like `expo-horizon-notifications`) to identify your app.                                                                                                              |
+| `defaultHeight`         | `string`  | No       | Not added | Default panel height in dp (e.g., `"640dp"`). See [Panel Sizing](https://developers.meta.com/vr/essentials/horizon-os-panel-sizing/)                                                                                             |
+| `defaultWidth`          | `string`  | No       | Not added | Default panel width in dp (e.g., `"1024dp"`). See [Panel Sizing](https://developers.meta.com/vr/essentials/horizon-os-panel-sizing/)                                                                                             |
+| `supportedDevices`      | `string`  | Yes      | None      | Pipe-separated list of supported Quest devices: `"quest2\|quest3\|quest3s"`. See [Mobile Manifest](https://developers.meta.com/horizon/resources/publish-mobile-manifest/)                                                       |
+| `disableVrHeadtracking` | `boolean` | No       | `false`   | Set to `true` to disable VR headtracking feature. By default, adds `android.hardware.vr.headtracking` to AndroidManifest.                                                                                                        |
+| `allowBackup`           | `boolean` | No       | `false`   | Set to `true` in the Quest build to enable Android's `allowBackup` feature. The default value is `false` which removes the "allowBackup=true" warning in the Meta Horizon Store. This does not affect your mobile build variant. |
 
-For Meta Horizon Store submission, the final merged manifest must explicitly
-declare supported devices. Configure `supportedDevices` unless another manifest
-supplies the declaration. See [Meta's release manifest requirements](https://developers.meta.com/vr/resources/publish-mobile-manifest/).
-
-The plugin preserves its existing behavior of allowing omission. In that case, it
-adds no `com.oculus.supportedDevices` metadata and supplies no default device list.
-Passing plugin validation alone does not establish that the manifest meets Store
-release requirements.
+`supportedDevices` is required and has no default. Configurations that previously
+omitted it must now provide an explicit list, such as `"quest2|quest3|quest3s"`,
+before running prebuild. This supplies the supported-device declaration required
+by [Meta's release manifest requirements](https://developers.meta.com/vr/resources/publish-mobile-manifest/).
 
 > **Meta Horizon Store Recommendation for `allowBackup`:**
 >
@@ -145,7 +141,7 @@ field (or use `undefined` in JavaScript) to keep its default; `null` is not acce
 - `horizonAppId` must be a string without whitespace, quotes, or backslashes.
   An empty string leaves it unset. Placeholder strings such as `"DEMO_APP_ID"`
   remain accepted; this check does not verify that an app ID exists in Meta.
-- `supportedDevices`, when supplied, must be a non-empty pipe-separated string.
+- `supportedDevices` is required and must be a non-empty pipe-separated string.
   Each device name may contain letters, digits, underscores, or hyphens. Empty
   entries, spaces, and comma-separated lists are rejected. Names are not checked
   against a fixed device list, so new device identifiers can be used.

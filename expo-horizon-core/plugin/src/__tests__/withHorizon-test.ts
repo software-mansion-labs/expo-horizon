@@ -35,7 +35,7 @@ afterEach(async () => {
   await fs.rm(projectRoot, { recursive: true, force: true });
 });
 
-async function prebuild(options: HorizonOptions = {}) {
+async function prebuild(options: HorizonOptions) {
   await compileModsAsync(withHorizon({ name: 'test', slug: 'test' }, options), {
     projectRoot,
     platforms: ['android'],
@@ -79,11 +79,11 @@ it('keeps mobile permissions and backup settings while restricting the Quest ove
 });
 
 it('produces identical output on repeated prebuild and updates the app ID once', async () => {
-  await prebuild({ horizonAppId: '123' });
+  await prebuild({ supportedDevices: 'quest3', horizonAppId: '123' });
   const first = await readOutput();
-  await prebuild({ horizonAppId: '123' });
+  await prebuild({ supportedDevices: 'quest3', horizonAppId: '123' });
   expect(await readOutput()).toEqual(first);
-  await prebuild({ horizonAppId: '456' });
+  await prebuild({ supportedDevices: 'quest3', horizonAppId: '456' });
   const [, gradle, properties] = await readOutput();
   expect(gradle.match(/flavorDimensions/g)).toHaveLength(1);
   expect(gradle).toContain('mobile { dimension "device" }');
@@ -93,8 +93,8 @@ it('produces identical output on repeated prebuild and updates the app ID once',
 });
 
 it('applies Quest option changes without leaving old feature declarations', async () => {
-  await prebuild();
-  await prebuild({ allowBackup: true, disableVrHeadtracking: true });
+  await prebuild({ supportedDevices: 'quest3' });
+  await prebuild({ supportedDevices: 'quest3', allowBackup: true, disableVrHeadtracking: true });
   const { manifest } = await AndroidConfig.Manifest.readAndroidManifestAsync(
     path.join(projectRoot, 'android/app/src/quest/AndroidManifest.xml')
   );
@@ -118,7 +118,7 @@ async function readQuestLayouts() {
 it.each(['defaultWidth', 'defaultHeight'] as const)(
   'supports a fractional %s independently',
   async (key) => {
-    await prebuild({ [key]: '360.5dp' });
+    await prebuild({ supportedDevices: 'quest3', [key]: '360.5dp' });
     expect(await readQuestLayouts()).toEqual([{ $: { [`android:${key}`]: '360.5dp' } }]);
   }
 );
@@ -141,7 +141,10 @@ describe.each(['defaultWidth', 'defaultHeight'] as const)('%s', (key) => {
     null,
   ])('rejects invalid configuration %s', (value) => {
     expect(() =>
-      withHorizon({ name: 'test', slug: 'test' }, { [key]: value } as HorizonOptions)
+      withHorizon({ name: 'test', slug: 'test' }, {
+        supportedDevices: 'quest3',
+        [key]: value,
+      } as HorizonOptions)
     ).toThrow(`${key} must be a positive dp dimension`);
   });
 });
@@ -149,7 +152,10 @@ describe.each(['defaultWidth', 'defaultHeight'] as const)('%s', (key) => {
 describe.each(['disableVrHeadtracking', 'allowBackup'] as const)('%s', (key) => {
   it.each(['true', 'false', 0, 1, null])('rejects non-boolean configuration %s', (value) => {
     expect(() =>
-      withHorizon({ name: 'test', slug: 'test' }, { [key]: value } as HorizonOptions)
+      withHorizon({ name: 'test', slug: 'test' }, {
+        supportedDevices: 'quest3',
+        [key]: value,
+      } as HorizonOptions)
     ).toThrow(`${key} must be a boolean (true or false)`);
   });
 });
@@ -158,7 +164,10 @@ it.each([123, null, ' ', '123\n456', '123\\456', '"123"', "'123'"])(
   'rejects an invalid app ID %s',
   (horizonAppId) => {
     expect(() =>
-      withHorizon({ name: 'test', slug: 'test' }, { horizonAppId } as HorizonOptions)
+      withHorizon({ name: 'test', slug: 'test' }, {
+        supportedDevices: 'quest3',
+        horizonAppId,
+      } as HorizonOptions)
     ).toThrow('horizonAppId must be a string without whitespace, quotes, or backslashes');
   }
 );
@@ -166,7 +175,7 @@ it.each([123, null, ' ', '123\n456', '123\\456', '"123"', "'123'"])(
 it.each(['', 'DEMO_APP_ID', '12345678901234567890'])(
   'preserves an unset, placeholder, or large string app ID %s',
   async (horizonAppId) => {
-    await prebuild({ horizonAppId });
+    await prebuild({ supportedDevices: 'quest3', horizonAppId });
     const [, , properties] = await readOutput();
     expect(properties.match(/^horizonAppId=.*$/gm)).toEqual([`horizonAppId=${horizonAppId}`]);
   }
@@ -182,10 +191,13 @@ it.each([
   'quest3\n',
   ['quest3'],
   null,
+  undefined,
 ])('rejects a malformed supportedDevices list %s', (supportedDevices) => {
   expect(() =>
     withHorizon({ name: 'test', slug: 'test' }, { supportedDevices } as HorizonOptions)
-  ).toThrow('supportedDevices must be a non-empty pipe-separated string of device names');
+  ).toThrow(
+    'supportedDevices is required and must be a non-empty pipe-separated string of device names'
+  );
 });
 
 it('preserves device names without a fixed device allowlist and explicit false booleans', async () => {
@@ -207,17 +219,29 @@ it('preserves device names without a fixed device allowlist and explicit false b
   });
 });
 
-it.each([null, false, 'quest3', 123, []])('rejects non-object plugin options %s', (options) => {
-  expect(() => withHorizon({ name: 'test', slug: 'test' }, options as HorizonOptions)).toThrow(
-    '[expo-horizon-core] Plugin options must be an object.'
-  );
-});
+it.each([undefined, null, false, 'quest3', 123, []])(
+  'rejects non-object plugin options %s',
+  (options) => {
+    expect(() => withHorizon({ name: 'test', slug: 'test' }, options as HorizonOptions)).toThrow(
+      '[expo-horizon-core] Plugin options must be an object with a supportedDevices list.'
+    );
+  }
+);
 
 it('rejects invalid options before changing previously generated files', async () => {
-  await prebuild({ horizonAppId: '123', defaultWidth: '1024dp' });
+  await prebuild({ supportedDevices: 'quest3', horizonAppId: '123', defaultWidth: '1024dp' });
   const previousOutput = await readOutput();
-  await expect(prebuild({ horizonAppId: '456', defaultWidth: '-100dp' })).rejects.toThrow(
-    'defaultWidth must be a positive dp dimension'
+  await expect(
+    prebuild({ supportedDevices: 'quest3', horizonAppId: '456', defaultWidth: '-100dp' })
+  ).rejects.toThrow('defaultWidth must be a positive dp dimension');
+  expect(await readOutput()).toEqual(previousOutput);
+});
+
+it('rejects an omitted device list before changing previously generated files', async () => {
+  await prebuild({ supportedDevices: 'quest3', horizonAppId: '123' });
+  const previousOutput = await readOutput();
+  await expect(prebuild({ horizonAppId: '456' } as HorizonOptions)).rejects.toThrow(
+    'supportedDevices is required'
   );
   expect(await readOutput()).toEqual(previousOutput);
 });
