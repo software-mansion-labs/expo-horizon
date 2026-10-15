@@ -6,7 +6,11 @@
 
 ### 🎉 New features
 
+- [Quest] Added foreground permissions, position lookup, and position watching through `expo-horizon-location/next`.
+
 ### 🐛 Bug fixes
+
+- [Quest] Constructing `LocationUpdatesHandle` now throws `ERR_QUEST_FEATURE_UNAVAILABLE` with an explicit message that background location updates are unsupported.
 
 ### 💡 Others
 
