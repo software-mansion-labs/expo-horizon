@@ -118,13 +118,33 @@ Add the plugin to your `app.json` or `app.config.[js|ts]`:
 | `horizonAppId`          | `string`  | No       | `""`      | Your Meta Horizon application ID. Used by other libraries (like `expo-horizon-notifications`) to identify your app.                                                                                                              |
 | `defaultHeight`         | `string`  | No       | Not added | Default panel height in dp (e.g., `"640dp"`). See [Panel Sizing](https://developers.meta.com/vr/essentials/horizon-os-panel-sizing/)                                                                                             |
 | `defaultWidth`          | `string`  | No       | Not added | Default panel width in dp (e.g., `"1024dp"`). See [Panel Sizing](https://developers.meta.com/vr/essentials/horizon-os-panel-sizing/)                                                                                             |
-| `supportedDevices`      | `string`  | Yes      | None      | Pipe-separated list of supported Quest devices: `"quest2\|quest3\|quest3s"`. See [Mobile Manifest](https://developers.meta.com/horizon/resources/publish-mobile-manifest/)                                                       |
+| `supportedDevices`      | `string`  | No       | None      | Pipe-separated list of supported Quest devices: `"quest2\|quest3\|quest3s"`. See [Mobile Manifest](https://developers.meta.com/horizon/resources/publish-mobile-manifest/)                                                       |
 | `disableVrHeadtracking` | `boolean` | No       | `false`   | Set to `true` to disable VR headtracking feature. By default, adds `android.hardware.vr.headtracking` to AndroidManifest.                                                                                                        |
 | `allowBackup`           | `boolean` | No       | `false`   | Set to `true` in the Quest build to enable Android's `allowBackup` feature. The default value is `false` which removes the "allowBackup=true" warning in the Meta Horizon Store. This does not affect your mobile build variant. |
 
 > **Meta Horizon Store Recommendation for `allowBackup`:**
 >
 > If the application is storing sensitive information on the device, it is recommended to disable backups by setting `allowBackup="false"` in your application's AndroidManifest.
+
+#### Configuration validation
+
+The plugin validates supplied options before writing native files. Omit an optional
+field (or use `undefined` in JavaScript) to keep its default; `null` is not accepted.
+
+- `defaultWidth` and `defaultHeight` must be positive dp strings, such as
+  `"600dp"` or `"360.5dp"`.
+- `horizonAppId` must be a string without whitespace, quotes, or backslashes.
+  An empty string leaves it unset. Placeholder strings such as `"DEMO_APP_ID"`
+  remain accepted; this check does not verify that an app ID exists in Meta.
+- `supportedDevices`, when supplied, must be a non-empty pipe-separated string.
+  Each device name may contain letters, digits, underscores, or hyphens. Empty
+  entries, spaces, and comma-separated lists are rejected. Names are not checked
+  against a fixed device list, so new device identifiers can be used.
+- `disableVrHeadtracking` and `allowBackup` must be booleans, not strings such as
+  `"false"` or numbers such as `0`.
+
+Invalid configuration throws an error naming the field, for example:
+`[expo-horizon-core] defaultWidth must be a positive dp dimension, e.g. "360dp".`
 
 ### Configuration Examples
 
