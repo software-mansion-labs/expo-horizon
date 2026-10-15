@@ -21,8 +21,8 @@
       "foregroundImage": "./assets/adaptive-icon.png",
       "backgroundColor": "#ffffff"
     },
-    "edgeToEdgeEnabled": true,
-    "package": "com.swmansion.horizon.demo"
+    "package": "com.swmansion.horizon.demo",
+    "permissions": ["android.permission.SCHEDULE_EXACT_ALARM"]
   },
   "web": {
     "favicon": "./assets/favicon.png"

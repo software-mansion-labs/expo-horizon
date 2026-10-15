@@ -520,7 +520,7 @@ class LocationModule : Module(), ActivityEventListener {
 
   internal fun sendLocationResponse(watchId: Int, response: LocationResponse) {
     val responseBundle = bundleOf()
-    responseBundle.putBundle("location", response.toBundle(Bundle::class.java))
+    responseBundle.putBundle("location", response.toBundle())
     responseBundle.putInt("watchId", watchId)
     sendEvent(LOCATION_EVENT_NAME, responseBundle)
   }

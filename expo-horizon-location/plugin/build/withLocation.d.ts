@@ -1,4 +1,5 @@
 import { ConfigPlugin } from 'expo/config-plugins';
+export declare const FULL_ACCURACY_PURPOSE_KEY = "ExpoLocationFullAccuracy";
 type DPIString = 'mdpi' | 'hdpi' | 'xhdpi' | 'xxhdpi' | 'xxxhdpi';
 type dpiMap = Record<DPIString, {
     folderName: string;
@@ -38,13 +39,30 @@ export type Props = {
     /**
      * A string to set the `NSMotionUsageDescription` permission message shown when
      * `getMotionActivityAsync` or `watchMotionActivityAsync` is called for the first time.
-     * Set to `false` to omit the key. In that case, the app must add `NSMotionUsageDescription`
-     * manually to its `Info.plist`, for example via the `infoPlist` key in `app.json`.
-     * Without this key, calling motion activity APIs on iOS will throw an exception.
+     * Set to `false` to disable the motion activity feature: the key is removed from `Info.plist`,
+     * the CoreMotion features are excluded from the iOS build, motion permission methods resolve
+     * with a denied response, and calling motion activity APIs throws an exception.
      * @default "Allow $(PRODUCT_NAME) to detect your current motion activity"
      * @platform ios
      */
     motionUsagePermission?: string | false;
+    /**
+     * A string to set the message the system shows when a permission request from
+     * `expo-location/next` asks to raise a reduced accuracy authorization to full accuracy. It is written under the
+     * `ExpoLocationFullAccuracy` key of `NSLocationTemporaryUsageDescriptionDictionary`.
+     * Pass `false` to omit the key, which skips the raise.
+     * @default "Allow $(PRODUCT_NAME) to access your precise location"
+     * @platform ios
+     */
+    locationFullAccuracyPermission?: string | false;
+    /**
+     * Whether the permission prompt offers reduced accuracy by default, by setting
+     * `NSLocationDefaultAccuracyReduced` in `Info.plist`. The app can still ask for full accuracy
+     * for a session with `accuracy: 'full'` in a permission request from `expo-location/next`.
+     * @default false
+     * @platform ios
+     */
+    isIosReducedAccuracyByDefault?: boolean;
     /**
      * Whether to enable location in `UIBackgroundModes`.
      * @default false

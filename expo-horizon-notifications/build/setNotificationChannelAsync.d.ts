@@ -15,7 +15,7 @@ import type { NotificationChannel, NotificationChannelInput } from './Notificati
  * see [Set custom notification sounds on Android](#set-custom-notification-sounds).
  * @param channelId The channel identifier.
  * @param channel Object representing the channel's configuration.
- * @return A Promise which resolving to the object (of type [`NotificationChannel`](#notificationchannel)) describing the modified channel
+ * @return A Promise which resolves to the object (of type [`NotificationChannel`](#notificationchannel)) describing the modified channel
  * or to `null` if the platform does not support notification channels.
  * @platform android
  * @header channels
