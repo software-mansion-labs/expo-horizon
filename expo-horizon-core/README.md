@@ -113,20 +113,23 @@ Add the plugin to your `app.json` or `app.config.[js|ts]`:
 
 #### Available Options
 
-| Option                  | Type      | Required    | Default   | Description                                                                                                                                                                                                                      |
-| ----------------------- | --------- | ----------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `horizonAppId`          | `string`  | No          | `""`      | Your Meta Horizon application ID. Used by other libraries (like `expo-horizon-notifications`) to identify your app.                                                                                                              |
-| `defaultHeight`         | `string`  | No          | Not added | Default panel height in dp (e.g., `"640dp"`). See [Panel Sizing](https://developers.meta.com/vr/essentials/horizon-os-panel-sizing/)                                                                                             |
-| `defaultWidth`          | `string`  | No          | Not added | Default panel width in dp (e.g., `"1024dp"`). See [Panel Sizing](https://developers.meta.com/vr/essentials/horizon-os-panel-sizing/)                                                                                             |
-| `supportedDevices`      | `string`  | No (plugin) | Not added | Pipe-separated list of supported Quest devices: `"quest2\|quest3\|quest3s"`. See the Store release requirement below.                                                                                                            |
-| `disableVrHeadtracking` | `boolean` | No          | `false`   | Set to `true` to disable VR headtracking feature. By default, adds `android.hardware.vr.headtracking` to AndroidManifest.                                                                                                        |
-| `allowBackup`           | `boolean` | No          | `false`   | Set to `true` in the Quest build to enable Android's `allowBackup` feature. The default value is `false` which removes the "allowBackup=true" warning in the Meta Horizon Store. This does not affect your mobile build variant. |
+| Option                  | Type      | Required                | Default   | Description                                                                                                                                                                                                                      |
+| ----------------------- | --------- | ----------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `horizonAppId`          | `string`  | No                      | `""`      | Your Meta Horizon application ID. Used by other libraries (like `expo-horizon-notifications`) to identify your app.                                                                                                              |
+| `defaultHeight`         | `string`  | No                      | Not added | Default panel height in dp (e.g., `"640dp"`). See [Panel Sizing](https://developers.meta.com/vr/essentials/horizon-os-panel-sizing/)                                                                                             |
+| `defaultWidth`          | `string`  | No                      | Not added | Default panel width in dp (e.g., `"1024dp"`). See [Panel Sizing](https://developers.meta.com/vr/essentials/horizon-os-panel-sizing/)                                                                                             |
+| `supportedDevices`      | `string`  | Yes, for Store releases | Not added | Pipe-separated list of supported Quest devices: `"quest2\|quest3\|quest3s"`. See the Store release requirement below.                                                                                                            |
+| `disableVrHeadtracking` | `boolean` | No                      | `false`   | Set to `true` to disable VR headtracking feature. By default, adds `android.hardware.vr.headtracking` to AndroidManifest.                                                                                                        |
+| `allowBackup`           | `boolean` | No                      | `false`   | Set to `true` in the Quest build to enable Android's `allowBackup` feature. The default value is `false` which removes the "allowBackup=true" warning in the Meta Horizon Store. This does not affect your mobile build variant. |
 
-`supportedDevices` is optional for the plugin. When omitted, the plugin adds no
-`com.oculus.supportedDevices` metadata and supplies no default device list. For
-Meta Horizon Store submission, the final merged manifest must explicitly declare
-supported devices: configure this field unless another manifest supplies the
-declaration. See [Meta's release manifest requirements](https://developers.meta.com/vr/resources/publish-mobile-manifest/).
+For Meta Horizon Store submission, the final merged manifest must explicitly
+declare supported devices. Configure `supportedDevices` unless another manifest
+supplies the declaration. See [Meta's release manifest requirements](https://developers.meta.com/vr/resources/publish-mobile-manifest/).
+
+The plugin preserves its existing behavior of allowing omission. In that case, it
+adds no `com.oculus.supportedDevices` metadata and supplies no default device list.
+Passing plugin validation alone does not establish that the manifest meets Store
+release requirements.
 
 > **Meta Horizon Store Recommendation for `allowBackup`:**
 >
