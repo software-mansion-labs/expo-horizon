@@ -129,8 +129,8 @@ Add the plugin to your `app.json` or `app.config.[js|ts]`:
 ### Migrating to SDK 58
 
 Starting with `expo-horizon-core@58.0.0`, `supportedDevices` is required in both
-TypeScript and runtime plugin configuration. SDK 57 allowed this option to be
-omitted; applications upgrading to SDK 58 must add an explicit list, for example
+TypeScript and runtime plugin configuration. Applications upgrading to SDK 58
+must add an explicit list, for example
 `"supportedDevices": "quest2|quest3|quest3s"`, before running prebuild.
 
 The plugin supplies no default list. Device names must be non-empty and separated

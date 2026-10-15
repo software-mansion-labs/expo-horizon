@@ -27,7 +27,7 @@ export type HorizonOptions = {
   defaultWidth?: string;
 
   /**
-   * Required in SDK 58: a pipe-separated list of supported Quest devices, with no default.
+   * Required pipe-separated list of supported Quest devices.
    * @example "quest2|quest3|quest3s"
    * @see https://developers.meta.com/horizon/resources/publish-mobile-manifest/
    */
