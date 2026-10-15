@@ -35,7 +35,7 @@ afterEach(async () => {
   await fs.rm(projectRoot, { recursive: true, force: true });
 });
 
-async function prebuild(options: HorizonOptions = {}) {
+async function prebuild(options: HorizonOptions) {
   await compileModsAsync(withHorizon({ name: 'test', slug: 'test' }, options), {
     projectRoot,
     platforms: ['android'],
@@ -79,11 +79,11 @@ it('keeps mobile permissions and backup settings while restricting the Quest ove
 });
 
 it('produces identical output on repeated prebuild and updates the app ID once', async () => {
-  await prebuild({ horizonAppId: '123' });
+  await prebuild({ supportedDevices: 'quest3', horizonAppId: '123' });
   const first = await readOutput();
-  await prebuild({ horizonAppId: '123' });
+  await prebuild({ supportedDevices: 'quest3', horizonAppId: '123' });
   expect(await readOutput()).toEqual(first);
-  await prebuild({ horizonAppId: '456' });
+  await prebuild({ supportedDevices: 'quest3', horizonAppId: '456' });
   const [, gradle, properties] = await readOutput();
   expect(gradle.match(/flavorDimensions/g)).toHaveLength(1);
   expect(gradle).toContain('mobile { dimension "device" }');
@@ -93,8 +93,8 @@ it('produces identical output on repeated prebuild and updates the app ID once',
 });
 
 it('applies Quest option changes without leaving old feature declarations', async () => {
-  await prebuild();
-  await prebuild({ allowBackup: true, disableVrHeadtracking: true });
+  await prebuild({ supportedDevices: 'quest3' });
+  await prebuild({ supportedDevices: 'quest3', allowBackup: true, disableVrHeadtracking: true });
   const { manifest } = await AndroidConfig.Manifest.readAndroidManifestAsync(
     path.join(projectRoot, 'android/app/src/quest/AndroidManifest.xml')
   );
@@ -104,4 +104,46 @@ it('applies Quest option changes without leaving old feature declarations', asyn
       $: expect.objectContaining({ 'android:name': 'android.hardware.vr.headtracking' }),
     })
   );
+});
+
+it.each([
+  undefined,
+  null,
+  false,
+  [],
+  {},
+  { supportedDevices: undefined },
+  { supportedDevices: null },
+  { supportedDevices: 123 },
+  { supportedDevices: '' },
+  { supportedDevices: ' ' },
+  { supportedDevices: 'quest2,quest3' },
+  { supportedDevices: 'quest2||quest3' },
+  { supportedDevices: '|quest3' },
+  { supportedDevices: 'quest3|' },
+  { supportedDevices: 'quest2| quest3' },
+])('rejects missing or malformed device configuration %j', (options) => {
+  expect(() => withHorizon({ name: 'test', slug: 'test' }, options as HorizonOptions)).toThrow(
+    '[expo-horizon-core] supportedDevices is required and must be a non-empty pipe-separated string'
+  );
+});
+
+it('preserves an explicit device list without a fixed model allowlist', async () => {
+  const supportedDevices = 'quest3|future-device_1';
+  await prebuild({ supportedDevices });
+  const { manifest } = await AndroidConfig.Manifest.readAndroidManifestAsync(
+    path.join(projectRoot, 'android/app/src/quest/AndroidManifest.xml')
+  );
+  expect(manifest.application![0]['meta-data']).toContainEqual({
+    $: { 'android:name': 'com.oculus.supportedDevices', 'android:value': supportedDevices },
+  });
+});
+
+it('rejects an omitted device list before changing previously generated files', async () => {
+  await prebuild({ supportedDevices: 'quest3', horizonAppId: '123' });
+  const previousOutput = await readOutput();
+  await expect(prebuild({ horizonAppId: '456' } as HorizonOptions)).rejects.toThrow(
+    'supportedDevices is required'
+  );
+  expect(await readOutput()).toEqual(previousOutput);
 });

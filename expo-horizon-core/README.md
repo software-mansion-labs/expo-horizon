@@ -126,6 +126,18 @@ Add the plugin to your `app.json` or `app.config.[js|ts]`:
 >
 > If the application is storing sensitive information on the device, it is recommended to disable backups by setting `allowBackup="false"` in your application's AndroidManifest.
 
+### Migrating to SDK 58
+
+Starting with `expo-horizon-core@58.0.0`, `supportedDevices` is required in both
+TypeScript and runtime plugin configuration. SDK 57 allowed this option to be
+omitted; applications upgrading to SDK 58 must add an explicit list, for example
+`"supportedDevices": "quest2|quest3|quest3s"`, before running prebuild.
+
+The plugin supplies no default list. Device names must be non-empty and separated
+by pipes, using letters, digits, underscores, or hyphens. Missing or malformed
+lists fail before native files are changed. This supplies the supported-device
+declaration required by [Meta's release manifest requirements](https://developers.meta.com/vr/resources/publish-mobile-manifest/).
+
 ### Configuration Examples
 
 ```json
