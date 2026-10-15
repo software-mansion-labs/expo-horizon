@@ -122,30 +122,21 @@ Add the plugin to your `app.json` or `app.config.[js|ts]`:
 | `disableVrHeadtracking` | `boolean` | No       | `false`   | Set to `true` to disable VR headtracking feature. By default, adds `android.hardware.vr.headtracking` to AndroidManifest.                                                                                                        |
 | `allowBackup`           | `boolean` | No       | `false`   | Set to `true` in the Quest build to enable Android's `allowBackup` feature. The default value is `false` which removes the "allowBackup=true" warning in the Meta Horizon Store. This does not affect your mobile build variant. |
 
-For SDK 57 compatibility, the plugin continues to accept an omitted
-`supportedDevices` option. It supplies no default device list and adds no
-`com.oculus.supportedDevices` metadata in that case. Store releases still need an
-explicit declaration in the final merged manifest; see
-[Meta's release manifest requirements](https://developers.meta.com/vr/resources/publish-mobile-manifest/).
-
 > **Meta Horizon Store Recommendation for `allowBackup`:**
 >
 > If the application is storing sensitive information on the device, it is recommended to disable backups by setting `allowBackup="false"` in your application's AndroidManifest.
 
 #### Configuration validation
 
-The plugin validates supplied options before writing native files. Omit an optional
-field (or use `undefined` in JavaScript) to keep its default; `null` is not accepted.
+The plugin validates supplied options before writing native files. Supplied values
+must match these formats; `null` is not accepted.
 
 - `defaultWidth` and `defaultHeight` must be positive dp strings, such as
   `"600dp"` or `"360.5dp"`.
 - `horizonAppId` must be a string without whitespace, quotes, or backslashes.
-  An empty string leaves it unset. Placeholder strings such as `"DEMO_APP_ID"`
-  remain accepted; this check does not verify that an app ID exists in Meta.
 - `supportedDevices`, when supplied, must be a non-empty pipe-separated string.
   Each device name may contain letters, digits, underscores, or hyphens. Empty
-  entries, spaces, and comma-separated lists are rejected. Names are not checked
-  against a fixed device list, so new device identifiers can be used.
+  entries, spaces, and comma-separated lists are rejected.
 - `disableVrHeadtracking` and `allowBackup` must be booleans, not strings such as
   `"false"` or numbers such as `0`.
 

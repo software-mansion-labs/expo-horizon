@@ -106,7 +106,7 @@ it('applies Quest option changes without leaving old feature declarations', asyn
   );
 });
 
-it('keeps supportedDevices optional on SDK 57 without inventing a default', async () => {
+it('omits supported-device metadata when no list is configured', async () => {
   await prebuild();
   const { manifest } = await AndroidConfig.Manifest.readAndroidManifestAsync(
     path.join(projectRoot, 'android/app/src/quest/AndroidManifest.xml')
@@ -176,7 +176,7 @@ it.each([123, null, ' ', '123\n456', '123\\456', '"123"', "'123'"])(
 );
 
 it.each(['', 'DEMO_APP_ID', '12345678901234567890'])(
-  'preserves an unset, placeholder, or large string app ID %s',
+  'writes string app ID %s without coercion',
   async (horizonAppId) => {
     await prebuild({ horizonAppId });
     const [, , properties] = await readOutput();
@@ -200,7 +200,7 @@ it.each([
   ).toThrow('supportedDevices must be a non-empty pipe-separated string of device names');
 });
 
-it('preserves device names without a fixed device allowlist and explicit false booleans', async () => {
+it('writes configured device names and boolean values', async () => {
   const supportedDevices = 'quest3|future-device_1';
   await prebuild({ supportedDevices, allowBackup: false, disableVrHeadtracking: false });
   const { manifest } = await AndroidConfig.Manifest.readAndroidManifestAsync(

@@ -7,7 +7,7 @@ export type HorizonOptions = {
   /**
    * Your Meta Horizon application ID.
    * Used by other libraries (like expo-horizon-notifications) to identify your app.
-   * Use a string without whitespace, quotes, or backslashes; an empty string leaves it unset.
+   * Use a string without whitespace, quotes, or backslashes.
    * @default ""
    * @see https://developers.meta.com/horizon/resources/publish-overview-appID/#creating-an-app-id
    */
