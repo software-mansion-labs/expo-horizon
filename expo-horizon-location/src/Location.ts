@@ -1,5 +1,4 @@
-import { createPermissionHook, isRunningInExpoGo, type PermissionResponse } from 'expo';
-import { Platform } from 'expo-modules-core';
+import { createPermissionHook, isRunningInExpoGo, Platform, type PermissionResponse } from 'expo';
 
 import ExpoLocation from './ExpoLocation';
 import type {
@@ -298,9 +297,9 @@ export const useForegroundPermissions = createPermissionHook({
 // @needsAudit
 /**
  * Checks user's permissions for accessing location while the app is in the background.
- * @return A promise that fulfills with an object of type [`PermissionResponse`](#permissionresponse).
+ * @return A promise that fulfills with an object of type [`LocationPermissionResponse`](#locationpermissionresponse).
  */
-export async function getBackgroundPermissionsAsync(): Promise<PermissionResponse> {
+export async function getBackgroundPermissionsAsync(): Promise<LocationPermissionResponse> {
   return await ExpoLocation.getBackgroundPermissionsAsync();
 }
 
@@ -312,9 +311,9 @@ export async function getBackgroundPermissionsAsync(): Promise<PermissionRespons
  * For example, you can use `Modal` component from `react-native` to do that.
  * > __Note__: Foreground permissions should be granted before asking for the background permissions
  * (your app can't obtain background permission without foreground permission).
- * @return A promise that fulfills with an object of type [`PermissionResponse`](#permissionresponse).
+ * @return A promise that fulfills with an object of type [`LocationPermissionResponse`](#locationpermissionresponse).
  */
-export async function requestBackgroundPermissionsAsync(): Promise<PermissionResponse> {
+export async function requestBackgroundPermissionsAsync(): Promise<LocationPermissionResponse> {
   return await ExpoLocation.requestBackgroundPermissionsAsync();
 }
 

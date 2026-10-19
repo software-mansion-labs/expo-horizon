@@ -25,7 +25,7 @@ yarn add expo-horizon-core
 
 ## Prerequisites
 
-- Expo SDK 57 or later (`expo` package version 57.0.15+)
+- Expo SDK 58 or later (`expo` package version 58.0.14+)
 - Android development environment configured
 - Meta Quest developer account (for publishing)
 
@@ -125,6 +125,18 @@ Add the plugin to your `app.json` or `app.config.[js|ts]`:
 > **Meta Horizon Store Recommendation for `allowBackup`:**
 >
 > If the application is storing sensitive information on the device, it is recommended to disable backups by setting `allowBackup="false"` in your application's AndroidManifest.
+
+### Migrating to SDK 58
+
+Starting with `expo-horizon-core@58.0.0`, `supportedDevices` is required in both
+TypeScript and runtime plugin configuration. Applications upgrading to SDK 58
+must add an explicit list, for example
+`"supportedDevices": "quest2|quest3|quest3s"`, before running prebuild.
+
+The plugin supplies no default list. Device names must be non-empty and separated
+by pipes, using letters, digits, underscores, or hyphens. Missing or malformed
+lists fail before native files are changed. This supplies the supported-device
+declaration required by [Meta's release manifest requirements](https://developers.meta.com/vr/resources/publish-mobile-manifest/).
 
 ### Configuration Examples
 
@@ -280,6 +292,7 @@ Now, `horizonAppId` will contain the value of your Horizon App ID as defined in 
 
 | `expo-horizon-core` | Expo SDK Version |
 | ------------------- | ---------------- |
+| 58.0.0 (unreleased) | 58               |
 | 57.0.0-57.0.3       | 57               |
 | 56.0.0              | 56               |
 | 55.0.0-55.0.1       | 55               |

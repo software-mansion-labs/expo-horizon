@@ -1,0 +1,1 @@
+{"version":3,"file":"LocationProvider.types.js","sourceRoot":"","sources":["../../../src/next/types/LocationProvider.types.ts"],"names":[],"mappings":"","sourcesContent":["export type LocationProviderRefType = 'LocationProvider';\n"]}

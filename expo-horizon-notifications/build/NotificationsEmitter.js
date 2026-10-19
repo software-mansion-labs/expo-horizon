@@ -1,8 +1,6 @@
-import { LegacyEventEmitter, UnavailabilityError } from 'expo-modules-core';
+import { UnavailabilityError } from 'expo';
 import NotificationsEmitterModule from './NotificationsEmitterModule';
 import { mapNotification, mapNotificationResponse } from './utils/mapNotificationResponse';
-// Web uses SyntheticEventEmitter
-const emitter = new LegacyEventEmitter(NotificationsEmitterModule);
 const didReceiveNotificationEventName = 'onDidReceiveNotification';
 const didDropNotificationsEventName = 'onNotificationsDeleted';
 const didReceiveNotificationResponseEventName = 'onDidReceiveNotificationResponse';
@@ -34,7 +32,7 @@ export const DEFAULT_ACTION_IDENTIFIER = 'expo.modules.notifications.actions.DEF
  * @header listen
  */
 export function addNotificationReceivedListener(listener) {
-    return emitter.addListener(didReceiveNotificationEventName, (notification) => {
+    return NotificationsEmitterModule.addListener(didReceiveNotificationEventName, (notification) => {
         const mappedNotification = mapNotification(notification);
         listener(mappedNotification);
     });
@@ -48,7 +46,7 @@ export function addNotificationReceivedListener(listener) {
  * @header listen
  */
 export function addNotificationsDroppedListener(listener) {
-    return emitter.addListener(didDropNotificationsEventName, listener);
+    return NotificationsEmitterModule.addListener(didDropNotificationsEventName, listener);
 }
 /**
  * Listeners registered by this method will be called whenever a user interacts with a notification (for example, taps on it).
@@ -77,7 +75,7 @@ export function addNotificationsDroppedListener(listener) {
  * @header listen
  */
 export function addNotificationResponseReceivedListener(listener) {
-    return emitter.addListener(didReceiveNotificationResponseEventName, (response) => {
+    return NotificationsEmitterModule.addListener(didReceiveNotificationResponseEventName, (response) => {
         const mappedResponse = mapNotificationResponse(response);
         listener(mappedResponse);
     });
@@ -139,12 +137,12 @@ export function clearLastNotificationResponse() {
     }
     NotificationsEmitterModule.clearLastNotificationResponse();
     // Emit event to clear any useLastNotificationResponse hooks, after native call succeeds
-    emitter.emit(didClearNotificationResponseEventName, []);
+    NotificationsEmitterModule.emit(didClearNotificationResponseEventName);
 }
 /**
  * @hidden
  */
 export function addNotificationResponseClearedListener(listener) {
-    return emitter.addListener(didClearNotificationResponseEventName, listener);
+    return NotificationsEmitterModule.addListener(didClearNotificationResponseEventName, listener);
 }
 //# sourceMappingURL=NotificationsEmitter.js.map
