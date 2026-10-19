@@ -1,0 +1,1 @@
+{"version":3,"file":"LocationUpdates.types.d.ts","sourceRoot":"","sources":["../../../src/next/types/LocationUpdates.types.ts"],"names":[],"mappings":"AAAA;;;;GAIG;AACH,MAAM,MAAM,oBAAoB,GAAG;IACjC,oDAAoD;IACpD,YAAY,EAAE,OAAO,CAAC;IACtB,6DAA6D;IAC7D,SAAS,EAAE,OAAO,CAAC;IACnB,uFAAuF;IACvF,SAAS,EAAE,MAAM,GAAG,IAAI,CAAC;IACzB;;;OAGG;IACH,SAAS,EAAE,MAAM,GAAG,IAAI,CAAC;CAC1B,CAAC"}

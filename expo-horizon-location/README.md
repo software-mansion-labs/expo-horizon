@@ -11,7 +11,7 @@ You can choose which implementation to use with the `quest` / `mobile` build var
 
 ## Prerequisites
 
-- Expo SDK 58 or later (`expo` package version 58.0.7+)
+- Expo SDK 58 or later (`expo` package version 58.0.14+)
 - (Recommended) `expo-horizon-core` package installed. See [expo-horizon-core](../expo-horizon-core/README.md) for more details
 
 ## Usage
@@ -52,27 +52,27 @@ import * as Location from 'expo-horizon-location';
 > [!IMPORTANT]
 > The `quest` build variants are intended specifically for Meta Quest devices. Using them on standard Android devices is not recommended, as certain features may be unsupported or behave differently.
 
-## SDK 58 beta location API
+## SDK 58 location API
 
-The new API is available from `expo-horizon-location/next`. This fork follows
-`expo-location@58.0.13`, including its current platform limitations:
+The new API is available from `expo-horizon-location/next`, following
+`expo-location@58.0.17`:
 
-- Foreground permissions, `Location.getPosition`, and `PositionWatchHandle` work on
-  iOS, Android mobile, and Quest. Google Play Services providers and background
-  permissions remain unavailable on Quest.
-- `LocationUpdatesHandle` currently has a native implementation only on iOS.
-  Constructing it on Quest throws `ERR_QUEST_FEATURE_UNAVAILABLE` with an explicit
-  message that background location updates are unsupported. On standard Android,
-  constructing it still throws a generic JavaScript error.
-- On iOS, calling `LocationUpdatesHandle.stop()` for a task that has not started
-  crashes the app. Avoid this call for inactive tasks; `hasStarted()` reports
-  whether the task is registered.
-- `Location.hasLocationServicesEnabled()` and `useLocationServices()` currently
-  fail on iOS because the upstream native method is missing. Use
-  `hasServicesEnabledAsync()` from `expo-horizon-location` instead.
+- Foreground permissions, position queries, and controllable watchers are available
+  on iOS, Android mobile, and Quest.
+- On Android mobile and Quest, `Location.ensureBackgroundSessionStarted()` starts
+  a foreground service so watchers can continue when the app is backgrounded.
+  Start it while the app is in the foreground; configure foreground-service
+  permissions with the location plugin. Use `Location.stopBackgroundSession()`
+  to stop it and clear its persisted configuration.
+- `LocationUpdatesHandle` supports background tasks on iOS and Android mobile.
+  Quest continues to reject its constructor with `ERR_QUEST_FEATURE_UNAVAILABLE`.
+  Foreground-service sessions do not enable background task support on Quest.
+- Google Play Services providers and background location permission requests
+  remain unavailable on Quest.
+- Upstream now implements `Location.hasLocationServicesEnabled()` on iOS and
+  safely allows stopping an inactive `LocationUpdatesHandle`.
 
-These limitations apply to the new `/next` API. The existing package entry point
-continues to expose the legacy location API.
+The existing package entry point continues to expose the legacy location API.
 
 ## Additional features
 
@@ -101,8 +101,8 @@ Our goal is to align the version numbers of `expo-horizon-location` and `expo-lo
 
 | `expo-horizon-location` | `expo-location` | Expo SDK Version |
 | ----------------------- | --------------- | ---------------- |
-| 58.0.0 (unreleased)     | 58.0.13         | 58               |
-| 57.0.3 (unreleased)     | 57.0.20         | 57               |
+| 58.0.0 (unreleased)     | 58.0.17         | 58               |
+| 57.0.3                  | 57.0.20         | 57               |
 | 57.0.2                  | 57.0.16         | 57               |
 | 57.0.1                  | 57.0.12         | 57               |
 | 57.0.0                  | 57.0.2          | 57               |

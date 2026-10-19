@@ -5,12 +5,6 @@
   "orientation": "default",
   "icon": "./assets/icon.png",
   "userInterfaceStyle": "light",
-  "newArchEnabled": true,
-  "splash": {
-    "image": "./assets/splash-icon.png",
-    "resizeMode": "contain",
-    "backgroundColor": "#ffffff"
-  },
   "ios": {
     "supportsTablet": true,
     "bundleIdentifier": "com.anonymous.app"
@@ -32,6 +26,14 @@
     "expo-router",
     "expo-task-manager",
     "expo-status-bar",
-    "@rnrepo/expo-config-plugin"
+    "@rnrepo/expo-config-plugin",
+    [
+      "expo-splash-screen",
+      {
+        "image": "./assets/splash-icon.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#ffffff"
+      }
+    ]
   ]
 }

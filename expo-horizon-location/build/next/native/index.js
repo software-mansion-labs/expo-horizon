@@ -1,2 +1,2 @@
-export { NativeLocationModuleNext, NativeLocationProvider, NativePositionWatchHandle, NativeLocationUpdatesHandle, } from './NativeLocationModuleNext';
+export { NativeLocationModuleNext, NativeLocationProvider, NativePositionWatchHandle, NativeLocationUpdatesHandle, NativeBackgroundSession, } from './NativeLocationModuleNext';
 //# sourceMappingURL=index.js.map

@@ -165,8 +165,10 @@ const withLocation = (config, { locationAlwaysAndWhenInUsePermission, locationAl
         // Note: permissions prohibited on the Meta Horizon Store (e.g. ACCESS_BACKGROUND_LOCATION,
         // ACTIVITY_RECOGNITION) are stripped from the `quest` flavor manifest by `expo-horizon-core`.
         isAndroidBackgroundLocationEnabled && 'android.permission.ACCESS_BACKGROUND_LOCATION',
+        isAndroidBackgroundLocationEnabled && 'android.permission.RECEIVE_BOOT_COMPLETED',
         enableAndroidForegroundService && 'android.permission.FOREGROUND_SERVICE',
         enableAndroidForegroundService && 'android.permission.FOREGROUND_SERVICE_LOCATION',
+        enableAndroidForegroundService && 'android.permission.POST_NOTIFICATIONS',
         isAndroidMotionActivityEnabled && 'android.permission.ACTIVITY_RECOGNITION',
         isAndroidMotionActivityEnabled && 'com.google.android.gms.permission.ACTIVITY_RECOGNITION',
     ].filter(Boolean));

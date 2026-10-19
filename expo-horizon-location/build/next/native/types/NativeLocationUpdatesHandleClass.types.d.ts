@@ -1,9 +1,10 @@
-import type { LocationProfile } from '../../types';
+import type { BackgroundTaskStatus, LocationProfile } from '../../types';
 export declare class NativeLocationUpdatesHandleClass {
     constructor(taskName: string);
     withProfile(profile: LocationProfile): void;
     start(): Promise<void>;
     stop(): Promise<void>;
     hasStarted(): Promise<boolean>;
+    status(): BackgroundTaskStatus;
 }
 //# sourceMappingURL=NativeLocationUpdatesHandleClass.types.d.ts.map
