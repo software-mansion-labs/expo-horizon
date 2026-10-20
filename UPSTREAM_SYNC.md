@@ -52,11 +52,17 @@ Conflicting paths appear in `git status`; text conflicts have conflict markers.
 
 Use the [SDK bump checklist](.cursor/skills/bump-expo-sdk/SKILL.md) to review and
 finish the migration. The helper preserves existing Android `src/mobile` routing
-and leaves `src/quest` implementations untouched. New or renamed Android files
-still need routing and Quest capability review. A clean merge does not prove
-compatibility. Review package metadata, dependencies, plugins, changelogs, and
-Horizon-specific changes as well. Generated `build/`, `plugin/build/`, Android
-build/cache directories, and TypeScript build-info are excluded; rebuild outputs.
+and leaves `src/quest` implementations untouched. Routing follows existing paths,
+so an upstream rename does not inherit the old file's `src/mobile` placement.
+Both preview and apply warn on stderr about new or renamed paths defaulting to
+`src/main`, which is shared by mobile and Quest. The warning also lists removed
+mobile paths from the same package as possible rename sources, even when Git
+cannot detect a heavily edited rename. Review these paths and move mobile-only
+code to `src/mobile` before committing; the warning does not change the exit code.
+A clean merge does not prove compatibility. Review package metadata, dependencies,
+plugins, changelogs, and Horizon-specific changes as well. Generated `build/`,
+`plugin/build/`, Android build/cache directories, and TypeScript build-info are
+excluded; rebuild outputs.
 
 After resolving conflicts and staging the resolved files, end the preparation:
 

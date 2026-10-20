@@ -100,6 +100,30 @@ def snapshot(repo, sha, tracked):
     return mapped
 
 
+def warn_android_routing(old, new):
+    # Compare paths rather than relying on Git's similarity-based rename detection:
+    # a renamed and rewritten mobile file still needs an explicit routing review.
+    for package in PACKAGES:
+        added = sorted(path for path in new.keys() - old.keys()
+                       if path.startswith(package + "/android/src/main/"))
+        if not added:
+            continue
+        print(
+            "WARNING: New or renamed Android files default to src/main, which is shared "
+            "by mobile and Quest. Existing src/mobile routes do not follow renames.",
+            file=sys.stderr,
+        )
+        print("Review these paths and move mobile-only code to src/mobile before committing:",
+              file=sys.stderr)
+        print("\n".join("  " + path for path in added), file=sys.stderr)
+        removed = sorted(path for path in old.keys() - new.keys()
+                         if path.startswith(package + "/android/src/mobile/"))
+        if removed:
+            print("Removed mobile paths in this package may be the sources of those renames:",
+                  file=sys.stderr)
+            print("\n".join("  " + path for path in removed), file=sys.stderr)
+
+
 def import_blobs(root, expo, snapshots):
     oids = sorted({oid for tree in snapshots for _, oid in tree.values()})
     pack = git(expo, "pack-objects", "--stdout", data=("\n".join(oids) + "\n").encode()).stdout
@@ -159,10 +183,7 @@ def prepare(args, root=ROOT):
     for path in changed:
         kind = "added" if path not in old else "deleted" if path not in new else "changed"
         print(f"  {kind:7} {path}")
-    added_android = [p for p in changed if p not in old and "/android/src/main/" in p]
-    if added_android:
-        print("Review new Android files for shared/mobile placement and Quest compatibility:")
-        print("\n".join("  " + p for p in added_android))
+    warn_android_routing(old, new)
     # Ignored local files are not reported by git status. Do not overwrite them.
     for path in new:
         if path not in tracked and os.path.lexists(root / path):

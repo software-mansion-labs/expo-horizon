@@ -78,7 +78,9 @@ class SyncTest(unittest.TestCase):
         return sha
 
     def run_sync(self):
-        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+        self.stdout = io.StringIO()
+        self.stderr = io.StringIO()
+        with contextlib.redirect_stdout(self.stdout), contextlib.redirect_stderr(self.stderr):
             return sync.prepare(self.args, self.root)
 
     def test_apply_routing_add_delete_and_generated_exclusion(self):
@@ -96,6 +98,80 @@ class SyncTest(unittest.TestCase):
         self.assertEqual(json.loads((self.root / sync.BASELINE).read_text())["commit"], target)
         self.assertEqual(git(self.root, "rev-parse", "HEAD"), start)
         self.assertEqual(git(self.root, "diff", "--name-only"), "")
+        self.assertNotIn("WARNING:", self.stderr.getvalue())
+
+    def test_android_mobile_rename_warns_in_preview_and_apply(self):
+        renamed = "android/src/main/java/RenamedLocation.kt"
+        self.target({UP + ANDROID: None, UP + renamed: "base mobile\n"})
+        refs = git(self.root, "show-ref")
+        self.args.dry_run = True
+        self.assertEqual(self.run_sync(), 0)
+        warning = self.stderr.getvalue()
+        self.assertIn("WARNING: New or renamed Android files default to src/main", warning)
+        self.assertIn("Existing src/mobile routes do not follow renames", warning)
+        self.assertIn("move mobile-only code to src/mobile before committing", warning)
+        self.assertIn(LOCAL + renamed, warning)
+        self.assertIn("Removed mobile paths in this package", warning)
+        self.assertIn(LOCAL + MOBILE, warning)
+        self.assertEqual(git(self.root, "status", "--porcelain"), "")
+        self.assertEqual(git(self.root, "show-ref"), refs)
+        self.assertFalse((self.root / sync.BASELINE).exists())
+
+        self.args.dry_run = False
+        self.assertEqual(self.run_sync(), 0)
+        self.assertEqual(self.stderr.getvalue(), warning)
+        self.assertEqual((self.root / (LOCAL + renamed)).read_text(), "base mobile\n")
+        self.assertFalse((self.root / (LOCAL + MOBILE)).exists())
+        self.assertEqual((self.root / (LOCAL + "android/src/quest/java/Location.kt")).read_text(),
+                         "Quest only\n")
+
+    def test_android_rewritten_rename_warns_without_git_rename_detection(self):
+        upstream = "packages/expo-notifications/"
+        local = "expo-horizon-notifications/"
+        original = "android/src/main/java/PushToken.kt"
+        mobile = "android/src/mobile/java/PushToken.kt"
+        renamed = "android/src/main/java/tokens/NewPushToken.kt"
+        write(self.expo, upstream + original, "original token implementation\n")
+        self.args.previous = commit(self.expo)
+        write(self.root, local + mobile, "original token implementation\n")
+        commit(self.root)
+        target = self.target({upstream + original: None, upstream + renamed: "rewritten tokens\n",
+                              UP + ANDROID: None})
+        delta = git(self.expo, "diff", "--name-status", "--find-renames",
+                    self.args.previous, target)
+        self.assertIn("A\t" + upstream + renamed, delta)
+        self.assertIn("D\t" + upstream + original, delta)
+        self.assertEqual(self.run_sync(), 0)
+        warning = self.stderr.getvalue()
+        self.assertIn("WARNING:", warning)
+        self.assertIn(local + renamed, warning)
+        self.assertIn(local + mobile, warning)
+        # An unrelated package's deletion must not be suggested as a rename source.
+        self.assertNotIn(LOCAL + MOBILE, warning)
+        self.assertEqual((self.root / (local + renamed)).read_text(), "rewritten tokens\n")
+        self.assertFalse((self.root / (local + mobile)).exists())
+
+    def test_new_android_file_warns_without_suggesting_a_rename_source(self):
+        added = "android/src/main/java/NewFile.kt"
+        self.target({UP + added: "new Android code\n"})
+        self.assertEqual(self.run_sync(), 0)
+        warning = self.stderr.getvalue()
+        self.assertIn("WARNING:", warning)
+        self.assertIn("shared by mobile and Quest", warning)
+        self.assertIn(LOCAL + added, warning)
+        self.assertNotIn("Removed mobile paths", warning)
+
+    def test_existing_shared_and_mobile_updates_do_not_warn(self):
+        shared = "android/src/main/java/Shared.kt"
+        write(self.expo, UP + shared, "shared\n")
+        self.args.previous = commit(self.expo)
+        write(self.root, LOCAL + shared, "shared\n")
+        commit(self.root)
+        self.target({UP + shared: "updated shared\n", UP + ANDROID: "updated mobile\n"})
+        self.assertEqual(self.run_sync(), 0)
+        self.assertNotIn("WARNING:", self.stderr.getvalue())
+        self.assertEqual((self.root / (LOCAL + shared)).read_text(), "updated shared\n")
+        self.assertEqual((self.root / (LOCAL + MOBILE)).read_text(), "updated mobile\n")
 
     def test_text_conflict_and_abort(self):
         write(self.root, LOCAL + "src/value.ts", "Horizon edit\n")
