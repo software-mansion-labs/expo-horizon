@@ -8,6 +8,8 @@ disable-model-invocation: true
 
 Migrate the Horizon forks to a target `expo/expo` branch. Upstream is authoritative for iOS and standard Android; Quest behavior remains an explicit product decision.
 
+See [Upstream upgrades](../../../UPSTREAM_SYNC.md) for the supported preparation and validation workflow.
+
 ## Required inputs
 
 Read [AGENTS.md](../../../AGENTS.md) and [Changelog ownership](../../../CONTRIBUTING.md#changelog-ownership). Reuse the following inputs from the user’s request or established session context; ask only for a missing or ambiguous value:
@@ -18,10 +20,12 @@ Read [AGENTS.md](../../../AGENTS.md) and [Changelog ownership](../../../CONTRIBU
 Resolve and report the target versions:
 
 ```bash
-.cursor/skills/bump-expo-sdk/scripts/resolve-sdk-versions.sh <expo-repo> <ref>
+.cursor/skills/bump-expo-sdk/scripts/resolve-sdk-versions.sh <expo-repo> <resolved-target-sha>
 ```
 
-Use versions from that ref, not arbitrary latest npm versions. Resolve the exact ref to a commit. Fetch that ref when needed within the authorized upgrade work; do not substitute a different ref or change the upstream checkout.
+Use versions from the exact target, not arbitrary latest npm versions. The manual preparation command below fetches and pins the selected remote ref; use its printed full SHA for version resolution, application, subsequent comparisons, and the temporary worktree. With `--offline`, the selected ref must already exist locally.
+
+The version resolver needs Node.js on `PATH`. If upstream removes or reorganizes a package expected by that helper, inspect package metadata and migration notes at the pinned SHA directly. Record the missing package and required tooling migration; do not substitute versions from another ref or treat successful sync preparation as a completed upgrade.
 
 ## Safety
 
@@ -29,11 +33,11 @@ Use versions from that ref, not arbitrary latest npm versions. Resolve the exact
 - Do not switch or modify the user's `expo/expo` checkout. Create a temporary detached worktree at the requested ref and remove it after validation:
 
 ```bash
-git -C <expo-repo> worktree add --detach <temporary-directory> <ref>
+git -C <expo-repo> worktree add --detach <temporary-directory> <resolved-commit-sha>
 ```
 
 - Reuse the authorized branch or use the branch name requested by the user; otherwise use the coding agent’s normal branch convention.
-- Follow the user’s existing authorization for commits and PR work. An SDK upgrade alone does not authorize publication or changes to the `upstream-filtered` branch.
+- Follow the user’s existing authorization for commits and PR work. An SDK upgrade alone does not authorize publication.
 - Track the migration as a checklist. Stop at unresolved merge conflicts or product decisions.
 
 ## Package mapping
@@ -48,6 +52,18 @@ git -C <expo-repo> worktree add --detach <temporary-directory> <ref>
 ## Migration workflow
 
 ### 1. Inventory the upstream delta
+
+Use the manual sync helper to preview the latest commit on the requested SDK branch:
+
+```bash
+./scripts/sync-upstream-local.sh <expo-repo> --ref <target-ref> --dry-run
+```
+
+On the first run, also pass `--from <previous-full-expo-sha>` from established upgrade evidence. Later runs use the committed `upstream-sync.json`. If the previous SHA is unknown, establish a baseline by full source comparison; do not guess. A preview exit code of 1 means conflicts were found, not that preparation failed.
+
+The target must descend from the previous Expo commit. An SDK branch can contain older package code than a snapshot from `main`; if the helper rejects an older/divergent target, review the chosen ref and versions instead of changing the baseline to bypass the check.
+
+Apply the previewed SHA by rerunning with `--ref <printed-target-sha>` and without `--dry-run`. This stages the upstream delta and leaves conflicts for resolution. Follow the remaining steps to resolve them and adapt Horizon behavior. After staging resolutions, run `git cherry-pick --quit` (not `--continue`) to leave the changes staged without committing. Use `git cherry-pick --abort` to undo a conflicted preparation. See [Upstream sync](../../../UPSTREAM_SYNC.md) for clean-result recovery and helper limits.
 
 Compare the target packages with the currently documented upstream versions and inspect all added, modified, renamed, and deleted files. Review native, TypeScript, config plugin, tests, package metadata, and build configuration. Do not copy only obvious implementation files.
 
@@ -128,6 +144,8 @@ Read the parity skill and run its read-only helper against the resolved upstream
 .cursor/skills/validate-upstream-parity/scripts/validate-parity.sh <expo-repo> <resolved-commit>
 ```
 
+The helper leaves both checkouts untouched, reports additions and deletions, and fails on native differences. TypeScript differences are printed for review. Separately inspect plugins, metadata, and native build configuration outside the compared source trees.
+
 Acceptance gates:
 
 - iOS diff is empty for both packages.
@@ -135,6 +153,7 @@ Acceptance gates:
 - Every TypeScript difference is understood and intentional.
 - Quest exposes the expected API surface and matches every recorded implement/no-op/reject decision.
 - Any temporary upstream worktree created for migration is removed. The parity helper itself leaves both checkouts untouched.
+- The proposed `upstream-sync.json` target matches the validated Expo SHA. Commit it with the upgrade only after validation; do not treat staged metadata as evidence that the upgrade is complete.
 
 ### 8. Verify
 
