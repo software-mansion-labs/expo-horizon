@@ -40,8 +40,8 @@ the pinned manifests and confirmed against npm instead. Upstream's replacement
 `@expo/internal-scripts@58.0.5` is private and is not substituted into the fork.
 
 All three Horizon packages remain **58.0.0, unpublished**, confirmed against npm.
-This is an SDK patch sync, not release preparation. No packages or remote release
-tags were published.
+The patch sync leaves release metadata unpublished. A subsequent isolated release
+rehearsal is recorded below. No packages or remote release tags were published.
 
 ## Source changes and parity
 
@@ -180,6 +180,70 @@ release remaining bindings.
 GitHub CI also passed for `52d7350f`: [library quality](https://github.com/software-mansion-labs/expo-horizon/actions/runs/41069295429),
 [example quality](https://github.com/software-mansion-labs/expo-horizon/actions/runs/41069295407),
 and [Android mobile/Quest and iOS simulator builds](https://github.com/software-mansion-labs/expo-horizon/actions/runs/41069295450).
+
+## Stable release dry run
+
+On 2026-10-30, rehearsed the coordinated stable release with PR source
+`013ef406f43ac3f3eb4ac0b11a2ef5bc51a7ecbe` and the release scripts, regression tests,
+and preparation/publication workflows from main commit
+`ee222c64664961610a10a2a8d0440131126e807e`. The PR branch does not yet contain that
+automation. These four files were overlaid in a disposable detached checkout;
+no other main-branch changes or dirty primary-checkout edits were included.
+
+The live npm registry reported **57.0.3** as the complete stable baseline for all
+three packages, with no stable SDK 58 versions. `RELEASE_BUMP=major` correctly
+reused **58.0.0**. Preparation changed three README compatibility rows, moved
+pending location/notification notes into `58.0.0 — 2026-10-30`, and normalized the
+location Android versionName quotes without changing its value. Package versions,
+core peer ranges, and upstream compatibility versions already matched.
+
+Reviewed all six changed files. Changelog content was preserved exactly once,
+published history remained byte-for-byte unchanged, and `Unpublished` headings
+were retained. Repeating preparation against the saved registry baseline and
+formatting again produced a byte-identical patch.
+
+| Check                                                            | Result                                                                                                                                                                 |
+| ---------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Node / Yarn / npm                                                | 24.9.0 / 1.22.22 / 11.11.0, matching the workflow pins                                                                                                                 |
+| `node --test scripts/__tests__/release.test.mjs`                 | 18 passed; isolated release-automation regression tests                                                                                                                |
+| Fresh `yarn install --frozen-lockfile --non-interactive`         | Pass; lockfile unchanged                                                                                                                                               |
+| Formatting, `node scripts/release.mjs check`, `git diff --check` | Pass; resolved version 58.0.0                                                                                                                                          |
+| `CI=1 yarn verify` on the prepared checkout                      | Pass: package/plugin builds, Oxlint, formatting, package/example types, 19 Jest suites, 128 passing tests, one existing skip, one snapshot                             |
+| Preparation repeated with the same registry baseline             | Identical patch; no double bump or duplicate notes                                                                                                                     |
+| `RELEASE_DRY_RUN=true node scripts/release.mjs publish`          | Pass for all three packages; npm publish calls explicitly used `--dry-run --provenance --tag latest`                                                                   |
+| Additional tarball inspection                                    | Every declared entry point/export exists; plugins, podspecs, and mobile/Quest native sources present; location `/next` and optional notification topic module included |
+
+The publisher used a clean local-only preparation commit,
+`24e539aa229da618fc5da38e7fa2fbc9b8ea27eb`. All three tarball manifests contain that
+exact `gitHead` and version `58.0.0`. Artifacts and logs were exported outside the
+disposable checkout to `/tmp/horizon-pr79-release-20261030/`, including
+`release-preparation.patch`, `rehearsal.bundle`, `publish-dry-run.log`, and
+`artifacts/manifest.json` with full SHA-512 integrity values.
+
+| Tarball                                 |   Bytes | Files |
+| --------------------------------------- | ------: | ----: |
+| `expo-horizon-core-58.0.0.tgz`          |  13,205 |    36 |
+| `expo-horizon-location-58.0.0.tgz`      | 176,973 |   282 |
+| `expo-horizon-notifications-58.0.0.tgz` | 246,716 |   597 |
+
+Release handoff must include core's breaking requirement for an explicit non-empty
+`supportedDevices` list, such as `quest2|quest3|quest3s`, because core has no package
+changelog. Location notes already include the Quest `/next` additions and upstream
+Android service-start/resume changes; notification notes retain the plugin option
+and crash/import fixes. This documentation-only follow-up needs no new package note.
+
+All four GitHub checks also passed on PR commit `013ef406`: [library quality](https://github.com/software-mansion-labs/expo-horizon/actions/runs/41072005544),
+[example quality](https://github.com/software-mansion-labs/expo-horizon/actions/runs/41072005582),
+and [Android mobile/Quest and iOS simulator builds](https://github.com/software-mansion-labs/expo-horizon/actions/runs/41072005539).
+Native/device checks were not repeated for this metadata-only rehearsal; the
+earlier evidence and limitations below still apply.
+
+The dated preparation changes and local commits were not pushed to the PR branch.
+This local rehearsal does not test GitHub bot PR creation, Actions permissions, npm
+upload authorization/provenance issuance, or native behavior of installed tarballs.
+npm reported its expected unauthenticated dry-run warning. Before real publication,
+prepare and dry-run again using the exact merged release commit and coordinated
+workflow. No npm upload, release tag, or merge was performed.
 
 ## Remaining limits
 
