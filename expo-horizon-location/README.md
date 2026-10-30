@@ -11,7 +11,7 @@ You can choose which implementation to use with the `quest` / `mobile` build var
 
 ## Prerequisites
 
-- Expo SDK 57 or later (`expo` package version 57.0.15+)
+- Expo SDK 58 or later (`expo` package version 58.0.21+)
 - (Recommended) `expo-horizon-core` package installed. See [expo-horizon-core](../expo-horizon-core/README.md) for more details
 
 ## Usage
@@ -52,6 +52,28 @@ import * as Location from 'expo-horizon-location';
 > [!IMPORTANT]
 > The `quest` build variants are intended specifically for Meta Quest devices. Using them on standard Android devices is not recommended, as certain features may be unsupported or behave differently.
 
+## SDK 58 location API
+
+The new API is available from `expo-horizon-location/next`, following
+`expo-location@58.0.20`:
+
+- Foreground permissions, position queries, and controllable watchers are available
+  on iOS, Android mobile, and Quest.
+- On Android mobile and Quest, `Location.ensureBackgroundSessionStarted()` starts
+  a foreground service so watchers can continue when the app is backgrounded.
+  Start it while the app is in the foreground; configure foreground-service
+  permissions with the location plugin. Use `Location.stopBackgroundSession()`
+  to stop it and clear its persisted configuration.
+- `LocationUpdatesHandle` supports background tasks on iOS and Android mobile.
+  Quest continues to reject its constructor with `ERR_QUEST_FEATURE_UNAVAILABLE`.
+  Foreground-service sessions do not enable background task support on Quest.
+- Google Play Services providers and background location permission requests
+  remain unavailable on Quest.
+- Upstream now implements `Location.hasLocationServicesEnabled()` on iOS and
+  safely allows stopping an inactive `LocationUpdatesHandle`.
+
+The existing package entry point continues to expose the legacy location API.
+
 ## Additional features
 
 You might need additional features like `isHorizonDevice` or `isHorizonBuild` to check if the device is a Meta Horizon device. See [expo-horizon-core](../expo-horizon-core/README.md) for more details.
@@ -79,6 +101,7 @@ Our goal is to align the version numbers of `expo-horizon-location` and `expo-lo
 
 | `expo-horizon-location` | `expo-location` | Expo SDK Version |
 | ----------------------- | --------------- | ---------------- |
+| 58.0.0 (unreleased)     | 58.0.20         | 58               |
 | 57.0.3                  | 57.0.20         | 57               |
 | 57.0.2                  | 57.0.16         | 57               |
 | 57.0.1                  | 57.0.12         | 57               |

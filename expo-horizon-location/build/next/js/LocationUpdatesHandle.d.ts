@@ -1,0 +1,66 @@
+import type { BackgroundTaskStatus, LocationProfile, LocationTaskOptions } from '../types';
+/**
+ * Starts and stops the delivery of positions to the task defined with `defineLocationTask`.
+ * The delivery is registered with the system, so it outlives the JS context: it survives the app
+ * moving to the background and, with the background permission, the app being terminated.
+ *
+ * On Android, positions keep arriving after the app process ended. Requires the background
+ * permission. While the app is in the background and no location foreground service is running,
+ * Android throttles the delivery. The handle keeps the provider selected during construction; to
+ * use a different provider, construct a new handle.
+ *
+ * On iOS, positions come from `CLLocationUpdate.liveUpdates`. Requires the `location` background
+ * mode and the foreground permission.
+ *
+ * See [Receive positions in the background](#receive-positions-in-the-background).
+ */
+export declare class LocationUpdatesHandle {
+    private readonly nativeHandle;
+    /**
+     * @param taskName The task that receives the positions. Must match the name passed to
+     * `defineLocationTask`; both default to the same name.
+     */
+    constructor(taskName?: string);
+    /**
+     * Stages the profile for the next `start()`. It has no effect on a delivery that is already
+     * running; call `stop()` and `start()` again to apply it.
+     *
+     * @return The same handle, for chaining.
+     */
+    withProfile(profile: LocationProfile): this;
+    /**
+     * Registers the delivery with the system and starts sending positions to the task.
+     *
+     * On Android the promise resolves even when the provider refuses the request for updates.
+     *
+     * @throws On Android, when the foreground or background permission is not granted, or when
+     * `RECEIVE_BOOT_COMPLETED` is missing from the manifest. On iOS, when location services are off
+     * or the foreground permission is missing, where the `location` background mode is also required.
+     */
+    start(): Promise<void>;
+    /**
+     * Unregisters the delivery. Positions stop arriving and the app is no longer relaunched for them.
+     */
+    stop(): Promise<void>;
+    /**
+     * Checks whether the delivery is registered with the system. It stays registered across app
+     * restarts, so check it on launch before calling `start()` again.
+     */
+    hasStarted(): Promise<boolean>;
+    /**
+     * Reads the state of the task. The state lives in the app process, so it resets whenever the
+     * process restarts, even while the task stays registered with the system.
+     *
+     * @platform android
+     */
+    status(): BackgroundTaskStatus;
+}
+/**
+ * Defines the task that receives the positions started with `LocationUpdatesHandle`.
+ * Wraps `TaskManager.defineTask`, so call it in the global scope of a module imported at startup.
+ * See [Receive positions in the background](#receive-positions-in-the-background).
+ *
+ * @param options The task name and the callbacks for positions and errors.
+ */
+export declare function defineLocationTask({ taskName, onPosition, onError, }: LocationTaskOptions): void;
+//# sourceMappingURL=LocationUpdatesHandle.d.ts.map

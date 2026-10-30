@@ -15,7 +15,7 @@ import type { HorizonOptions } from './withHorizon';
  * This plugin uses withDangerousMod to directly manipulate files and
  * modifies the app build.gradle to add flavor dimensions.
  */
-export const withCustomAndroidManifest: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
+export const withCustomAndroidManifest: ConfigPlugin<HorizonOptions> = (config, options) => {
   // Add flavor dimensions to build.gradle
   config = withQuestFlavorDimensions(config);
 

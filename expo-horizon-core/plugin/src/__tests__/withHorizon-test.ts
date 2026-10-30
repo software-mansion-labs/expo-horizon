@@ -35,7 +35,7 @@ afterEach(async () => {
   await fs.rm(projectRoot, { recursive: true, force: true });
 });
 
-async function prebuild(options: HorizonOptions = {}) {
+async function prebuild(options: HorizonOptions) {
   await compileModsAsync(withHorizon({ name: 'test', slug: 'test' }, options), {
     projectRoot,
     platforms: ['android'],
@@ -79,11 +79,11 @@ it('keeps mobile permissions and backup settings while restricting the Quest ove
 });
 
 it('produces identical output on repeated prebuild and updates the app ID once', async () => {
-  await prebuild({ horizonAppId: '123' });
+  await prebuild({ supportedDevices: 'quest3', horizonAppId: '123' });
   const first = await readOutput();
-  await prebuild({ horizonAppId: '123' });
+  await prebuild({ supportedDevices: 'quest3', horizonAppId: '123' });
   expect(await readOutput()).toEqual(first);
-  await prebuild({ horizonAppId: '456' });
+  await prebuild({ supportedDevices: 'quest3', horizonAppId: '456' });
   const [, gradle, properties] = await readOutput();
   expect(gradle.match(/flavorDimensions/g)).toHaveLength(1);
   expect(gradle).toContain('mobile { dimension "device" }');
@@ -93,8 +93,8 @@ it('produces identical output on repeated prebuild and updates the app ID once',
 });
 
 it('applies Quest option changes without leaving old feature declarations', async () => {
-  await prebuild();
-  await prebuild({ allowBackup: true, disableVrHeadtracking: true });
+  await prebuild({ supportedDevices: 'quest3' });
+  await prebuild({ supportedDevices: 'quest3', allowBackup: true, disableVrHeadtracking: true });
   const { manifest } = await AndroidConfig.Manifest.readAndroidManifestAsync(
     path.join(projectRoot, 'android/app/src/quest/AndroidManifest.xml')
   );
@@ -106,8 +106,54 @@ it('applies Quest option changes without leaving old feature declarations', asyn
   );
 });
 
+it.each([
+  undefined,
+  null,
+  false,
+  [],
+  {},
+  { supportedDevices: undefined },
+  { supportedDevices: null },
+  { supportedDevices: 123 },
+  { supportedDevices: '' },
+  { supportedDevices: ' ' },
+  { supportedDevices: 'quest2,quest3' },
+  { supportedDevices: 'quest2||quest3' },
+  { supportedDevices: '|quest3' },
+  { supportedDevices: 'quest3|' },
+  { supportedDevices: 'quest2| quest3' },
+])('rejects missing or malformed device configuration %j', (options) => {
+  expect(() => withHorizon({ name: 'test', slug: 'test' }, options as HorizonOptions)).toThrow(
+    '[expo-horizon-core] supportedDevices is required and must be a non-empty pipe-separated string'
+  );
+});
+
+it('preserves an explicit device list without a fixed model allowlist', async () => {
+  const supportedDevices = 'quest3|future-device_1';
+  await prebuild({ supportedDevices });
+  const { manifest } = await AndroidConfig.Manifest.readAndroidManifestAsync(
+    path.join(projectRoot, 'android/app/src/quest/AndroidManifest.xml')
+  );
+  expect(manifest.application![0]['meta-data']).toContainEqual({
+    $: { 'android:name': 'com.oculus.supportedDevices', 'android:value': supportedDevices },
+  });
+});
+
+it('rejects an omitted device list before changing previously generated files', async () => {
+  await prebuild({ supportedDevices: 'quest3', horizonAppId: '123' });
+  const previousOutput = await readOutput();
+  await expect(prebuild({ horizonAppId: '456' } as HorizonOptions)).rejects.toThrow(
+    'supportedDevices is required'
+  );
+  expect(await readOutput()).toEqual(previousOutput);
+});
+
 it('writes namespaced Horizon SDK settings only to the Quest overlay', async () => {
-  await prebuild({ horizonMinSdkVersion: 207, horizonTargetSdkVersion: 208 });
+  await prebuild({
+    supportedDevices: 'quest3',
+    horizonMinSdkVersion: 207,
+    horizonTargetSdkVersion: 208,
+  });
   const [questManifest] = await readOutput();
   expect(questManifest).toContain('xmlns:metavr="http://schemas.meta.com/metavr-sdk"');
   expect(questManifest).toContain(
@@ -117,22 +163,26 @@ it('writes namespaced Horizon SDK settings only to the Quest overlay', async () 
     await fs.readFile(path.join(projectRoot, 'android/app/src/main/AndroidManifest.xml'), 'utf8')
   ).toBe(mobileManifest);
   const first = await readOutput();
-  await prebuild({ horizonMinSdkVersion: 207, horizonTargetSdkVersion: 208 });
+  await prebuild({
+    supportedDevices: 'quest3',
+    horizonMinSdkVersion: 207,
+    horizonTargetSdkVersion: 208,
+  });
   expect(await readOutput()).toEqual(first);
 });
 
 it('supports either SDK setting alone and removes declarations when options are removed', async () => {
-  await prebuild({ horizonMinSdkVersion: 207 });
+  await prebuild({ supportedDevices: 'quest3', horizonMinSdkVersion: 207 });
   let [questManifest] = await readOutput();
   expect(questManifest).toContain('<metavr:uses-metavr-sdk metavr:minSdkVersion="207"/>');
   expect(questManifest).not.toContain('metavr:targetSdkVersion');
 
-  await prebuild({ horizonTargetSdkVersion: 208 });
+  await prebuild({ supportedDevices: 'quest3', horizonTargetSdkVersion: 208 });
   [questManifest] = await readOutput();
   expect(questManifest).toContain('<metavr:uses-metavr-sdk metavr:targetSdkVersion="208"/>');
   expect(questManifest).not.toContain('metavr:minSdkVersion');
 
-  await prebuild();
+  await prebuild({ supportedDevices: 'quest3' });
   [questManifest] = await readOutput();
   expect(questManifest).not.toContain('metavr');
 });
@@ -142,7 +192,10 @@ describe.each(['horizonMinSdkVersion', 'horizonTargetSdkVersion'] as const)('%s'
     'rejects invalid configuration %s',
     (version) => {
       expect(() =>
-        withHorizon({ name: 'test', slug: 'test' }, { [key]: version } as HorizonOptions)
+        withHorizon({ name: 'test', slug: 'test' }, {
+          supportedDevices: 'quest3',
+          [key]: version,
+        } as HorizonOptions)
       ).toThrow(`${key} must be an integer between 61 and 2147483647`);
     }
   );
@@ -152,7 +205,7 @@ it('rejects a target SDK lower than the minimum', () => {
   expect(() =>
     withHorizon(
       { name: 'test', slug: 'test' },
-      { horizonMinSdkVersion: 208, horizonTargetSdkVersion: 207 }
+      { supportedDevices: 'quest3', horizonMinSdkVersion: 208, horizonTargetSdkVersion: 207 }
     )
   ).toThrow('horizonTargetSdkVersion must be greater than or equal to horizonMinSdkVersion');
 });
@@ -173,7 +226,7 @@ it('writes default and minimum panel dimensions only to the Quest overlay', asyn
     minWidth: '600dp',
     minHeight: '400dp',
   };
-  await prebuild(options);
+  await prebuild({ supportedDevices: 'quest3', ...options });
   expect(await readQuestLayouts()).toEqual([
     {
       $: {
@@ -188,27 +241,32 @@ it('writes default and minimum panel dimensions only to the Quest overlay', asyn
     await fs.readFile(path.join(projectRoot, 'android/app/src/main/AndroidManifest.xml'), 'utf8')
   ).toBe(mobileManifest);
   const first = await readOutput();
-  await prebuild(options);
+  await prebuild({ supportedDevices: 'quest3', ...options });
   expect(await readOutput()).toEqual(first);
 });
 
 it.each(['minWidth', 'minHeight'] as const)(
   'supports %s without default dimensions',
   async (key) => {
-    await prebuild({ [key]: '360.5dp' });
+    await prebuild({ supportedDevices: 'quest3', [key]: '360.5dp' });
     expect(await readQuestLayouts()).toEqual([{ $: { [`android:${key}`]: '360.5dp' } }]);
   }
 );
 
 it('updates and removes panel minimums without retaining stale attributes', async () => {
-  await prebuild({ defaultWidth: '1024dp', minWidth: '600dp', minHeight: '400dp' });
-  await prebuild({ defaultWidth: '1024dp', minWidth: '500dp' });
+  await prebuild({
+    supportedDevices: 'quest3',
+    defaultWidth: '1024dp',
+    minWidth: '600dp',
+    minHeight: '400dp',
+  });
+  await prebuild({ supportedDevices: 'quest3', defaultWidth: '1024dp', minWidth: '500dp' });
   expect(await readQuestLayouts()).toEqual([
     { $: { 'android:defaultWidth': '1024dp', 'android:minWidth': '500dp' } },
   ]);
-  await prebuild({ defaultWidth: '1024dp' });
+  await prebuild({ supportedDevices: 'quest3', defaultWidth: '1024dp' });
   expect(await readQuestLayouts()).toEqual([{ $: { 'android:defaultWidth': '1024dp' } }]);
-  await prebuild();
+  await prebuild({ supportedDevices: 'quest3' });
   expect(await readQuestLayouts()).toBeUndefined();
 });
 
@@ -217,7 +275,10 @@ describe.each(['minWidth', 'minHeight'] as const)('%s', (key) => {
     'rejects invalid configuration %s',
     (value) => {
       expect(() =>
-        withHorizon({ name: 'test', slug: 'test' }, { [key]: value } as HorizonOptions)
+        withHorizon({ name: 'test', slug: 'test' }, {
+          supportedDevices: 'quest3',
+          [key]: value,
+        } as HorizonOptions)
       ).toThrow(`${key} must be a positive dp dimension`);
     }
   );

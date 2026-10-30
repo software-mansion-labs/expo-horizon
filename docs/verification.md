@@ -7,13 +7,13 @@ From the repository root, use the Node version in `.nvmrc` and install with
 yarn verify
 ```
 
-This builds all packages and config plugins, runs the existing ESLint and Prettier
+This builds all packages and config plugins, runs the Oxlint and Prettier
 checks, type-checks all packages and the example, and runs Jest once. It needs no
 Android SDK, Xcode, device, or service credentials. Generated build output, Expo
 caches, and the example's generated native projects are excluded from formatting.
 
 CI runs the same commands as separate named steps. After dependencies install,
-ESLint and formatting still run if a build fails. Type checks and Jest require
+Oxlint and formatting still run if a build fails. Type checks and Jest require
 successful library and plugin builds, but run even if another quality check fails.
 Any failed check fails the job; cancelling the workflow stops the remaining checks.
 The local `yarn verify` command still stops at the first failure.
@@ -30,9 +30,11 @@ yarn ts:check
 
 The root Jest configuration runs the existing location tests on Android and iOS,
 notifications tests on iOS (including the existing export snapshot), core SDK version
-fallback tests on web, and config plugin tests in Node. The Horizon native bridge
-is mocked as a mobile device for these JS tests; they do not establish Quest native
-behavior. The existing Android
+checks on web, and config plugin tests in Node, including the location plugin.
+Native suites use the SDK 58 Jest presets; plugin suites use Babel because the
+upstream SWC export plugin is incompatible with the pinned SWC runtime. The Horizon
+native bridge is mocked as a mobile device for these JS tests; they do not establish
+Quest native behavior. The existing Android
 Google Maps geocoding test remains skipped because it requires an API key.
 
 The restored Xcode fixture and its test-path adjustment are recorded as exact,

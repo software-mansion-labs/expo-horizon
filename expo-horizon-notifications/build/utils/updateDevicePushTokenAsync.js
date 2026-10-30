@@ -1,7 +1,7 @@
+import { CodedError, Platform, UnavailabilityError } from 'expo';
 import * as Application from 'expo-application';
-import { CodedError, Platform, UnavailabilityError } from 'expo-modules-core';
-import { computeNextBackoffInterval } from './backoff';
 import ServerRegistrationModule from '../ServerRegistrationModule';
+import { computeNextBackoffInterval } from './backoff';
 const updateDevicePushTokenUrl = 'https://exp.host/--/api/v2/push/updateDeviceToken';
 const LAST_TOKEN_KEY = 'lastRegisteredDeviceToken';
 // Force re-registration after 7 days even if nothing changed, in case the

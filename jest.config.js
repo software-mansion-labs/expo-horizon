@@ -1,12 +1,10 @@
-/* eslint-disable @typescript-eslint/no-require-imports -- Jest loads this configuration as CommonJS. */
 const pluginPreset = { ...require('expo-module-scripts/jest-preset-plugin') };
 const path = require('path');
-
-const babelConfig = require.resolve('expo-module-scripts/babel.config.base.js');
 
 function nativeProject(packageName, platform) {
   const preset = { ...require(`jest-expo/${platform}/jest-preset`) };
   delete preset.watchPlugins;
+  delete preset.passWithNoTests;
   return {
     ...preset,
     displayName: `${packageName}/${platform}`,
@@ -16,21 +14,12 @@ function nativeProject(packageName, platform) {
     transformIgnorePatterns: preset.transformIgnorePatterns.map((pattern) =>
       pattern.replace('(?!(.pnpm|', '(?!(jest-expo|.pnpm|')
     ),
-    transform: {
-      ...preset.transform,
-      '\\.[jt]sx?$': [
-        'babel-jest',
-        {
-          configFile: babelConfig,
-          caller: { name: 'metro', bundler: 'metro', platform },
-        },
-      ],
-    },
   };
 }
 
 delete pluginPreset.watchPlugins;
 delete pluginPreset.prettierPath;
+delete pluginPreset.passWithNoTests;
 
 module.exports = {
   projects: [
@@ -41,7 +30,23 @@ module.exports = {
     {
       ...pluginPreset,
       displayName: 'plugins',
-      roots: ['<rootDir>/expo-horizon-core/plugin', '<rootDir>/expo-horizon-notifications/plugin'],
+      // Keep plugin tests on Babel: the upstream SWC export plugin is incompatible
+      // with the SWC runtime shipped by this SDK's module scripts.
+      transform: {
+        '^.+\\.[jt]sx?$': [
+          require.resolve('babel-jest', { paths: [require.resolve('jest-expo/package.json')] }),
+          {
+            babelrc: false,
+            configFile: false,
+            presets: [require.resolve('expo/internal/babel-preset')],
+          },
+        ],
+      },
+      roots: [
+        '<rootDir>/expo-horizon-core/plugin',
+        '<rootDir>/expo-horizon-location/plugin',
+        '<rootDir>/expo-horizon-notifications/plugin',
+      ],
     },
   ],
 };

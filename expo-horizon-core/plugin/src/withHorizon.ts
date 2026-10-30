@@ -56,11 +56,11 @@ export type HorizonOptions = {
   minHeight?: string;
 
   /**
-   * Pipe-separated list of supported Quest devices.
+   * Required pipe-separated list of supported Quest devices.
    * @example "quest2|quest3|quest3s"
    * @see https://developers.meta.com/horizon/resources/publish-mobile-manifest/
    */
-  supportedDevices?: string;
+  supportedDevices: string;
 
   /**
    * Set to `true` to disable VR headtracking feature.
@@ -78,9 +78,22 @@ export type HorizonOptions = {
 
 const USE_EXPERIMENTAL_PLUGIN = true;
 
-const withHorizon: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
+const withHorizon: ConfigPlugin<HorizonOptions> = (config, options) => {
+  if (
+    options === null ||
+    typeof options !== 'object' ||
+    Array.isArray(options) ||
+    typeof options.supportedDevices !== 'string' ||
+    !/^[A-Za-z0-9_-]+(?:\|[A-Za-z0-9_-]+)*$/.test(options.supportedDevices)
+  ) {
+    throw new Error(
+      '[expo-horizon-core] supportedDevices is required and must be a non-empty pipe-separated string of device names (letters, digits, underscores, or hyphens), e.g. "quest2|quest3|quest3s".'
+    );
+  }
+
   validateHorizonSdkVersions(options);
   validatePanelMinimums(options);
+
   config = withHorizonAppId(config, options);
 
   if (USE_EXPERIMENTAL_PLUGIN) {
@@ -147,7 +160,7 @@ const withHorizonEnabled: ConfigPlugin = (config) => {
   });
 };
 
-const withHorizonAppId: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
+const withHorizonAppId: ConfigPlugin<HorizonOptions> = (config, options) => {
   return withGradleProperties(config, (config) => {
     const horizonAppId = options.horizonAppId ?? '';
 
@@ -164,7 +177,7 @@ const withHorizonAppId: ConfigPlugin<HorizonOptions> = (config, options = {}) =>
   });
 };
 
-const withPanelSize: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
+const withPanelSize: ConfigPlugin<HorizonOptions> = (config, options) => {
   return withAndroidManifest(config, (config) => {
     // Only add layout if at least one dimension is provided
     if (
@@ -208,7 +221,7 @@ const withPanelSize: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
   });
 };
 
-const withSupportedDevices: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
+const withSupportedDevices: ConfigPlugin<HorizonOptions> = (config, options) => {
   return withAndroidManifest(config, (config) => {
     // Only add meta-data if supportedDevices is explicitly provided
     if (!options.supportedDevices) {
@@ -234,7 +247,7 @@ const withSupportedDevices: ConfigPlugin<HorizonOptions> = (config, options = {}
   });
 };
 
-const withVrHeadtracking: ConfigPlugin<HorizonOptions> = (config, options = {}) => {
+const withVrHeadtracking: ConfigPlugin<HorizonOptions> = (config, options) => {
   return withAndroidManifest(config, (config) => {
     // Add VR headtracking by default unless explicitly disabled
     if (options.disableVrHeadtracking === true) {
