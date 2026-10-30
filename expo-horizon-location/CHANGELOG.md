@@ -18,6 +18,24 @@
 
 #### Upstream patch changes
 
+##### expo-location 58.0.20
+
+- [Android] Fix background location tasks that stop delivering updates after an app update, and the `Context.startForegroundService() did not then call Service.startForeground()` ANR that goes with them. The foreground service now enters the foreground from `onStartCommand` instead of from the asynchronous service connection, and a service that could not be started while the app was in the background is started when the app is resumed. ([#52051](https://github.com/expo/expo/pull/52051) by [@HubertBer](https://github.com/HubertBer))
+- [Android] Remove the stored parent `Context` from the legacy location foreground service. `LocationTaskService` extends `Service`, which is already a `Context`, so it now reads `packageManager`, `packageName` and `resources` from itself. This drops a `lateinit` field and the public `setParentContext` setter. ([#51989](https://github.com/expo/expo/pull/51989) by [@HubertBer](https://github.com/HubertBer))
+- Rebuild precompiled iOS binaries against React Native 0.88.1. ([#52404](https://github.com/expo/expo/pull/52404) by [@intergalacticspacehighway](https://github.com/intergalacticspacehighway))
+- Updated dependencies.
+  - @expo/image-utils@0.12.6
+
+##### expo-location 58.0.19
+
+- [Android] Use jsLogger for logging where possible, add more logs in silent failure spots. ([#51987](https://github.com/expo/expo/pull/51987) by [@HubertBer](https://github.com/HubertBer))
+
+##### expo-location 58.0.18
+
+- Bump precompiled artifacts due to ABI breakage in expo-modules-core@58.0.23. ([#51823](https://github.com/expo/expo/pull/51823) by [@alanjhughes](https://github.com/alanjhughes))
+
+##### Earlier SDK 58 patches
+
 - [Android] Fix LocationTaskConsumer.didReceiveBroadcast crashing when the user revoked permissions and the task consumer tried getting the lastLocation. ([#51689](https://github.com/expo/expo/pull/51689) by [@HubertBer](https://github.com/HubertBer))
 
 - [Android] Don't crash when the foreground service of a location task can't be started, for example when the location permission was revoked while the task stayed registered. The task now keeps running without the service instead of crashing the app on every launch. ([#51216](https://github.com/expo/expo/pull/51216) by [@krisoft20](https://github.com/krisoft20))

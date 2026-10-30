@@ -11,7 +11,7 @@ You can choose which implementation to use with the `quest` / `mobile` build var
 
 ## Prerequisites
 
-- Expo SDK 58 or later (`expo` package version 58.0.14+)
+- Expo SDK 58 or later (`expo` package version 58.0.21+)
 - (Recommended) `expo-horizon-core` package installed. See [expo-horizon-core](../expo-horizon-core/README.md) for more details
 
 ## Usage
@@ -55,7 +55,7 @@ import * as Location from 'expo-horizon-location';
 ## SDK 58 location API
 
 The new API is available from `expo-horizon-location/next`, following
-`expo-location@58.0.17`:
+`expo-location@58.0.20`:
 
 - Foreground permissions, position queries, and controllable watchers are available
   on iOS, Android mobile, and Quest.
@@ -101,7 +101,7 @@ Our goal is to align the version numbers of `expo-horizon-location` and `expo-lo
 
 | `expo-horizon-location` | `expo-location` | Expo SDK Version |
 | ----------------------- | --------------- | ---------------- |
-| 58.0.0 (unreleased)     | 58.0.17         | 58               |
+| 58.0.0 (unreleased)     | 58.0.20         | 58               |
 | 57.0.3                  | 57.0.20         | 57               |
 | 57.0.2                  | 57.0.16         | 57               |
 | 57.0.1                  | 57.0.12         | 57               |
