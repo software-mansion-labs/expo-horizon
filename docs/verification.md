@@ -29,11 +29,12 @@ yarn ts:check
 ```
 
 The root Jest configuration runs the existing location tests on Android and iOS,
-notifications tests on iOS (including the existing export snapshot), and config
-plugin tests in Node, including the location plugin. Native suites use the SDK 58
-Jest presets; plugin suites use Babel because the upstream SWC export plugin is
-incompatible with the pinned SWC runtime. The Horizon native bridge is mocked as a mobile device for
-these JS tests; they do not establish Quest native behavior. The existing Android
+notifications tests on iOS (including the existing export snapshot), core SDK version
+checks on web, and config plugin tests in Node, including the location plugin.
+Native suites use the SDK 58 Jest presets; plugin suites use Babel because the
+upstream SWC export plugin is incompatible with the pinned SWC runtime. The Horizon
+native bridge is mocked as a mobile device for these JS tests; they do not establish
+Quest native behavior. The existing Android
 Google Maps geocoding test remains skipped because it requires an API key.
 
 The restored Xcode fixture and its test-path adjustment are recorded as exact,
@@ -43,6 +44,11 @@ hashes and their pinned Expo commit when changing the fixture or upgrading the S
 Core plugin tests run Expo's mod compiler against temporary native files. They
 check mobile/Quest permission separation, Quest options, and repeatable output,
 including updating `horizonAppId`. Temporary files are removed after each test.
+SDK version tests also check the namespaced Quest declaration, optional values,
+invalid configuration, and removal of settings on a subsequent prebuild.
+Panel sizing tests cover optional `minWidth` and `minHeight`, positive dp
+validation, minimums without default dimensions, repeatable output, and updating
+or removing minimums while leaving the mobile manifest unchanged.
 This validates generated overlays; native builds must still validate manifest
 merging and Gradle compatibility.
 
@@ -80,3 +86,69 @@ flavors or app ID entries.
 Save a short result table with pass/fail/unverified and error codes or log excerpts.
 Avoid saving exact coordinates or push-token contents in committed evidence. A JS
 unit-test pass, a successful build, and a device smoke pass are separate evidence.
+
+## Panel size checks
+
+After Android prebuild, build both Android variants and inspect their merged
+manifests. The example's Quest `MainActivity` layout should contain
+`defaultWidth="1024dp"`, `defaultHeight="640dp"`, `minWidth="600dp"`, and
+`minHeight="400dp"`, all in the Android namespace. The mobile variant should
+have no panel layout added by the plugin.
+
+Install the Quest build and resize its panel using the headset's window controls.
+Verify that it starts at the configured default size, can grow, and stops
+shrinking at the configured minimums. Check the UI at the smallest permitted
+size. A successful manifest check or app launch alone does not verify the
+headset's resizing behavior.
+
+## Horizon OS SDK version checks
+
+After Android prebuild, run the native compatibility tests from `example/android`:
+
+```sh
+./gradlew :expo-horizon-core:testMobileDebugUnitTest :expo-horizon-core:testQuestDebugUnitTest
+```
+
+These exercise the real Meta utility library without Horizon OS classes, verifying
+the fallback on non-Horizon systems and rejection of invalid version numbers.
+OS display-version tests cover unavailable APIs, legacy names, and preserving the
+opaque label. Robolectric tests exercise Meta's real OS detector with modern and
+legacy system features, Quest model fallback, and ordinary Android devices.
+They run in the native Android CI jobs too. They do not prove detection on a Quest.
+Native CI also builds an optimized Quest release to validate the consumer R8
+rules for classes supplied by Horizon OS.
+
+On the example's Horizon screen, use the **Horizon OS SDK** section:
+
+The **Current SDK version** row reads `ExpoHorizon.horizonSdkVersion` directly.
+It should show the device's numeric Horizon SDK version (207 on the tested Quest),
+or `Unavailable` on non-Horizon Android, iOS, and web. Check this before using the
+comparison button so the constant is verified independently of the helper.
+
+The **Horizon OS version** row displays the user-facing OS label, separately from
+the numeric SDK version. Expect a non-empty label where the OS display API is
+available, or `Unavailable` elsewhere. Confirm the label is unchanged between
+Quest and mobile builds on the same device and that **Is Horizon Device** remains
+`true` in both.
+
+| Input          | Expected result on Android                                                                      |
+| -------------- | ----------------------------------------------------------------------------------------------- |
+| 1 or 60        | `false`; these SDK versions cannot be checked by the compatibility library.                     |
+| 61             | `true` on a Quest with SDK 61 or newer; `false` on non-Horizon Android.                         |
+| 207            | Matches whether the Quest's Meta VR OS SDK is 207 or newer, independent of Android's API level. |
+| 2147483647     | `false` on current devices, without a crash.                                                    |
+| 0, -1, or 61.5 | A validation error, without a crash.                                                            |
+
+On iOS and web, every comparison call must throw `ERR_HORIZON_SDK_UNAVAILABLE`
+with an explanation that Horizon OS SDK checks are only available on Android.
+The version constants remain `null`. Verify that the example displays the error
+and stays responsive.
+
+Repeat with the mobile build on Quest: SDK availability must not depend on the
+build flavor. Record the device, OS/SDK version, build variant, and results. The
+example declares target SDK 207 but leaves the minimum unset so older Quest
+releases can still exercise the runtime fallback. Inspect merged manifests to
+confirm the Meta target appears only in the Quest build.
+
+Current results, exact source revisions, APK hashes, and remaining limits are in
+[Horizon OS information and panel configuration verification](horizon-os-sdk-verification.md).

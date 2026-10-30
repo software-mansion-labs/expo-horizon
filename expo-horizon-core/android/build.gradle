@@ -17,6 +17,7 @@ android {
     versionCode 1
     versionName "58.0.0"
     buildConfigField "String", "META_HORIZON_APP_ID", horizonAppIdConfigField
+    consumerProguardFiles 'consumer-rules.pro'
   }
   buildFeatures {
     buildConfig true
@@ -30,4 +31,13 @@ android {
     quest { dimension "device" }
     mobile { dimension "device" }
   }
+}
+
+dependencies {
+  // Only API stubs: Horizon OS supplies the implementation at runtime.
+  compileOnly 'com.meta.metavr:metavr-os-jsdk:207'
+  // This compatibility library is safe on older Horizon OS and other Android devices.
+  implementation 'com.meta.metavrx.util:util:1.0.0'
+  testImplementation 'junit:junit:4.13.2'
+  testImplementation 'org.robolectric:robolectric:4.16.1'
 }
