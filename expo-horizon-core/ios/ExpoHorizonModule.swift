@@ -24,8 +24,14 @@ public class ExpoHorizonModule: Module {
             nil as String?
         }
 
-        Function("isHorizonSdkVersionAtLeast") { (_: Double) -> Bool in
-            false
+        Function("isHorizonSdkVersionAtLeast") { (_: Double) throws -> Bool in
+            throw HorizonSdkUnavailableException()
         }
+    }
+}
+
+private final class HorizonSdkUnavailableException: Exception, @unchecked Sendable {
+    override var reason: String {
+        "Horizon OS SDK checks are only available on Android."
     }
 }

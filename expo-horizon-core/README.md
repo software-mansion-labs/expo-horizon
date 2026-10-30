@@ -350,12 +350,13 @@ app ID, or Platform SDK connection.
 
 ```typescript
 import ExpoHorizon from 'expo-horizon-core';
+import { Platform } from 'react-native';
 
 // Read the version directly for display, diagnostics, or your own comparisons.
 const sdkVersion = ExpoHorizon.horizonSdkVersion;
 console.log('Horizon OS SDK:', sdkVersion ?? 'Unavailable');
 
-const supportsSdk207 = ExpoHorizon.isHorizonSdkVersionAtLeast(207);
+const supportsSdk207 = Platform.OS === 'android' && ExpoHorizon.isHorizonSdkVersionAtLeast(207);
 // Use this result to enable an optional SDK 207 feature or show its fallback.
 ```
 
@@ -373,11 +374,13 @@ compile-only dependency: its API stubs are not packaged in your app.
 `isHorizonSdkVersionAtLeast(version: number): boolean` is a synchronous convenience
 method for checking SDK availability without reading and comparing the number.
 
-On Android, the method returns `false` on non-Horizon devices and older Horizon OS
-versions where the requested SDK is unavailable. It throws for non-integer values,
-versions below 61, or values above 2147483647. On iOS and web, it is a stub that
-ignores the version and always returns `false`. You do not need an app ID,
-permission, or Platform SDK service connection to call it.
+On Android, the method returns `false` on non-Horizon devices and when the requested
+SDK is unavailable. It also returns `false` for versions 1–60, which the compatibility
+library cannot check. It throws for non-integer values or values outside 1–2147483647.
+On iOS and web, it throws `ERR_HORIZON_SDK_UNAVAILABLE`; guard the call with
+`Platform.OS === 'android'` in shared code. You do not need an app ID, permission,
+or Platform SDK service connection to call it. The config plugin's minimum and
+target SDK settings still require versions 61 or newer.
 
 Android uses Meta's [OS Utility Library](https://developers.meta.com/vr/documentation/android-apps/metavrx-os-utility-library/)
 (`com.meta.metavrx.util:util:1.0.0`) to handle absent OS APIs safely. Rebuild your

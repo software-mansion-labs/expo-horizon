@@ -1,4 +1,4 @@
-import { registerWebModule, NativeModule } from 'expo';
+import { registerWebModule, NativeModule, CodedError } from 'expo';
 
 class ExpoHorizonModule extends NativeModule {
   isHorizonDevice = false;
@@ -12,7 +12,10 @@ class ExpoHorizonModule extends NativeModule {
   readonly horizonOsVersion: string | null = null;
 
   isHorizonSdkVersionAtLeast(_version: number): boolean {
-    return false;
+    throw new CodedError(
+      'ERR_HORIZON_SDK_UNAVAILABLE',
+      'Horizon OS SDK checks are only available on Android.'
+    );
   }
 }
 

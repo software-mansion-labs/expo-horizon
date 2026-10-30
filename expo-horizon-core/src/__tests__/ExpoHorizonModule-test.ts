@@ -9,13 +9,14 @@ it('reports the current SDK version as unavailable on web', () => {
   expect(ExpoHorizon.horizonSdkVersion).toBeNull();
 });
 
-it.each([61, 207, 2147483647])('reports SDK %s as unavailable on web', (version) => {
-  expect(ExpoHorizon.isHorizonSdkVersionAtLeast(version)).toBe(false);
-});
-
-it.each([-1, 0, 60, 61.5, NaN, Infinity, -Infinity, 2147483648])(
-  'returns false without validating SDK version %s on web',
+it.each([1, 60, 61, 207, 2147483647, -1, 0, 61.5, NaN, Infinity, -Infinity, 2147483648])(
+  'throws a platform availability error for SDK version %s on web',
   (version) => {
-    expect(ExpoHorizon.isHorizonSdkVersionAtLeast(version)).toBe(false);
+    expect(() => ExpoHorizon.isHorizonSdkVersionAtLeast(version)).toThrow(
+      expect.objectContaining({
+        code: 'ERR_HORIZON_SDK_UNAVAILABLE',
+        message: 'Horizon OS SDK checks are only available on Android.',
+      })
+    );
   }
 );

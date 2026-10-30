@@ -26,16 +26,18 @@ internal object HorizonSdkVersion {
   }
 
   fun isAtLeast(version: Double): Boolean {
-    if (!version.isFinite() || version < 61 || version > Int.MAX_VALUE || version % 1.0 != 0.0) {
+    if (!version.isFinite() || version < 1 || version > Int.MAX_VALUE || version % 1.0 != 0.0) {
       throw InvalidHorizonSdkVersionException()
     }
 
+    // The compatibility library cannot check releases before SDK 61.
+    if (version < 61) return false
+
     // Meta's compatibility library returns false when the OS APIs are absent.
-    // Versions below 61 are rejected because the library cannot safely check them.
     return MetaVrOsSdkVersion.isAtOrAbove(version.toInt())
   }
 }
 
 internal class InvalidHorizonSdkVersionException : CodedException(
-  "Horizon SDK version must be an integer between 61 and 2147483647."
+  "Horizon SDK version must be an integer between 1 and 2147483647."
 )

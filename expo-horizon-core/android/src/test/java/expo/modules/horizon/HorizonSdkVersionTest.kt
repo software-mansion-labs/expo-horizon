@@ -50,8 +50,15 @@ class HorizonSdkVersionTest {
   }
 
   @Test
-  fun rejectsUnsupportedAndNonIntegerVersionsBeforeCallingTheSdk() {
-    for (version in listOf(-1.0, 0.0, 60.0, 61.5, Double.NaN, Double.POSITIVE_INFINITY,
+  fun returnsFalseForVersionsBelowTheCompatibilityLibraryMinimum() {
+    for (version in listOf(1.0, 30.0, 60.0)) {
+      assertFalse(HorizonSdkVersion.isAtLeast(version))
+    }
+  }
+
+  @Test
+  fun rejectsInvalidVersionsBeforeCallingTheSdk() {
+    for (version in listOf(-1.0, 0.0, 60.5, 61.5, Double.NaN, Double.POSITIVE_INFINITY,
       Double.NEGATIVE_INFINITY, Int.MAX_VALUE.toDouble() + 1)) {
       assertThrows(InvalidHorizonSdkVersionException::class.java) {
         HorizonSdkVersion.isAtLeast(version)
