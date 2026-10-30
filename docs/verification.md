@@ -149,3 +149,6 @@ build flavor. Record the device, OS/SDK version, build variant, and results. The
 example declares target SDK 207 but leaves the minimum unset so older Quest
 releases can still exercise the runtime fallback. Inspect merged manifests to
 confirm the Meta target appears only in the Quest build.
+
+Current results, exact source revisions, APK hashes, and remaining limits are in
+[Horizon OS information and panel configuration verification](horizon-os-sdk-verification.md).
