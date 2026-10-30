@@ -135,42 +135,18 @@ For changes made to the libraries, it's recommended to squash your commits befor
 
 ## Upstream Sync
 
-You can sync the packages from the upstream Expo repository in two ways:
-
-- Using GitHub Actions (recommended)
-- Using a local script (for manual sync and conflict resolution)
-
-### Using GitHub Actions
-
-To sync using GitHub Actions, run the workflow manually from the GitHub Actions page. After the workflow completes, check out the created branch, open a pull request (PR), and merge it into the main branch if everything looks good.
-
-### Manual Sync with Conflict Resolution
-
-When the automated sync encounters conflicts, you can use the local sync script to resolve them manually:
+Start with the manual helper, using a local Expo checkout and an explicit SDK target:
 
 ```bash
-# Run the local sync script
-./scripts/sync-upstream-local.sh
-
-# If conflicts occur, you'll be guided through the resolution process:
-# 1. Edit conflicted files to resolve conflicts
-# 2. Add resolved files: git add <file>
-# 3. Complete the merge: git commit
-# 4. Push and create PR: git push -u origin <branch-name>
+./scripts/sync-upstream-local.sh /path/to/expo --ref <sdk-branch> --from <previous-expo-sha> --dry-run
 ```
 
-The script will:
+Follow [Upstream sync](UPSTREAM_SYNC.md) to apply the previewed commit and resolve
+conflicts with the [SDK bump checklist](.cursor/skills/bump-expo-sdk/SKILL.md).
+After the first validated sync, the previous SHA is recorded in `upstream-sync.json`.
+Verify with `yarn verify`, native builds, and the [device smoke checks](docs/verification.md).
 
-- Create a new branch for the sync
-- Attempt to merge upstream changes
-- If conflicts occur, leave you on the branch to resolve them manually
-- If no conflicts, provide instructions for creating a PR
-
-**Requirements:**
-
-- `git-filter-repo`: Install with `pip install git-filter-repo`
-- `gh` CLI tool: For creating PRs automatically
-
-### Merging Sync Pull Requests
-
-To maintain a clean and consistent commit history with the upstream repository, consider using either `merge` or `rebase` when integrating changes. When syncing with upstream, use `merge` to preserve the original commit structure, or use `rebase` if you prefer a linear history. Be sure to review and resolve any conflicts carefully before finalizing the merge or rebase.
+The helper prepares changes without committing and preserves existing Android
+mobile routing. It requires no tracking branch or `git-filter-repo`. New APIs and
+Quest behavior still need review. The GitHub workflow tests the helper; it no
+longer merges upstream or creates PRs. Normal squash merges are supported.
