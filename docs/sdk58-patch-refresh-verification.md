@@ -143,12 +143,49 @@ destruction pass. The `/next` service stopped normally. The demo process was sto
 afterward to release the test bindings. Local notifications used fresh identifiers and waited for handler completion
 before checking presentation; an earlier short observation window was inconclusive.
 
+## Physical Quest 3 follow-up
+
+Tested the same implementation commit `52d7350ff3b9f3f08810ea7faff0407df547dd0a`
+on a USB-connected Quest 3, Horizon OS / Android 14 (API 34), build
+`UP1A.231005.007.A1`, on 2026-10-30. Installed the existing clean-built `questDebug`
+APK with `adb install -r`; existing app data was retained. APK SHA-256:
+`36d9e30a527b8c298569f1e063d5036d5b0a6ad66ac248ae10b47c1eedf2bedf`.
+The development helper used actual native modules and recorded no coordinates or
+push-token contents. It was removed after testing.
+
+| Check                                   | Result                                                                                                                                                         |
+| --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Device/build flags                      | Both Horizon flags true; configured app ID is `DEMO_APP_ID`                                                                                                    |
+| Provider                                | Android provider; network available, GPS unavailable                                                                                                           |
+| Foreground and notification permissions | Read/request paths return granted; original grants restored after the denial test                                                                              |
+| Denied foreground location              | Legacy returns `ERR_LOCATION_UNAUTHORIZED`; `/next` returns `ERR_FOREGROUND_LOCATION_PERMISSIONS_NOT_GRANTED`; positions work again after restoring the grants |
+| Last-known and current position         | Initial cache was empty; both legacy and `/next` subsequently returned valid real positions                                                                    |
+| Watcher delivery and cleanup            | Repeated callbacks from both APIs; counts stopped at 38/38 after removal/disposal, and native provider requests were removed                                   |
+| Unsupported APIs                        | Heading, motion activity, GMS provider, `/next` background permissions and background handle return `ERR_QUEST_FEATURE_UNAVAILABLE`                            |
+| Motion permissions                      | Denied, with `canAskAgain=false`, for both read and request                                                                                                    |
+| Legacy background permission            | `ERR_NO_PERMISSION_IN_MANIFEST`, consistent with the Quest manifest excluding `ACCESS_BACKGROUND_LOCATION`                                                     |
+| `/next` foreground-service lifecycle    | `PROMOTED`, unthrottled; native service confirms `isForeground=true`; stopping returns `NOT_RUNNING` and removes the native service                            |
+| Background watcher delivery             | 29 real callbacks while React Native reported the app backgrounded; no errors, with the foreground session active                                              |
+| Legacy foreground task                  | Registered successfully and delivered a callback; stopping unregisters the task and removes its foreground notification                                        |
+| Local notification delivery             | Receipt callback, handler success, and presented notification confirmed                                                                                        |
+| Notification tap/response               | Unverified: no matching tap event or last response was observed during the test window                                                                         |
+
+The legacy service retained a bound connection after stopping on Quest too
+(`startRequested=false`, no foreground notification). This reproduces the upstream
+cleanup limitation observed on the emulator. The `/next` service was fully removed.
+The test task was unregistered, the test notification dismissed, original location
+grants and development-server settings restored, and the demo process stopped to
+release remaining bindings.
+
+GitHub CI also passed for `52d7350f`: [library quality](https://github.com/software-mansion-labs/expo-horizon/actions/runs/41069295429),
+[example quality](https://github.com/software-mansion-labs/expo-horizon/actions/runs/41069295407),
+and [Android mobile/Quest and iOS simulator builds](https://github.com/software-mansion-labs/expo-horizon/actions/runs/41069295450).
+
 ## Remaining limits
 
-No physical Quest was connected, so this refresh has Quest compilation and manifest
-coverage, not a new Quest device pass. Physical iPhone behavior, real Meta/FCM/APNs
-push delivery, reboot/long-duration/geofencing scenarios, notification tap/cold-start
-flows, release/store builds, native XCTest, and Android JVM suites were not rerun.
+Physical iPhone behavior, real Meta/FCM/APNs push delivery,
+reboot/long-duration/geofencing scenarios, notification tap/response and process-cold launches,
+release/store builds, native XCTest, and Android JVM suites were not rerun.
 The unsigned iOS simulator reports a missing Keychain entitlement when reading
 persisted push-registration information; local notifications still work. Valid
 credentials and a signed build are needed to validate push registration and delivery.
