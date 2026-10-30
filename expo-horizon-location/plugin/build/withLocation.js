@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.withForegroundServiceIcon = exports.META_DATA_FOREGROUND_SERVICE_ICON = exports.FOREGROUND_SERVICE_ICON_RESOURCE = exports.FOREGROUND_SERVICE_ICON = exports.dpiValues = exports.ANDROID_RES_PATH = void 0;
+exports.withForegroundServiceIcon = exports.META_DATA_FOREGROUND_SERVICE_ICON = exports.FOREGROUND_SERVICE_ICON_RESOURCE = exports.FOREGROUND_SERVICE_ICON = exports.dpiValues = exports.ANDROID_RES_PATH = exports.FULL_ACCURACY_PURPOSE_KEY = void 0;
 exports.setForegroundServiceIconAsync = setForegroundServiceIconAsync;
 const image_utils_1 = require("@expo/image-utils");
 const config_plugins_1 = require("expo/config-plugins");
@@ -9,6 +9,8 @@ const path_1 = require("path");
 const pkg = require('../../package.json');
 const LOCATION_USAGE = 'Allow $(PRODUCT_NAME) to access your location';
 const MOTION_USAGE = 'Allow $(PRODUCT_NAME) to detect your current motion activity';
+const FULL_ACCURACY_USAGE = 'Allow $(PRODUCT_NAME) to access your precise location';
+exports.FULL_ACCURACY_PURPOSE_KEY = 'ExpoLocationFullAccuracy';
 exports.ANDROID_RES_PATH = 'android/app/src/main/res/';
 exports.dpiValues = {
     mdpi: { folderName: 'mipmap-mdpi', scale: 1 },
@@ -102,9 +104,39 @@ function removeForegroundServiceIconImageFiles(projectRoot) {
         }
     });
 }
-const withLocation = (config, { locationAlwaysAndWhenInUsePermission, locationAlwaysPermission, locationWhenInUsePermission, motionUsagePermission, isIosBackgroundLocationEnabled, isAndroidBackgroundLocationEnabled, isAndroidForegroundServiceEnabled, isAndroidMotionActivityEnabled, androidForegroundServiceIcon, } = {}) => {
+const withTemporaryFullAccuracy = (config, message) => {
+    return (0, config_plugins_1.withInfoPlist)(config, (config) => {
+        config.modResults.NSLocationTemporaryUsageDescriptionDictionary = {
+            ...config.modResults.NSLocationTemporaryUsageDescriptionDictionary,
+            [exports.FULL_ACCURACY_PURPOSE_KEY]: message,
+        };
+        return config;
+    });
+};
+const withReducedAccuracyDefault = (config) => {
+    return (0, config_plugins_1.withInfoPlist)(config, (config) => {
+        config.modResults.NSLocationDefaultAccuracyReduced = true;
+        return config;
+    });
+};
+const withLocation = (config, { locationAlwaysAndWhenInUsePermission, locationAlwaysPermission, locationWhenInUsePermission, motionUsagePermission, locationFullAccuracyPermission, isIosReducedAccuracyByDefault, isIosBackgroundLocationEnabled, isAndroidBackgroundLocationEnabled, isAndroidForegroundServiceEnabled, isAndroidMotionActivityEnabled, androidForegroundServiceIcon, } = {}) => {
     if (isIosBackgroundLocationEnabled) {
         config = withBackgroundLocation(config);
+    }
+    config = (0, config_plugins_1.withPodfileProperties)(config, (config) => {
+        if (motionUsagePermission === false) {
+            config.modResults['expo.location.motionActivityEnabled'] = 'false';
+        }
+        else {
+            delete config.modResults['expo.location.motionActivityEnabled'];
+        }
+        return config;
+    });
+    if (locationFullAccuracyPermission !== false) {
+        config = withTemporaryFullAccuracy(config, locationFullAccuracyPermission || FULL_ACCURACY_USAGE);
+    }
+    if (isIosReducedAccuracyByDefault) {
+        config = withReducedAccuracyDefault(config);
     }
     config = (0, exports.withForegroundServiceIcon)(config, { icon: androidForegroundServiceIcon ?? null });
     config_plugins_1.IOSConfig.Permissions.createPermissionsPlugin({
@@ -133,8 +165,10 @@ const withLocation = (config, { locationAlwaysAndWhenInUsePermission, locationAl
         // Note: permissions prohibited on the Meta Horizon Store (e.g. ACCESS_BACKGROUND_LOCATION,
         // ACTIVITY_RECOGNITION) are stripped from the `quest` flavor manifest by `expo-horizon-core`.
         isAndroidBackgroundLocationEnabled && 'android.permission.ACCESS_BACKGROUND_LOCATION',
+        isAndroidBackgroundLocationEnabled && 'android.permission.RECEIVE_BOOT_COMPLETED',
         enableAndroidForegroundService && 'android.permission.FOREGROUND_SERVICE',
         enableAndroidForegroundService && 'android.permission.FOREGROUND_SERVICE_LOCATION',
+        enableAndroidForegroundService && 'android.permission.POST_NOTIFICATIONS',
         isAndroidMotionActivityEnabled && 'android.permission.ACTIVITY_RECOGNITION',
         isAndroidMotionActivityEnabled && 'com.google.android.gms.permission.ACTIVITY_RECOGNITION',
     ].filter(Boolean));

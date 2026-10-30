@@ -1,0 +1,2 @@
+export { getPosition, watchPosition, hasLocationServicesEnabled, enableLocationServices, getForegroundPermissions, requestForegroundPermissions, getBackgroundPermissions, requestBackgroundPermissions, getNotificationPermissions, requestNotificationPermissions, setLocationProvider, getSelectedLocationProviderName, ensureBackgroundSessionStarted, stopBackgroundSession, getBackgroundSessionStatus, } from './js';
+//# sourceMappingURL=Location.d.ts.map

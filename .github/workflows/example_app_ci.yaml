@@ -4,26 +4,26 @@ on:
   pull_request:
     paths:
       - 'example/**'
-      - '.github/workflows/example_app_ci.yml'
+      - '.github/workflows/example_app_ci.yaml'
 
       # --- Shared paths for BOTH workflows ---
       - 'package.json'
       - 'yarn.lock'
-      - '.eslintrc.js'
-      - '.prettierrc.json'
+      - 'oxlint.config.mts'
+      - '.prettierrc'
       - 'tsconfig.base.json'
   push:
     branches:
       - main
     paths:
       - 'example/**'
-      - '.github/workflows/example-app-ci.yml'
+      - '.github/workflows/example_app_ci.yaml'
 
       # --- Shared paths for BOTH workflows ---
       - 'package.json'
       - 'yarn.lock'
-      - '.eslintrc.js'
-      - '.prettierrc.json'
+      - 'oxlint.config.mts'
+      - '.prettierrc'
       - 'tsconfig.base.json'
 
 jobs:
@@ -52,7 +52,7 @@ jobs:
         run: yarn install --frozen-lockfile
         working-directory: ./example
 
-      - name: 🤓 Run ESLint
+      - name: 🤓 Run Oxlint
         run: yarn lint
         working-directory: ./example
 

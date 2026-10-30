@@ -6,9 +6,29 @@
 
 ### 🎉 New features
 
+- Add `enableRemoteNotifications` config plugin option. Set it to `false` to skip the APNs entitlement for apps that use only local notifications. Defaults to `true`. ([#50891](https://github.com/expo/expo/pull/50891) by [@netmaxt3r](https://github.com/netmaxt3r))
+
 ### 🐛 Bug fixes
 
 ### 💡 Others
+
+#### Upstream patch changes
+
+##### expo-notifications 58.1.7
+
+- [Android] Fix importing `expo-notifications` throwing `Cannot find native module 'ExpoTopicSubscriptionModule'` in Expo Go. ([#52182](https://github.com/expo/expo/pull/52182) by [@fixfon](https://github.com/fixfon))
+- Updated dependencies.
+  - expo-constants@58.0.14
+  - @expo/image-utils@0.12.6
+
+##### expo-notifications 58.1.6
+
+- Updated dependencies.
+  - expo-constants@58.0.13
+
+##### Earlier SDK 58 patches
+
+- [iOS] Fix a crash (`EXC_BAD_ACCESS` in `__RawDictionaryStorage.find`) when the JS notification handler responds while the same foreground notification times out or another one arrives, by handling `handleNotificationAsync` on the main queue. ([#51370](https://github.com/expo/expo/pull/51370) by [@GersonRocha9](https://github.com/GersonRocha9))
 
 ## 57.0.3 — 2026-10-12
 

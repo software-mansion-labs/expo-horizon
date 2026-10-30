@@ -5,12 +5,6 @@
   "orientation": "default",
   "icon": "./assets/icon.png",
   "userInterfaceStyle": "light",
-  "newArchEnabled": true,
-  "splash": {
-    "image": "./assets/splash-icon.png",
-    "resizeMode": "contain",
-    "backgroundColor": "#ffffff"
-  },
   "ios": {
     "supportsTablet": true,
     "bundleIdentifier": "com.anonymous.app"
@@ -21,8 +15,8 @@
       "foregroundImage": "./assets/adaptive-icon.png",
       "backgroundColor": "#ffffff"
     },
-    "edgeToEdgeEnabled": true,
-    "package": "com.swmansion.horizon.demo"
+    "package": "com.swmansion.horizon.demo",
+    "permissions": ["android.permission.SCHEDULE_EXACT_ALARM"]
   },
   "web": {
     "favicon": "./assets/favicon.png"
@@ -32,6 +26,14 @@
     "expo-router",
     "expo-task-manager",
     "expo-status-bar",
-    "@rnrepo/expo-config-plugin"
+    "@rnrepo/expo-config-plugin",
+    [
+      "expo-splash-screen",
+      {
+        "image": "./assets/splash-icon.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#ffffff"
+      }
+    ]
   ]
 }

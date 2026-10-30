@@ -1,4 +1,4 @@
-import { UnavailabilityError } from 'expo-modules-core';
+import { UnavailabilityError } from 'expo';
 import NotificationChannelManager from './NotificationChannelManager';
 import { AndroidImportance } from './NotificationChannelManager.types';
 export async function setNotificationChannelAsync(channelId, channel) {
