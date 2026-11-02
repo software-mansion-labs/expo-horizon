@@ -1,9 +1,5 @@
 # Expo SDK 58 stable verification
 
-This report records the October 19 snapshot. For the prepared 58.0.0 release,
-current package versions, and publication status, see
-[SDK 58 release validation](sdk58-release-validation.md).
-
 Validated on 2026-10-19 in the existing `jtatar/sdk58-upgrade-poc` worktree.
 The source baseline is `8b967b2d9fc8fedf5ed3717f24eaa88d50bea56e`, plus the
 changes accompanying this report. Unrelated edits in the primary checkout were

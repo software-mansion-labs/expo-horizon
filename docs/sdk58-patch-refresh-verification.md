@@ -1,9 +1,5 @@
 # Expo SDK 58 patch refresh verification
 
-This report records the October 30 snapshot and its separate local rehearsal.
-For the prepared 58.0.0 release and subsequent CI/publication results, see
-[SDK 58 release validation](sdk58-release-validation.md).
-
 Validated on 2026-10-30 from PR #79 source commit
 `81225f24d04389c532ac449c39e46b372962fe1e`, plus the patch refresh accompanying
 this report, on `jtatar/sdk58-upgrade-poc`. Work used the clean existing isolated

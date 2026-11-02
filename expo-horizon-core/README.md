@@ -26,7 +26,7 @@ yarn add expo-horizon-core
 
 ## Prerequisites
 
-- Expo SDK 58 (`expo` package version 58.0.21 or a newer SDK 58 patch)
+- Expo SDK 58 or later (`expo` package version 58.0.21+)
 - Android development environment configured
 - Meta Quest developer account (for publishing)
 
