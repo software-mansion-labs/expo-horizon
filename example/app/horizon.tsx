@@ -24,6 +24,7 @@ export default function HorizonScreen() {
   return (
     <View style={GlobalStyles.screenContainer}>
       <ScrollView
+        contentInsetAdjustmentBehavior="automatic"
         style={GlobalStyles.scrollView}
         contentContainerStyle={[GlobalStyles.scrollContent, { paddingBottom: insets.bottom }]}>
         <Section title="Horizon">
