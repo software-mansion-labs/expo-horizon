@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 58.0.1 — 2026-11-02
+
+### 💡 Others
+
+- Fix README warning and note formatting on npm. No runtime changes.
+
 ## 58.0.0 — 2026-11-02
 
 ### 🛠 Breaking changes

@@ -417,7 +417,7 @@ Now, `horizonAppId` will contain the value of your Horizon App ID as defined in 
 
 | `expo-horizon-core` | Expo SDK Version |
 | ------------------- | ---------------- |
-| 58.0.0              | 58               |
+| 58.0.0-58.0.1       | 58               |
 | 57.0.0-57.0.3       | 57               |
 | 56.0.0              | 56               |
 | 55.0.0-55.0.1       | 55               |
