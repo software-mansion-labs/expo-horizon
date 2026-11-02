@@ -40,7 +40,10 @@ android {
 
   flavorDimensions += "device"
   productFlavors {
-    quest { dimension "device" }
+    quest {
+      dimension "device"
+      consumerProguardFiles 'src/quest/proguard-rules.pro'
+    }
     mobile { dimension "device" }
   }
 }

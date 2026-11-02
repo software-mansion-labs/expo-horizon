@@ -9,6 +9,7 @@
     "plugin/build",
     "ios",
     "android/build.gradle",
+    "android/consumer-rules.pro",
     "android/src",
     "app.plugin.js",
     "expo-module.config.json",

@@ -10,6 +10,8 @@
 
 ### 🐛 Bug fixes
 
+- [Quest] Fix release builds with R8 enabled by suppressing missing-class warnings for push-notification APIs supplied by Horizon OS.
+
 ### 💡 Others
 
 #### Upstream patch changes
