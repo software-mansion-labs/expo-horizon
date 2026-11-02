@@ -6,13 +6,55 @@
 
 ### 🎉 New features
 
+### 🐛 Bug fixes
+
+### 💡 Others
+
+## 58.0.0 — 2026-11-02
+
+### 🛠 Breaking changes
+
+- Show notifications that arrive while the app is in the foreground, unless the app asks for another behavior with `setNotificationHandler`. A handler that doesn't answer within 3 seconds no longer drops the notification. `setNotificationHandler(null)` still stops `expo-notifications` from showing a notification. ([#49072](https://github.com/expo/expo/pull/49072) by [@vonovak](https://github.com/vonovak))
+
+- [Android] Prevent an FCM `dataString` field from overriding the notification's derived data. ([#49274](https://github.com/expo/expo/pull/49274) by [@vonovak](https://github.com/vonovak))
+
+### 🎉 New features
+
+- [android] Add a `delivery` option to `DateTriggerInput` and the repeating wall-clock triggers (`DailyTriggerInput`, `WeeklyTriggerInput`, `MonthlyTriggerInput`, `YearlyTriggerInput`). Set it to `'alarmClock'` to deliver the notification via `AlarmManager.setAlarmClock()`, which OEM battery policies do not defer. Intended for time-critical, user-facing alarms. ([#49687](https://github.com/expo/expo/pull/49687) by [@capt-muji](https://github.com/capt-muji))
+
+- [ios] Forward notification center calls to a `UNUserNotificationCenterDelegate` that another library set, so that both libraries keep working. ([#48313](https://github.com/expo/expo/pull/48313) by [@vonovak](https://github.com/vonovak))
+
+- [ios] Add support for grouping notifications via `threadIdentifier`. ([#49429](https://github.com/expo/expo/pull/49429) by [@vonovak](https://github.com/vonovak))
+
+- [Android] Add a `largeIcon` config plugin property that sets the notification large icon. ([#49481](https://github.com/expo/expo/pull/49481) by [@expo-bot](https://github.com/expo-bot))
+
 - Add `enableRemoteNotifications` config plugin option. Set it to `false` to skip the APNs entitlement for apps that use only local notifications. Defaults to `true`. ([#50891](https://github.com/expo/expo/pull/50891) by [@netmaxt3r](https://github.com/netmaxt3r))
 
 ### 🐛 Bug fixes
 
+- [Android] Prevent a crash when reading the notification large icon from a manifest without meta-data. ([#49273](https://github.com/expo/expo/pull/49273) by [@vonovak](https://github.com/vonovak))
+
+- [iOS] Fix a data race on `NotificationCenterManager`'s delegate list that crashed the app with `SIGSEGV` when one app context registered its modules while another tore its own down, such as on a dev-client reload or `Updates.reloadAsync()`. [#49554](https://github.com/expo/expo/pull/49554) by [@dennytosp](https://github.com/dennytosp))
+
+- [Android] Prevented `onUserLeaveHint` from firing when a notification tap opens the app, which made picture-in-picture implementations enter PiP unexpectedly. ([#48471](https://github.com/expo/expo/pull/48471) by [@stareezy-1](https://github.com/stareezy-1))
+
+- [iOS] Avoid warning when an aborted push token registration request rejects with a native fetch cancellation error. ([#48547](https://github.com/expo/expo/pull/48547) by [@JoaoPauloCMarra](https://github.com/JoaoPauloCMarra))
+
+- [Android] Prevent a crash on notification tap when `getLaunchIntentForPackage` throws on some OEM ROMs. ([#47889](https://github.com/expo/expo/pull/47889) by [@nunocaseiro](https://github.com/nunocaseiro))
+
+- [web] Fixed crash when browser storage is blocked (e.g. Safari's "Block All Cookies"), where reading `localStorage` throws a `SecurityError` instead of returning `null`. ([#48033](https://github.com/expo/expo/pull/48033) by [@Ignigena](https://github.com/Ignigena))
+
+- [Android] Fixed importing `expo-notifications` crashing the app in Expo Go. ([#49062](https://github.com/expo/expo/pull/49062) by [@alanjhughes](https://github.com/alanjhughes))
+
 - [Quest] Fix release builds with R8 enabled by suppressing missing-class warnings for push-notification APIs supplied by Horizon OS.
 
 ### 💡 Others
+
+- [Android] Remove an unreachable legacy JSON null-stripping fallback. ([#49272](https://github.com/expo/expo/pull/49272) by [@vonovak](https://github.com/vonovak))
+
+- [Android] Correct native-value lookup semantics for audio usage and content type enums. ([#49270](https://github.com/expo/expo/pull/49270) by [@vonovak](https://github.com/vonovak))
+
+- Drop usage of the deprecated `LegacyEventEmitter`. ([#49080](https://github.com/expo/expo/pull/49080) by [@vonovak](https://github.com/vonovak))
 
 #### Upstream patch changes
 
@@ -31,6 +73,20 @@
 ##### Earlier SDK 58 patches
 
 - [iOS] Fix a crash (`EXC_BAD_ACCESS` in `__RawDictionaryStorage.find`) when the JS notification handler responds while the same foreground notification times out or another one arrives, by handling `handleNotificationAsync` on the main queue. ([#51370](https://github.com/expo/expo/pull/51370) by [@GersonRocha9](https://github.com/GersonRocha9))
+
+#### Additional upstream SDK 58 patches
+
+##### expo-notifications 58.1.1
+
+- [Android] Add support for grouping notifications via `threadIdentifier`. ([#43388](https://github.com/expo/expo/pull/43388) by [@vonovak](https://github.com/vonovak))
+
+- [Android] Add `getExactAlarmPermissionsAsync` and `requestExactAlarmPermissionsAsync` to check and request the exact alarm permission. ([#50919](https://github.com/expo/expo/pull/50919) by [@vonovak](https://github.com/vonovak))
+
+##### expo-notifications 58.0.10
+
+- Allow native push token requests to retry after a transient failure while preserving shared in-flight requests. ([#50848](https://github.com/expo/expo/pull/50848) by [@JoaoPauloCMarra](https://github.com/JoaoPauloCMarra))
+
+- [Android] Fix notification action buttons going missing after an app update that changes R8 minification, until the app is opened again. ([#50799](https://github.com/expo/expo/pull/50799) by [@icoric4](https://github.com/icoric4))
 
 ## 57.0.3 — 2026-10-12
 

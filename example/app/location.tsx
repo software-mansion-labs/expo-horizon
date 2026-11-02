@@ -1,7 +1,7 @@
 import ExpoHorizon from 'expo-horizon-core';
 import * as Location from 'expo-horizon-location';
-import * as TaskManager from 'expo-task-manager';
-import React, { useState, useEffect, useCallback } from 'react';
+import { useFocusEffect } from 'expo-router';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Text,
   View,
@@ -84,16 +84,34 @@ export default function LocationScreen() {
   const [geocodedLocation, setGeocodedLocation] = useState<
     Location.LocationGeocodedLocation[] | null
   >(null);
-  const [locationSubscription, setLocationSubscription] =
-    useState<Location.LocationSubscription | null>(null);
-  const [headingSubscription, setHeadingSubscription] =
-    useState<Location.LocationSubscription | null>(null);
+  const locationSubscription = useRef<Location.LocationSubscription | null>(null);
+  const headingSubscription = useRef<Location.LocationSubscription | null>(null);
   const [motionActivity, setMotionActivity] = useState<Location.MotionActivityObject | null>(null);
   const [motionPermissions, setMotionPermissions] = useState<Awaited<
     ReturnType<typeof Location.getMotionActivityPermissionsAsync>
   > | null>(null);
-  const [motionSubscription, setMotionSubscription] =
-    useState<Location.LocationSubscription | null>(null);
+  const motionSubscription = useRef<Location.LocationSubscription | null>(null);
+
+  const watchGeneration = useRef(0);
+
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        watchGeneration.current += 1;
+        if (locationSubscription.current) {
+          setLocationUpdatesActive(false);
+        }
+        for (const subscription of [
+          locationSubscription,
+          headingSubscription,
+          motionSubscription,
+        ]) {
+          subscription.current?.remove();
+          subscription.current = null;
+        }
+      };
+    }, [])
+  );
 
   // Loading states for async operations
   const [loadingStates, setLoadingStates] = useState<{
@@ -107,33 +125,6 @@ export default function LocationScreen() {
 
   // Helper function to check if operation is loading
   const isLoading = (operation: string) => loadingStates[operation] || false;
-
-  const setupTaskManager = useCallback(() => {
-    // Define background tasks
-    TaskManager.defineTask(
-      'test-location-task',
-      //eslint-disable-next-line  @typescript-eslint/no-explicit-any
-      async ({ data, error }: { data: any; error: any }) => {
-        if (error) {
-          console.error('Location task error:', error);
-          return;
-        }
-        console.log('Location task data:', data);
-      }
-    );
-
-    TaskManager.defineTask(
-      'test-geofencing-task',
-      //eslint-disable-next-line  @typescript-eslint/no-explicit-any
-      async ({ data, error }: { data: any; error: any }) => {
-        if (error) {
-          console.error('Geofencing task error:', error);
-          return;
-        }
-        console.log('Geofencing task data:', data);
-      }
-    );
-  }, []);
 
   const checkInitialStatus = useCallback(async () => {
     try {
@@ -255,6 +246,7 @@ export default function LocationScreen() {
   const startLocationWatching = useCallback(async () => {
     try {
       setLoading('startLocationWatching', true);
+      const generation = watchGeneration.current;
 
       // Check if location services are enabled
       const areServicesEnabled = await Location.hasServicesEnabledAsync();
@@ -292,7 +284,12 @@ export default function LocationScreen() {
           notifyFailure('watch location', error);
         }
       );
-      setLocationSubscription(subscription);
+      if (watchGeneration.current !== generation) {
+        subscription.remove();
+        return;
+      }
+      locationSubscription.current?.remove();
+      locationSubscription.current = subscription;
       setLocationUpdatesActive(true);
       Alert.alert(
         'Location Watching',
@@ -307,13 +304,13 @@ export default function LocationScreen() {
   }, []);
 
   const stopLocationWatching = useCallback(() => {
-    if (locationSubscription) {
-      locationSubscription.remove();
-      setLocationSubscription(null);
+    if (locationSubscription.current) {
+      locationSubscription.current.remove();
+      locationSubscription.current = null;
       setLocationUpdatesActive(false);
       Alert.alert('Location Watching', 'Stopped watching location updates');
     }
-  }, [locationSubscription]);
+  }, []);
 
   const getHeading = useCallback(async () => {
     try {
@@ -334,6 +331,7 @@ export default function LocationScreen() {
   const startHeadingWatching = useCallback(async () => {
     try {
       setLoading('startHeadingWatching', true);
+      const generation = watchGeneration.current;
       const subscription = await Location.watchHeadingAsync(
         (newHeading: Location.LocationHeadingObject) => {
           setHeading(newHeading);
@@ -343,7 +341,12 @@ export default function LocationScreen() {
           console.error('Heading watch error:', error);
         }
       );
-      setHeadingSubscription(subscription);
+      if (watchGeneration.current !== generation) {
+        subscription.remove();
+        return;
+      }
+      headingSubscription.current?.remove();
+      headingSubscription.current = subscription;
       Alert.alert('Heading Watching', 'Started watching heading updates');
     } catch (error) {
       notifyFailure('start heading watching', error);
@@ -353,12 +356,12 @@ export default function LocationScreen() {
   }, []);
 
   const stopHeadingWatching = useCallback(() => {
-    if (headingSubscription) {
-      headingSubscription.remove();
-      setHeadingSubscription(null);
+    if (headingSubscription.current) {
+      headingSubscription.current.remove();
+      headingSubscription.current = null;
       Alert.alert('Heading Watching', 'Stopped watching heading updates');
     }
-  }, [headingSubscription]);
+  }, []);
 
   // Motion activity (new in SDK 56). On Quest the permission resolves denied and the watch rejects.
   const getMotionPermissions = useCallback(async () => {
@@ -403,6 +406,7 @@ export default function LocationScreen() {
   const startMotionActivityWatching = useCallback(async () => {
     try {
       setLoading('startMotionActivityWatching', true);
+      const generation = watchGeneration.current;
       const subscription = await Location.watchMotionActivityAsync(
         (newActivity: Location.MotionActivityObject) => {
           setMotionActivity(newActivity);
@@ -412,7 +416,12 @@ export default function LocationScreen() {
           console.error('Motion activity watch error:', error);
         }
       );
-      setMotionSubscription(subscription);
+      if (watchGeneration.current !== generation) {
+        subscription.remove();
+        return;
+      }
+      motionSubscription.current?.remove();
+      motionSubscription.current = subscription;
       Alert.alert('Motion Activity Watching', 'Started watching motion activity updates');
     } catch (error) {
       notifyFailure('start motion activity watching', error);
@@ -422,12 +431,12 @@ export default function LocationScreen() {
   }, []);
 
   const stopMotionActivityWatching = useCallback(() => {
-    if (motionSubscription) {
-      motionSubscription.remove();
-      setMotionSubscription(null);
+    if (motionSubscription.current) {
+      motionSubscription.current.remove();
+      motionSubscription.current = null;
       Alert.alert('Motion Activity Watching', 'Stopped watching motion activity updates');
     }
-  }, [motionSubscription]);
+  }, []);
 
   const geocodeAddress = useCallback(async () => {
     try {
@@ -608,12 +617,12 @@ export default function LocationScreen() {
 
   useEffect(() => {
     checkInitialStatus();
-    setupTaskManager();
-  }, [checkInitialStatus, setupTaskManager]);
+  }, [checkInitialStatus]);
 
   return (
     <View style={GlobalStyles.screenContainer}>
       <ScrollView
+        contentInsetAdjustmentBehavior="automatic"
         style={GlobalStyles.scrollView}
         contentContainerStyle={[GlobalStyles.scrollContent, { paddingBottom: insets.bottom }]}>
         <Section title="Permissions">

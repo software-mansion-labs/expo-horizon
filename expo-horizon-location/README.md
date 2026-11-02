@@ -101,7 +101,7 @@ Our goal is to align the version numbers of `expo-horizon-location` and `expo-lo
 
 | `expo-horizon-location` | `expo-location` | Expo SDK Version |
 | ----------------------- | --------------- | ---------------- |
-| 58.0.0 (unreleased)     | 58.0.20         | 58               |
+| 58.0.0                  | 58.0.20         | 58               |
 | 57.0.3                  | 57.0.20         | 57               |
 | 57.0.2                  | 57.0.16         | 57               |
 | 57.0.1                  | 57.0.12         | 57               |
