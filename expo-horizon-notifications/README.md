@@ -24,8 +24,7 @@ npx expo install expo-horizon-core
 
 For detailed setup steps and configuration options, refer to the [`expo-horizon-core` documentation](../expo-horizon-core/README.md).
 
-> [!NOTE]
-> For push notifications to work, you must set the correct `horizonAppId` in the `expo-horizon-core` configuration.
+> **Note:** For push notifications to work, you must set the correct `horizonAppId` in the `expo-horizon-core` configuration.
 
 2. Install the package:
 
@@ -60,8 +59,7 @@ import * as Notifications from 'expo-horizon-notifications';
 - On standard Android devices → Falls back to the default `expo-notifications` behavior using Firebase Cloud Messaging.
 - On iOS it should have no effect; behavior is always the same as `expo-notifications`.
 
-> [!IMPORTANT]
-> The `quest` build variants are intended specifically for Meta Quest devices. Using them on standard Android devices is not recommended, as certain features may be unsupported or behave differently.
+> **Important:** The `quest` build variants are intended specifically for Meta Quest devices. Using them on standard Android devices is not recommended, as certain features may be unsupported or behave differently.
 
 ## Additional features
 
