@@ -114,23 +114,22 @@ Add the plugin to your `app.json` or `app.config.[js|ts]`:
 
 #### Available Options
 
-Horizon OS SDK options (see [SDK version configuration](#horizon-os-sdk-versions)):
+`supportedDevices` is required (for example, `"quest2|quest3|quest3s"`). All other options are optional.
 
-| Option                    | Type     | Default   | Description                                        |
-| ------------------------- | -------- | --------- | -------------------------------------------------- |
-| `horizonMinSdkVersion`    | `number` | Not added | Minimum Meta VR OS SDK required by the Quest app.  |
-| `horizonTargetSdkVersion` | `number` | Not added | Meta VR OS SDK behavior targeted by the Quest app. |
+| Option                    | Type      | Default | Description                                          |
+| ------------------------- | --------- | ------- | ---------------------------------------------------- |
+| `supportedDevices`        | `string`  | —       | Pipe-separated list of supported Quest devices.      |
+| `horizonAppId`            | `string`  | `""`    | Meta app ID used by Horizon services.                |
+| `defaultWidth`            | `string`  | —       | Initial panel width, e.g. `"1024dp"`.                |
+| `defaultHeight`           | `string`  | —       | Initial panel height, e.g. `"640dp"`.                |
+| `minWidth`                | `string`  | —       | Minimum panel width in positive dp, e.g. `"600dp"`.  |
+| `minHeight`               | `string`  | —       | Minimum panel height in positive dp, e.g. `"400dp"`. |
+| `horizonMinSdkVersion`    | `number`  | —       | Minimum Meta VR OS SDK required by the Quest app.    |
+| `horizonTargetSdkVersion` | `number`  | —       | Meta VR OS SDK behavior targeted by the Quest app.   |
+| `disableVrHeadtracking`   | `boolean` | `false` | Disable the VR head-tracking feature.                |
+| `allowBackup`             | `boolean` | `false` | Enable Android backups for the Quest build only.     |
 
-| Option                  | Type      | Required | Default   | Description                                                                                                                                                                                                                      |
-| ----------------------- | --------- | -------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `horizonAppId`          | `string`  | No       | `""`      | Your Meta Horizon application ID. Used by other libraries (like `expo-horizon-notifications`) to identify your app.                                                                                                              |
-| `defaultHeight`         | `string`  | No       | Not added | Default panel height in dp (e.g., `"640dp"`). See [Panel Sizing](https://developers.meta.com/vr/essentials/horizon-os-panel-sizing/)                                                                                             |
-| `defaultWidth`          | `string`  | No       | Not added | Default panel width in dp (e.g., `"1024dp"`). See [Panel Sizing](https://developers.meta.com/vr/essentials/horizon-os-panel-sizing/)                                                                                             |
-| `minWidth`              | `string`  | No       | Not added | Minimum panel width for the Quest build, as a positive dp dimension (e.g., `"600dp"`).                                                                                                                                           |
-| `minHeight`             | `string`  | No       | Not added | Minimum panel height for the Quest build, as a positive dp dimension (e.g., `"400dp"`).                                                                                                                                          |
-| `supportedDevices`      | `string`  | Yes      | None      | Pipe-separated list of supported Quest devices: `"quest2\|quest3\|quest3s"`. See [Mobile Manifest](https://developers.meta.com/horizon/resources/publish-mobile-manifest/)                                                       |
-| `disableVrHeadtracking` | `boolean` | No       | `false`   | Set to `true` to disable VR headtracking feature. By default, adds `android.hardware.vr.headtracking` to AndroidManifest.                                                                                                        |
-| `allowBackup`           | `boolean` | No       | `false`   | Set to `true` in the Quest build to enable Android's `allowBackup` feature. The default value is `false` which removes the "allowBackup=true" warning in the Meta Horizon Store. This does not affect your mobile build variant. |
+**—** means no default value. See [SDK versions](#horizon-os-sdk-versions), [panel sizing](https://developers.meta.com/vr/essentials/horizon-os-panel-sizing/), and [supported devices](https://developers.meta.com/horizon/resources/publish-mobile-manifest/) for details.
 
 > **Meta Horizon Store Recommendation for `allowBackup`:**
 >
@@ -418,7 +417,7 @@ Now, `horizonAppId` will contain the value of your Horizon App ID as defined in 
 
 | `expo-horizon-core` | Expo SDK Version |
 | ------------------- | ---------------- |
-| 58.0.0              | 58               |
+| 58.0.0-58.0.1       | 58               |
 | 57.0.0-57.0.3       | 57               |
 | 56.0.0              | 56               |
 | 55.0.0-55.0.1       | 55               |

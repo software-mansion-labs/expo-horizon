@@ -49,8 +49,7 @@ import * as Location from 'expo-horizon-location';
 - On standard Android devices → Falls back to the default `expo-location` behavior using Google Play Services.
 - On iOS it should have no effect; behavior is always the same as `expo-location`.
 
-> [!IMPORTANT]
-> The `quest` build variants are intended specifically for Meta Quest devices. Using them on standard Android devices is not recommended, as certain features may be unsupported or behave differently.
+> **Important:** The `quest` build variants are intended specifically for Meta Quest devices. Using them on standard Android devices is not recommended, as certain features may be unsupported or behave differently.
 
 ## SDK 58 location API
 
@@ -101,6 +100,7 @@ Our goal is to align the version numbers of `expo-horizon-location` and `expo-lo
 
 | `expo-horizon-location` | `expo-location` | Expo SDK Version |
 | ----------------------- | --------------- | ---------------- |
+| 58.0.1                  | 58.0.20         | 58               |
 | 58.0.0                  | 58.0.20         | 58               |
 | 57.0.3                  | 57.0.20         | 57               |
 | 57.0.2                  | 57.0.16         | 57               |
