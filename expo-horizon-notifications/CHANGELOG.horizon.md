@@ -1,5 +1,10 @@
 # Changelog
 
+This is a historical record retained from before SDK 58; it is unchanged from
+the published 57.0.3 source. The `Unpublished` heading below is part of that
+record, not a list of pending 58.0.0 changes. Current release notes, including
+Horizon-specific fixes, are maintained in [CHANGELOG.md](CHANGELOG.md).
+
 ## Unpublished
 
 ### 🛠 Breaking changes

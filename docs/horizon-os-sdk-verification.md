@@ -1,5 +1,9 @@
 # Horizon OS information and panel configuration verification
 
+This report records the PR #87 implementation checks. The subsequent release-wide
+checks, including manual Quest panel resizing, are in
+[SDK 58 release validation](sdk58-release-validation.md).
+
 Validated on 2026-10-30 for PR #87, using implementation commit
 `ade294f11749f98baa9010ce8f32d8cf1bb2e277` on `jtatar/horizon-sdk-versioning`.
 That commit follows merge commit `6c72570c`, which incorporates main

@@ -11,7 +11,7 @@ You can choose which implementation to use with the `quest` / `mobile` build var
 
 ## Prerequisites
 
-- Expo SDK 58 or later (`expo` package version 58.0.21+)
+- Expo SDK 58 (`expo` package version 58.0.21 or a newer SDK 58 patch)
 - `expo-horizon-core` package installed. See [expo-horizon-core](../expo-horizon-core/README.md) for more details
 
 ## Usage
@@ -65,6 +65,20 @@ import * as Notifications from 'expo-horizon-notifications';
 
 ## Additional features
 
+### SDK 58 migration
+
+Foreground notifications now display by default, including when a notification
+handler times out. Use `setNotificationHandler` to choose the presentation
+behavior; `setNotificationHandler(null)` disables automatic presentation.
+
+SDK 58 also adds notification grouping, Android alarm-clock delivery and
+exact-alarm permission helpers, and the `largeIcon` plugin option. Local-only
+iOS apps can set the notifications plugin's `enableRemoteNotifications` option
+to `false` to skip the APNs entitlement. See the [58.0.0 changelog](CHANGELOG.md)
+for platform details and the complete release notes.
+
+### Horizon device detection
+
 You might need additional features like `isHorizonDevice` or `isHorizonBuild` to check if the device is a Meta Horizon device. See [expo-horizon-core](../expo-horizon-core/README.md) for more details.
 
 ## Features supported on Meta Horizon OS
@@ -86,8 +100,8 @@ You might need additional features like `isHorizonDevice` or `isHorizonBuild` to
 | `scheduleNotificationAsync`                                                      | ✅ Supported            |                                                                                                               |                |
 | `dismissAllNotificationsAsync` <br> `dismissNotificationAsync`                   | ✅ Supported            |                                                                                                               |                |
 | `getPresentedNotificationsAsync`                                                 | ✅ Supported            |                                                                                                               |                |
-| Manage notification channels                                                     | 🔍 Not tested yet       |                                                                                                               |                |
-| Manage notification categories (interactive notifications)                       | 🔍 Not tested yet       |                                                                                                               |                |
+| Manage notification channels and groups                                          | ✅ Supported            | Create/read/delete verified on Quest; presentation behavior may depend on Horizon OS.                         |                |
+| Manage notification categories (interactive notifications)                       | ✅ Supported            | Create/read/delete verified on Quest; interaction with action buttons remains unverified.                     |                |
 | `clearLastNotificationResponse` <br> `clearLastNotificationResponseAsync`        | ✅ Supported            |                                                                                                               |                |
 | `getLastNotificationResponse` <br> `getLastNotificationResponseAsync`            | ✅ Supported            |                                                                                                               |                |
 | `unregisterForNotificationsAsync`                                                | ❌ Not supported        |                                                                                                               |                |

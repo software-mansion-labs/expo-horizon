@@ -47,7 +47,18 @@ Use **Prepare stable release** and **Publish stable release** for future stable 
 
 Merge the automation into the default branch so the workflows appear in Actions. Enable **Allow GitHub Actions to create and approve pull requests** in the repository's Actions settings. Bot-created PR checks may require a maintainer to click **Approve workflows to run**. Preparation runs the shared `yarn verify` checks before opening the PR; publication reruns them on the exact source commit. These include package/plugin builds, lint, formatting, package/example type checks, and Jest. The generated PR also matches the Modules CI and Native Compatibility path filters; require those checks before merging.
 
-Publishing uses the existing `NPM_TOKEN` secret. If the packages use npm trusted publishing instead, configure **each package** to trust `release-stable.yml` in this repository. A successful dry run validates packaging and metadata; it cannot prove that npm will authorize a real upload. Keep the release workflows on maintained SDK branches as well as `main`.
+The publisher supports npm trusted publishing or an `NPM_TOKEN` secret. Previous
+releases used trusted publishing through `publish.yml`; that does not authorize
+the new `release-stable.yml` workflow. For **each package**, configure a GitHub
+Actions trusted publisher with organization `software-mansion-labs`, repository
+`expo-horizon`, and workflow filename `release-stable.yml`. Allow direct
+`npm publish`; the workflow does not use staged publishing or declare a GitHub
+environment. See [npm's trusted-publishing instructions](https://docs.npmjs.com/trusted-publishers/).
+
+A successful dry run validates packaging and metadata; it cannot prove that npm
+will authorize a real upload. If a live run stops with `ENEEDAUTH`, check the
+trusted-publisher mapping and permissions before retrying the same source SHA.
+Keep the release workflows on maintained SDK branches as well as `main`.
 
 ### Prepare, review, publish
 

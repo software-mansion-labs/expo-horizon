@@ -7,6 +7,36 @@ Validation on 2026-11-02 started from `origin/main` at
 **58.0.0** for all three packages. npm's complete published baseline was **57.0.3**;
 no stable SDK 58 version was published when checked.
 
+## Release status
+
+The prepared source tested by GitHub Actions is
+`58cf6bec99766af2e13aac21c6490f541e12252d` on
+`jtatar/sdk58-release-validation`. On 2026-11-02:
+
+| Check                                                                                                         | Result                                                                                         |
+| ------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| [Release preparation dry run](https://github.com/software-mansion-labs/expo-horizon/actions/runs/41422493385) | Passed; no additional metadata changes                                                         |
+| [Publication dry run](https://github.com/software-mansion-labs/expo-horizon/actions/runs/41422498863)         | All three packages passed; tarballs byte-identical to two local runs                           |
+| [Native Compatibility](https://github.com/software-mansion-labs/expo-horizon/actions/runs/41422506234)        | Android mobile, Quest debug, optimized Quest release, and unsigned iOS simulator builds passed |
+| [Authorized live publication](https://github.com/software-mansion-labs/expo-horizon/actions/runs/41425247356) | Verification passed; first upload failed with npm `ENEEDAUTH`                                  |
+
+Both release dry runs and the live workflow passed 20 Jest suites: 189 tests
+passed, one existing skip. All 18 release regression tests passed. The live run's
+artifacts also match the dry-run tarballs byte for byte.
+
+Registry checks after the failed upload confirmed **no 58.0.0 package was
+published**; all three `latest` tags remain **57.0.3**, and there is no
+`v58.0.0` release tag. The previous releases used npm trusted publishing through
+`publish.yml`. Authorization for `release-stable.yml` still needs confirmation
+for all three packages; see [publishing setup](../CONTRIBUTING.md#one-time-setup).
+No PR was merged as part of this release preparation.
+
+These results refer to the exact source SHA above. Later documentation corrections
+do not establish a new native/device test result. Rehearse any updated release
+source before publishing it; retain the original SHA if retrying its artifacts.
+
+## Validation scope
+
 Work used the isolated `jtatar/sdk58-release-validation` checkout. Unrelated
 notification and example edits in the original checkout were **excluded**.
 The native libraries tested are from that main commit. The example fixes below

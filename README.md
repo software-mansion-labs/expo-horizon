@@ -14,6 +14,19 @@ To get started with developing for Meta horizon devices, you should first add th
 
 Then you can add additional packages as needed for location services and notifications.
 
+## SDK 58 release documentation
+
+The prepared `58.0.0` packages target Expo SDK 58. Review the migration and
+release notes before upgrading:
+
+- [Core migration and required `supportedDevices` configuration](expo-horizon-core/README.md#migrating-to-sdk-58)
+- [Location release notes](expo-horizon-location/CHANGELOG.md)
+- [Notifications release notes](expo-horizon-notifications/CHANGELOG.md)
+- [Release status, complete core release notes, and platform validation](docs/sdk58-release-validation.md)
+
+The validation report records publication status separately from successful
+builds and dry runs.
+
 ## Example App
 
 - [`example`](example/README.md) - an example app that uses the included packages
