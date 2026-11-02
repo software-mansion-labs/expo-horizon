@@ -89,6 +89,11 @@ mocked JS tests. Temporary `/next` probe imports were removed from the example.
 
 ## Results
 
+On 2026-11-02, the user confirmed on the physical Quest that the panel resizes
+larger and down to the smallest size the headset permits, with controls remaining
+usable. This manual resizing/usability check passed; exact dp dimensions were not
+measured on the headset.
+
 | Check                                    | Android mobile                                                 | Quest                                                                   | iOS simulator                                                     |
 | ---------------------------------------- | -------------------------------------------------------------- | ----------------------------------------------------------------------- | ----------------------------------------------------------------- |
 | Launch and navigation                    | Pass                                                           | Pass; headset UI automation limited                                     | Pass                                                              |
@@ -170,8 +175,6 @@ its exact committed source SHA in the log and each tarball's `gitHead`.
   FCM, and APNs credentials. The user explicitly chose to leave these unverified.
   The unsigned iOS build also logs a Keychain entitlement error for persisted
   remote registration; local notifications still work.
-- Manually resize the Quest panel and check its minimum size and controls.
-  Manifest validation does not prove window-manager behavior.
 - Verify Quest notification taps and location delivery while its panel is
   actually backgrounded. The tested headset kept reporting the app active
   during automated Home/settings transitions.
