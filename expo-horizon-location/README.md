@@ -11,7 +11,7 @@ You can choose which implementation to use with the `quest` / `mobile` build var
 
 ## Prerequisites
 
-- Expo SDK 58 or later (`expo` package version 58.0.21+)
+- Expo SDK 58 or later (`expo` package version 58.0.25+)
 - (Recommended) `expo-horizon-core` package installed. See [expo-horizon-core](../expo-horizon-core/README.md) for more details
 
 ## Usage
@@ -94,12 +94,18 @@ You might need additional features like `isHorizonDevice` or `isHorizonBuild` to
 | `startGeofencingAsync` <br> `stopGeofencingAsync` <br> `hasStartedGeofencingAsync`                | ✅ Supported    | ❌ Not supported | Meta Horizon Store doesn't support `ACCESS_BACKGROUND_LOCATION` Android permission.                                                                                                                                                                                         |
 | `startLocationUpdatesAsync` <br> `stopLocationUpdatesAsync` <br> `hasStartedLocationUpdatesAsync` | ✅ Supported    | ❌ Not supported | Meta Horizon Store doesn't support `ACCESS_BACKGROUND_LOCATION` Android permission.                                                                                                                                                                                         |
 
+The `/next` API also exports `geocode` and `reverseGeocode` with an optional
+`locale` on Android mobile and iOS. Both reject with
+`ERR_QUEST_FEATURE_UNAVAILABLE` in the Quest build variant, matching the existing
+geocoding restriction.
+
 ## Version compatibility
 
 Our goal is to align the version numbers of `expo-horizon-location` and `expo-location` for easier upgrades. However, since this fork is still under development, we are currently using a separate versioning scheme.
 
 | `expo-horizon-location` | `expo-location` | Expo SDK Version |
 | ----------------------- | --------------- | ---------------- |
+| 58.1.0 (unreleased)     | 58.0.22         | 58               |
 | 58.0.1                  | 58.0.20         | 58               |
 | 58.0.0                  | 58.0.20         | 58               |
 | 57.0.3                  | 57.0.20         | 57               |

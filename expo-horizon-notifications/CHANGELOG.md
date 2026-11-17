@@ -10,6 +10,19 @@
 
 ### 💡 Others
 
+#### Upstream patch changes
+
+##### expo-notifications 58.1.9
+
+- Updated dependencies. ([#52932](https://github.com/expo/expo/pull/52932))
+  - @expo/image-utils@0.12.7
+  - expo-constants@58.0.16
+
+##### expo-notifications 58.1.8
+
+- Updated dependencies.
+  - expo-constants@58.0.15
+
 ## 58.0.1 — 2026-11-02
 
 ### 💡 Others

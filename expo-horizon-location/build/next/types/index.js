@@ -4,4 +4,5 @@ export * from './LocationProvider.types';
 export * from './LocationTask.types';
 export * from './BackgroundSession.types';
 export * from './LocationUpdates.types';
+export * from './Geocoding.types';
 //# sourceMappingURL=index.js.map

@@ -6,9 +6,24 @@
 
 ### 🎉 New features
 
+- [Quest] Expose `/next` `geocode` and `reverseGeocode` with explicit `ERR_QUEST_FEATURE_UNAVAILABLE` errors, preserving the existing geocoding restriction.
+
 ### 🐛 Bug fixes
 
 ### 💡 Others
+
+#### Upstream patch changes
+
+##### expo-location 58.0.22
+
+- [Android] Add `geocode` and `reverseGeocode` to the `expo-location/next` API. ([#52444](https://github.com/expo/expo/pull/52444) by [@HubertBer](https://github.com/HubertBer))
+- [next] Add `geocode` and `reverseGeocode` with a `locale` option. ([#52024](https://github.com/expo/expo/pull/52024) by [@Wenszel](https://github.com/Wenszel))
+
+##### expo-location 58.0.21
+
+- [Android] Fixed the foreground location service not coming back when the app returns to the foreground after the system stopped its process. ([#52634](https://github.com/expo/expo/pull/52634) by [@HubertBer](https://github.com/HubertBer))
+- Updated dependencies. ([#52932](https://github.com/expo/expo/pull/52932))
+  - @expo/image-utils@0.12.7
 
 ## 58.0.1 — 2026-11-02
 
