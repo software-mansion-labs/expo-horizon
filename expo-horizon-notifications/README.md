@@ -11,7 +11,7 @@ You can choose which implementation to use with the `quest` / `mobile` build var
 
 ## Prerequisites
 
-- Expo SDK 58 or later (`expo` package version 58.0.21+)
+- Expo SDK 58 or later (`expo` package version 58.1.0+)
 - `expo-horizon-core` package installed. See [expo-horizon-core](../expo-horizon-core/README.md) for more details
 
 ## Usage
@@ -96,6 +96,7 @@ Our goal is to align the version numbers of `expo-horizon-notifications` and `ex
 
 | `expo-horizon-notifications` | `expo-notifications` | Expo SDK Version |
 | ---------------------------- | -------------------- | ---------------- |
+| 58.1.0                       | 58.1.10              | 58               |
 | 58.0.1                       | 58.1.7               | 58               |
 | 58.0.0                       | 58.1.7               | 58               |
 | 57.0.3                       | 57.0.21              | 57               |

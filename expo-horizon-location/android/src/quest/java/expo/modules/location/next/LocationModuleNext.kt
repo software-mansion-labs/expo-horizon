@@ -8,6 +8,9 @@ import expo.modules.interfaces.permissions.Permissions
 import expo.modules.kotlin.exception.CodedException
 import expo.modules.kotlin.exception.Exceptions
 import expo.modules.location.QuestFeatureUnavailableException
+import expo.modules.location.next.geocoding.Address
+import expo.modules.location.next.geocoding.GeocodeOptions
+import expo.modules.location.next.geocoding.ReverseGeocodeOptions
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 import expo.modules.kotlin.functions.Coroutine
@@ -105,6 +108,14 @@ class LocationModuleNext : Module() {
 
     AsyncFunction("getBackgroundPermissions") Coroutine { ->
       return@Coroutine unsupportedBackgroundPermissions()
+    }
+
+    AsyncFunction("geocode").Coroutine<List<Address>, String, GeocodeOptions?> { _, _ ->
+      throw QuestFeatureUnavailableException("Geocoding is not supported in the Quest build variant.")
+    }
+
+    AsyncFunction("reverseGeocode").Coroutine<List<Address>, Coordinates, ReverseGeocodeOptions?> { _, _ ->
+      throw QuestFeatureUnavailableException("Reverse geocoding is not supported in the Quest build variant.")
     }
 
     AsyncFunction("requestNotificationPermissions") Coroutine { ->

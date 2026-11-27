@@ -1,4 +1,4 @@
-import { createPermissionHook, isRunningInExpoGo, Platform } from 'expo';
+import { CodedError, createPermissionHook, isRunningInExpoGo, Platform, } from 'expo';
 import ExpoLocation from './ExpoLocation';
 import { LocationAccuracy } from './Location.types';
 import { LocationSubscriber, HeadingSubscriber, LocationErrorSubscriber, MotionActivitySubscriber, } from './LocationSubscribers';
@@ -323,28 +323,43 @@ export const useMotionActivityPermissions = createPermissionHook({
  * On Android 10+, the `ACTIVITY_RECOGNITION` runtime permission must be granted beforehand.
  *  On iOS, the system will prompt the user for Motion and Fitness access the first time this method is called.
  *
- *
- * @return a promise which fulfills with a [`MotionActivityObject`](#motionactivityobject).
+ * @param options Options for the call. See [`MotionActivityOptions`](#motionactivityoptions).
+ * @return A promise which fulfills with a [`MotionActivityObject`](#motionactivityobject), or
+ * rejects with `ERR_LOCATION_MOTION_ACTIVITY_TIMEOUT` when `timeout` passes first.
  *
  * @platform android
  * @platform ios
  */
-export async function getMotionActivityAsync() {
-    return new Promise(async (resolve, reject) => {
-        let subscriber;
-        try {
-            subscriber = await watchMotionActivityAsync((activity) => {
-                subscriber?.remove();
-                resolve(activity);
-            }, (reason) => {
-                subscriber?.remove();
-                reject(new Error(reason));
-            });
-        }
-        catch (e) {
-            reject(e);
-        }
+export async function getMotionActivityAsync({ timeout, } = {}) {
+    assertValidTimeout(timeout);
+    const { promise, resolve, reject } = Promise.withResolvers();
+    const subscriber = await watchMotionActivityAsync(resolve, (reason) => reject(new Error(reason)));
+    try {
+        return await withTimeout(promise, timeout);
+    }
+    finally {
+        subscriber.remove();
+    }
+}
+function assertValidTimeout(timeout) {
+    if (timeout === undefined) {
+        return;
+    }
+    if (!Number.isFinite(timeout) || timeout <= 0) {
+        throw new CodedError('ERR_LOCATION_INVALID_TIMEOUT', `\`timeout\` must be a positive, finite number of milliseconds. Got ${timeout} instead.`);
+    }
+}
+function withTimeout(promise, timeout) {
+    if (timeout === undefined) {
+        return promise;
+    }
+    let timer;
+    const timedOut = new Promise((_, reject) => {
+        timer = setTimeout(() => {
+            reject(new CodedError('ERR_LOCATION_MOTION_ACTIVITY_TIMEOUT', `No motion activity update arrived within ${timeout} ms.`));
+        }, timeout);
     });
+    return Promise.race([promise, timedOut]).finally(() => clearTimeout(timer));
 }
 /**
  * Subscribes to motion activity updates from the device. The callback fires whenever the

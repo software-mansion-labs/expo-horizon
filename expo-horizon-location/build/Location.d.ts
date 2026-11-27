@@ -1,5 +1,5 @@
 import { type PermissionResponse } from 'expo';
-import type { LocationErrorCallback, LocationCallback, LocationGeocodedAddress, LocationGeocodedLocation, LocationHeadingCallback, LocationHeadingObject, LocationLastKnownOptions, LocationObject, LocationOptions, LocationPermissionResponse, LocationProviderStatus, LocationRegion, LocationSubscription, LocationTaskOptions, MotionActivityCallback, MotionActivityObject } from './Location.types';
+import type { LocationErrorCallback, LocationCallback, LocationGeocodedAddress, LocationGeocodedLocation, LocationHeadingCallback, LocationHeadingObject, LocationLastKnownOptions, LocationObject, LocationOptions, LocationPermissionResponse, LocationProviderStatus, LocationRegion, LocationSubscription, LocationTaskOptions, MotionActivityCallback, MotionActivityObject, MotionActivityOptions } from './Location.types';
 /**
  * Check status of location providers.
  * @return A promise which fulfills with an object of type [`LocationProviderStatus`](#locationproviderstatus).
@@ -198,13 +198,14 @@ export declare const useMotionActivityPermissions: (options?: import("expo-modul
  * On Android 10+, the `ACTIVITY_RECOGNITION` runtime permission must be granted beforehand.
  *  On iOS, the system will prompt the user for Motion and Fitness access the first time this method is called.
  *
- *
- * @return a promise which fulfills with a [`MotionActivityObject`](#motionactivityobject).
+ * @param options Options for the call. See [`MotionActivityOptions`](#motionactivityoptions).
+ * @return A promise which fulfills with a [`MotionActivityObject`](#motionactivityobject), or
+ * rejects with `ERR_LOCATION_MOTION_ACTIVITY_TIMEOUT` when `timeout` passes first.
  *
  * @platform android
  * @platform ios
  */
-export declare function getMotionActivityAsync(): Promise<MotionActivityObject>;
+export declare function getMotionActivityAsync({ timeout, }?: MotionActivityOptions): Promise<MotionActivityObject>;
 /**
  * Subscribes to motion activity updates from the device. The callback fires whenever the
  * platform's motion coprocessor detects a change in the user's activity. Only foreground use

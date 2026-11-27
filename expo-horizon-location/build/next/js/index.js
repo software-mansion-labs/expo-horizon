@@ -5,4 +5,5 @@ export { LocationProvider, setLocationProvider, getSelectedLocationProviderName,
 export { getForegroundPermissions, requestForegroundPermissions, getBackgroundPermissions, requestBackgroundPermissions, getNotificationPermissions, requestNotificationPermissions, useForegroundLocationPermissions, useBackgroundLocationPermissions, useNotificationPermissions, } from './Permissions';
 export { LocationUpdatesHandle, defineLocationTask } from './LocationUpdatesHandle';
 export { ensureBackgroundSessionStarted, stopBackgroundSession, getBackgroundSessionStatus, } from './BackgroundSession';
+export { geocode, reverseGeocode } from './geocoding';
 //# sourceMappingURL=index.js.map

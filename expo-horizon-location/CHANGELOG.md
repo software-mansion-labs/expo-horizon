@@ -10,6 +10,33 @@
 
 ### 💡 Others
 
+## 58.1.0 — 2026-11-27
+
+### 🎉 New features
+
+- [Quest] Expose `/next` `geocode` and `reverseGeocode` with explicit `ERR_QUEST_FEATURE_UNAVAILABLE` errors, preserving the existing geocoding restriction.
+
+### 💡 Others
+
+#### Upstream patch changes
+
+##### expo-location 58.0.23
+
+- [Android] Fix a `ConcurrentModificationException` crash in the motion activity receiver and stop `removeWatchAsync` from requiring the location permission. ([#53919](https://github.com/expo/expo/pull/53919) by [@HubertBer](https://github.com/HubertBer))
+- Add a `timeout` option to `getMotionActivityAsync` that rejects with `ERR_LOCATION_MOTION_ACTIVITY_TIMEOUT` when no activity update arrives in time. ([#53920](https://github.com/expo/expo/pull/53920) by [@HubertBer](https://github.com/HubertBer))
+- [next][iOS] Send `null` instead of omitting the unavailable `Position` fields in task and watcher payloads. ([#53093](https://github.com/expo/expo/pull/53093) by [@Wenszel](https://github.com/Wenszel))
+
+##### expo-location 58.0.22
+
+- [Android] Add `geocode` and `reverseGeocode` to the `expo-location/next` API. ([#52444](https://github.com/expo/expo/pull/52444) by [@HubertBer](https://github.com/HubertBer))
+- [next] Add `geocode` and `reverseGeocode` with a `locale` option. ([#52024](https://github.com/expo/expo/pull/52024) by [@Wenszel](https://github.com/Wenszel))
+
+##### expo-location 58.0.21
+
+- [Android] Fixed the foreground location service not coming back when the app returns to the foreground after the system stopped its process. ([#52634](https://github.com/expo/expo/pull/52634) by [@HubertBer](https://github.com/HubertBer))
+- Updated dependencies. ([#52932](https://github.com/expo/expo/pull/52932))
+  - @expo/image-utils@0.12.7
+
 ## 58.0.1 — 2026-11-02
 
 ### 💡 Others

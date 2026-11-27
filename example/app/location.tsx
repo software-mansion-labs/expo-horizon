@@ -1,5 +1,6 @@
 import ExpoHorizon from 'expo-horizon-core';
 import * as Location from 'expo-horizon-location';
+import { Location as LocationNext, type Address } from 'expo-horizon-location/next';
 import { useFocusEffect } from 'expo-router';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
@@ -84,6 +85,7 @@ export default function LocationScreen() {
   const [geocodedLocation, setGeocodedLocation] = useState<
     Location.LocationGeocodedLocation[] | null
   >(null);
+  const [nextGeocodedAddresses, setNextGeocodedAddresses] = useState<Address[]>([]);
   const locationSubscription = useRef<Location.LocationSubscription | null>(null);
   const headingSubscription = useRef<Location.LocationSubscription | null>(null);
   const [motionActivity, setMotionActivity] = useState<Location.MotionActivityObject | null>(null);
@@ -393,7 +395,7 @@ export default function LocationScreen() {
   const getMotionActivity = useCallback(async () => {
     try {
       setLoading('getMotionActivity', true);
-      const activity = await Location.getMotionActivityAsync();
+      const activity = await Location.getMotionActivityAsync({ timeout: 10000 });
       setMotionActivity(activity);
       Alert.alert('Motion Activity', JSON.stringify(activity.activities, null, 2));
     } catch (error) {
@@ -435,6 +437,24 @@ export default function LocationScreen() {
       motionSubscription.current.remove();
       motionSubscription.current = null;
       Alert.alert('Motion Activity Watching', 'Stopped watching motion activity updates');
+    }
+  }, []);
+
+  const geocodeNext = useCallback(async (reverse: boolean) => {
+    const operation = reverse ? 'reverseGeocodeNext' : 'geocodeNext';
+    setLoading(operation, true);
+    try {
+      const options = { locale: 'en-US' };
+      const addresses = reverse
+        ? await LocationNext.reverseGeocode({ latitude: 38.8977, longitude: -77.0365 }, options)
+        : await LocationNext.geocode('1600 Pennsylvania Avenue NW, Washington, DC', options);
+      setNextGeocodedAddresses(addresses);
+      Alert.alert('Next Geocoding Result', `Found ${addresses.length} address(es)`);
+    } catch (error) {
+      setNextGeocodedAddresses([]);
+      notifyFailure(reverse ? 'reverse geocode with /next' : 'geocode with /next', error);
+    } finally {
+      setLoading(operation, false);
     }
   }, []);
 
@@ -760,6 +780,32 @@ export default function LocationScreen() {
             onPress={reverseGeocodeLocation}
             isButtonLoading={isLoading('reverseGeocodeLocation')}
           />
+        </Section>
+
+        <Section title="Next Geocoding">
+          <Text style={GlobalStyles.dataText}>
+            Uses the /next API with locale en-US. Geocoding is unavailable in the Quest build.
+          </Text>
+          <TestButton
+            title="Next: Geocode Address"
+            onPress={() => geocodeNext(false)}
+            isButtonLoading={isLoading('geocodeNext')}
+          />
+          <TestButton
+            title="Next: Reverse Geocode"
+            onPress={() => geocodeNext(true)}
+            isButtonLoading={isLoading('reverseGeocodeNext')}
+          />
+          {nextGeocodedAddresses.map((address, index) => (
+            <View key={index} style={GlobalStyles.infoBox}>
+              <Text style={GlobalStyles.dataText}>
+                {address.formattedAddress ?? address.name ?? 'Address unavailable'}
+              </Text>
+              <Text style={GlobalStyles.dataText}>
+                {address.city ?? 'Unknown city'}, {address.country ?? 'Unknown country'}
+              </Text>
+            </View>
+          ))}
         </Section>
 
         <Section title="Geocoded Address">

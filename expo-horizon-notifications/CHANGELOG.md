@@ -10,6 +10,27 @@
 
 ### 💡 Others
 
+## 58.1.0 — 2026-11-27
+
+### 💡 Others
+
+#### Upstream patch changes
+
+##### expo-notifications 58.1.10
+
+- [iOS] `requestPermissionsAsync` now resolves with the denied status, instead of rejecting with `ERR_PERMISSIONS_REQUEST_NOTIFICATIONS`, when the user denies the prompt in an iOS app on an Apple Silicon Mac ("Designed for iPad"). ([#52828](https://github.com/expo/expo/pull/52828) by [@LizunovSergey](https://github.com/LizunovSergey))
+
+##### expo-notifications 58.1.9
+
+- Updated dependencies. ([#52932](https://github.com/expo/expo/pull/52932))
+  - @expo/image-utils@0.12.7
+  - expo-constants@58.0.16
+
+##### expo-notifications 58.1.8
+
+- Updated dependencies.
+  - expo-constants@58.0.15
+
 ## 58.0.1 — 2026-11-02
 
 ### 💡 Others
