@@ -6,13 +6,25 @@
 
 ### 🎉 New features
 
-- [Quest] Expose `/next` `geocode` and `reverseGeocode` with explicit `ERR_QUEST_FEATURE_UNAVAILABLE` errors, preserving the existing geocoding restriction.
-
 ### 🐛 Bug fixes
 
 ### 💡 Others
 
+## 58.1.0 — 2026-11-27
+
+### 🎉 New features
+
+- [Quest] Expose `/next` `geocode` and `reverseGeocode` with explicit `ERR_QUEST_FEATURE_UNAVAILABLE` errors, preserving the existing geocoding restriction.
+
+### 💡 Others
+
 #### Upstream patch changes
+
+##### expo-location 58.0.23
+
+- [Android] Fix a `ConcurrentModificationException` crash in the motion activity receiver and stop `removeWatchAsync` from requiring the location permission. ([#53919](https://github.com/expo/expo/pull/53919) by [@HubertBer](https://github.com/HubertBer))
+- Add a `timeout` option to `getMotionActivityAsync` that rejects with `ERR_LOCATION_MOTION_ACTIVITY_TIMEOUT` when no activity update arrives in time. ([#53920](https://github.com/expo/expo/pull/53920) by [@HubertBer](https://github.com/HubertBer))
+- [next][iOS] Send `null` instead of omitting the unavailable `Position` fields in task and watcher payloads. ([#53093](https://github.com/expo/expo/pull/53093) by [@Wenszel](https://github.com/Wenszel))
 
 ##### expo-location 58.0.22
 

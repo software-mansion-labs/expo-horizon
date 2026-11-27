@@ -395,7 +395,7 @@ export default function LocationScreen() {
   const getMotionActivity = useCallback(async () => {
     try {
       setLoading('getMotionActivity', true);
-      const activity = await Location.getMotionActivityAsync();
+      const activity = await Location.getMotionActivityAsync({ timeout: 10000 });
       setMotionActivity(activity);
       Alert.alert('Motion Activity', JSON.stringify(activity.activities, null, 2));
     } catch (error) {

@@ -193,10 +193,6 @@ class LocationModule : Module(), ActivityEventListener {
     }
 
     AsyncFunction("removeWatchAsync") { watchId: Int ->
-      if (isMissingForegroundPermissions()) {
-        throw LocationUnauthorizedException()
-      }
-
       removeLocationUpdatesForRequest(watchId)
     }
 
