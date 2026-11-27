@@ -30,7 +30,8 @@ SDK 58 version. Preparation reused the existing **58.1.0** manual bump, moved th
 reviewed notes into the dated 2026-11-27 release sections, and updated compatibility
 rows. Core's SDK-facing dependency changes have no additional user-facing release
 note. This is local preparation; no npm package, remote tag, PR, or merge was
-created. Physical Quest verification remains a release prerequisite.
+created. The physical Quest follow-up below records the completed checks and
+remaining release limitations.
 
 ## Pinned source and implementation
 
@@ -159,13 +160,57 @@ with ID `3fd92a48-4ba8-4c8f-8ada-cbdcdf4671d0` produced
 The unsigned simulator build still logs a missing Keychain entitlement when
 reading persisted server registration info; local notification operations passed.
 
-## Pending Quest and other limits
+## Physical Quest follow-up — 2026-11-27
 
-Connect the headset to run the prepared Quest build and check: device/OS detection,
-legacy watcher cleanup after permission changes, `/next` foreground-service
-sessions and position watching, explicit geocoding/motion unavailability,
-notification delivery/taps, and panel sizing. Quest compilation and core JVM tests
-do not replace these checks.
+Tested source: `f0b8b45ac8c984dce376fe0582ea6cc1eda9aa91`, using the
+already-built arm64 `questDebug` and `mobileDebug` APKs. Device: Quest 3,
+Android 14 / API 34, Horizon SDK 207, Horizon OS display label `2.7.0`.
+The main checkout's unrelated edits remained excluded. The temporary development
+harness called real native modules through Metro; no location fixes were injected
+and no precise coordinates were retained in the results. Both APK hashes match
+the initial build handoff. The Quest build and original permission grants were
+restored afterward; all watchers and services were stopped, and the temporary
+harness was removed. The manual notification tap was checked against its exact native request ID
+(`horizon-quest-manual-20261127`).
+
+| Check                                        | Result                                                                                                                                                                           |
+| -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Quest core flags                             | Pass: device `true`, build `true`, SDK `207`, OS `2.7.0`, configured placeholder app ID visible                                                                                  |
+| Mobile flavor on the same Quest              | Pass: device `true`, build `false`; identical SDK, OS and comparison results                                                                                                     |
+| SDK comparisons                              | Pass: 1/60 false, 61/207 true, 2147483647 false; 0/-1/61.5 reject with `ERR_INVALID_HORIZON_SDK_VERSION`                                                                         |
+| Revoked foreground permission                | Pass: legacy `ERR_LOCATION_UNAUTHORIZED`, `/next` `ERR_FOREGROUND_LOCATION_PERMISSIONS_NOT_GRANTED`                                                                              |
+| `removeWatchAsync` without permission        | Pass: absent-watch cleanup resolves, confirming the Quest adaptation reaches native code                                                                                         |
+| Legacy current/cache and `/next` position    | Pass: valid fixes from the available network provider; GPS unavailable                                                                                                           |
+| Legacy and `/next` watching                  | Pass: both delivered 106 callbacks without errors; counts stayed unchanged after disposal; restarting delivered 14 callbacks each before stopping again                          |
+| `/next` foreground session                   | Pass: `PROMOTED` and unthrottled; Android reports a foreground location service; stopping returns `NOT_RUNNING` and removes the service                                          |
+| Heading and motion                           | Pass: `ERR_QUEST_FEATURE_UNAVAILABLE`; motion permission permanently denied; invalid timeout values return `ERR_LOCATION_INVALID_TIMEOUT`                                        |
+| Legacy and `/next` forward/reverse geocoding | Pass: explicit `ERR_QUEST_FEATURE_UNAVAILABLE`, including the newly exposed `/next` methods                                                                                      |
+| Background permissions/tasks                 | Expected rejection: legacy permission read/request returns `ERR_NO_PERMISSION_IN_MANIFEST`; `/next` permission APIs and task construction return `ERR_QUEST_FEATURE_UNAVAILABLE` |
+| Local scheduled notification                 | Pass: received callback and presented notification match request `c02837ea-7335-4695-a4d9-e35bb5d6fb39`                                                                          |
+| Notification tap and last-response clearing  | Pass: native last response matches `horizon-quest-manual-20261127` and the default action; clearing returns null; scheduled/presented queues empty                               |
+| Panel configuration on device                | Pass for default dimensions: 1024 × 640 dp; native minimums are 750 × 500 px at 200 dpi, corresponding to 600 × 400 dp                                                           |
+| Physical resizing and minimum-size UI        | Pass: user confirmed enlargement, minimum-size enforcement and usable UI; cast/native window dimensions also showed actual resizing                                              |
+| Real Horizon push                            | Unverified: the example uses `DEMO_APP_ID`, not valid Horizon push credentials                                                                                                   |
+
+Opening Quest Home left the Demo panel active in multi-window mode. During the
+user's subsequent immersive-app check, the harness recorded `active → background
+→ active` with only **7 ms** in the background. The follow-up notification
+`horizon-quest-background-20261127` was delivered while active. The user reported
+tapping it, but the native response listener recorded no matching event and the
+last-response ID remained the earlier manual-test ID. Therefore sustained
+background watcher delivery, notification delivery while actually backgrounded,
+and the follow-up notification's tap are **inconclusive**, not passed. There were
+239 position callbacks without errors during this follow-up; none of the sampled
+states established continued delivery in the background. This does not establish
+a package regression.
+
+The absent-watch permission check does not prove a live watcher survives
+permission revocation: Android can terminate the process when permissions change.
+No additional package implementation change was identified by these device checks.
+This follow-up changes verification documentation only, so it adds no package
+changelog entry.
+
+## Other limits
 
 Physical Android/iOS devices, the motion receiver concurrency regression under
 real sensor callbacks, iOS motion hardware, the Apple Silicon Mac permission-denial
@@ -176,5 +221,6 @@ surviving permission revocation, which can terminate the Android process. Import
 Swift tests were not run through XCTest.
 
 Detailed logs, runtime JSON, package metadata and native build artifacts are saved
-outside Git in the local release-evidence directory `2026-11-27-refresh`. No device
-coordinates or push-token contents are included in this report.
+outside Git in the local release-evidence directories `2026-11-27-refresh` and
+`2026-11-27-quest`. No device coordinates or push-token contents are included in
+this report.
